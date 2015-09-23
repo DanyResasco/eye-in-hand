@@ -1,5 +1,5 @@
 #ifndef Pollini_project_h
-#define Pollini_project
+#define Pollini_project_h
 
 
 // #include <boost/thread/thread.hpp>
@@ -16,23 +16,23 @@
 
 
 //opencv
-#include <opencv2/core/core.hpp>
+// #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/opencv.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include "opencv2/core/core_c.h"
-#include "opencv2/core/core.hpp"
-#include "opencv2/flann/miniflann.hpp"
-#include "opencv2/imgproc/imgproc_c.h"
-#include "opencv2/imgproc/imgproc.hpp"
-#include "opencv2/video/video.hpp"
-#include "opencv2/features2d/features2d.hpp"
-#include "opencv2/objdetect/objdetect.hpp"
-#include "opencv2/calib3d/calib3d.hpp"
-#include "opencv2/ml/ml.hpp"
-#include "opencv2/highgui/highgui_c.h"
-#include "opencv2/highgui/highgui.hpp"
-#include "opencv2/contrib/contrib.hpp"
+// #include <opencv2/core/core_c.h>
+// #include <opencv2/core/core.hpp>
+// #include <opencv2/flann/miniflann.hpp>
+// #include <opencv2/imgproc/imgproc_c.h>
+// #include <opencv2/imgproc/imgproc.hpp>
+// #include <opencv2/video/video.hpp>
+// #include <opencv2/features2d/features2d.hpp>
+// #include <opencv2/objdetect/objdetect.hpp>
+// #include <opencv2/calib3d/calib3d.hpp>
+// #include <opencv2/ml/ml.hpp>
+// #include <opencv2/highgui/highgui_c.h>
+// #include <opencv2/highgui/highgui.hpp>
+// #include <opencv2/contrib/contrib.hpp>
 
 
 
@@ -55,7 +55,7 @@ class Camera
 		double frame_height;
 		Point pos_object;
 		Point CorretObjectPos;
-		std::vetor<KeyPoint> kp1;
+		std::vector<KeyPoint> kp1;
 		Mat des1;
 
 
@@ -80,9 +80,9 @@ class Camera
 
 
 
+void setLabel(cv::Mat& im, const std::string label, std::vector<cv::Point>& contour);
 
-
-
+static double angle(cv::Point pt1, cv::Point pt2, cv::Point pt0);
 
 
 
