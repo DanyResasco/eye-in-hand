@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 	// // //set the callback function for any mouse event
  // 	camera_local.setMouseCallback("CAMERA_ROBOT", CallBackFunc, NULL);
 
-	camera_local.GetButton();
+	camera_local.ShapeDetect();
 	// //setMouseCallback("CAMERA_ROBOT", camera_local.CallBackFunc, NULL);
 
 	// while(k != 'ESC')
@@ -55,7 +55,7 @@ void Camera::ControllCamera()
     	//Mat image;
    		// Mat img = imread("MyPic.JPG", CV_LOAD_IMAGE_UNCHANGED);;   // Read the file
    		// VideoCapture cap("NOME_DEL_FILE_CHE_DEVE_LEGGERE.avi"); // open the video file for reading
-       	scene = imread("/home/daniela/Desktop/pollini/bott1.jpg", CV_LOAD_IMAGE_UNCHANGED);
+       	scene = imread("/home/daniela/Desktop/pollini/bott.jpg", CV_LOAD_IMAGE_UNCHANGED);
 	    if(!scene.data ) // Check for invalid input
 	    {
 	        std::cout<<"Could not open or find the image"<<std::endl;
@@ -122,10 +122,9 @@ void Camera::ControllCamera()
 
 }
 
-void Camera::GetButton()
-{
-
-  	Mat src_gray;
+void Camera::ShapeDetect()
+{ 
+	Mat src_gray;
     /// Convert it to gray
   	cvtColor( scene, src_gray, CV_BGR2GRAY );
 
@@ -144,6 +143,9 @@ void Camera::GetButton()
 
 	// We'll put the labels in this destination image
 	cv::Mat dst = scene.clone();
+	std::vector<Point2f>center( contours.size() );
+  	std::vector<float>radius( contours.size() );
+  	int num_bott_cerchio = 0;
 
 	for (int i = 0; i < contours.size(); i++)
 	{
@@ -197,10 +199,12 @@ void Camera::GetButton()
 	        cv::Rect r = cv::boundingRect(contours[i]);
 	        int radius = r.width / 2;
 
-	        if (std::abs(1 - ((double)r.width / r.height)) <= 0.2 &&
-	            std::abs(1 - (area / (CV_PI * std::pow(radius, 2)))) <= 0.2)
+	        if (std::abs(1 - ((double)r.width / r.height)) <= 0.2 && std::abs(1 - (area / (CV_PI * std::pow(radius, 2)))) <= 0.2)
 	        {
+	        	minEnclosingCircle( (Mat)contours[i], center[i], radius[i] );
+	        	//GetCenter(contours[i]);
 	            setLabel(dst, "CIR", contours[i]);
+	            num_bott_cerchio ++;
 	        }
 	    }
 	} // end of for() loop
@@ -214,12 +218,12 @@ void Camera::GetButton()
   // /// Apply the Hough Transform to find the circles
  //  	HoughCircles( src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows/8, 90, 80, 0, 0 );
  //  	std::cout<<"dany cerco i bottoni"<<std::endl;
-	// std::vector<double> distance;
-	// distance.resize(circles.size());
+	std::vector<double> distance;
+	distance.resize(circles.size());
 	// std::cout<<"numero di cerchi "<<circles.size()<<std::endl;
   // /// Draw the circles detected
-	// for( size_t i = 0; i < circles.size(); i++ )
-	// {	
+	for( size_t i = 0; i < num_bott_cerchio.size(); i++ )
+	{	
 	// 	// std::cout<<"dany sono dentro al for"<<std::endl;
 	//   	  Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
 	//       int radius = cvRound(circles[i][2]);
@@ -228,28 +232,28 @@ void Camera::GetButton()
 	//       // circle outline
 	//       circle( scene, center, radius, Scalar(0,0,255), 3, 8, 0 );
 
-	//       //distance between circle[i] and select point
-	//       double local_dist;
-	//       local_dist = norm((pos_object- center));
-	//       distance.push_back(local_dist);
-	//   }
+	    //distance between circle[i] and select point
+	    double local_dist;
+	    local_dist = norm((pos_object - center[i]));
+	    distance.push_back(local_dist);
+	}
 
-  // double min_d = distance[0];
-  // int index_circle;
-  // for(int i=0; i< distance.size(); i++)
-  // {
-  // 	if(min_d > distance[i])
-  // 	{
-  // 		min_d = distance[i];
-  // 		index_circle = i;
-  // 	}
-  	
-  // 	else
-  // 	{
-  // 		continue;
-  // 	}
+	  double min_d = distance[0];
+	  int index_circle;
+	  for(int i=0; i< distance.size(); i++)
+	  {
+	  	if(min_d > distance[i])
+	  	{
+	  		min_d = distance[i];
+	  		index_circle = i;
+	  	}
+	  	
+	  	else
+	  	{
+	  		continue;
+	  	}
 
-  // }
+	  }
 
   // CorretObjectPos.x = cvRound(circles[index_circle][0]);
   // CorretObjectPos.y = cvRound(circles[index_circle][1]);
@@ -259,13 +263,59 @@ void Camera::GetButton()
   // /// Show your results
   // namedWindow( "Hough Circle Transform Demo", CV_WINDOW_AUTOSIZE );
   // imshow( "Hough Circle Transform Demo", scene );
-		cv::imshow("src", scene);
+	cv::imshow("src", scene);
 	cv::imshow("dst", dst);
 	cv::waitKey(0);
 
 
   
 }
+
+// void Camera::GetCenter(std::vector<cv::Point> objects)
+// {
+// 	cv::Point center;
+// 	Eigen::Matrix3d bx = Eigen::Matrix3d::Zero();
+// 	Eigen::Matrix3d by= Eigen::Matrix3d::Zero();;
+// 	Eigen::Matrix3d a= Eigen::Matrix3d::Zero();;
+
+// 	double A,B,C;
+// 	A = pow(objects[0].x,2) +pow(objects[0].y,2);
+// 	B = pow(objects[1].x,2) +pow(objects[1].y,2);
+// 	C = pow(objects[2].x,2) +pow(objects[2].y,2); 
+// 	//std::cout<<"dany ho calcolato a,b,c"<<std::endl;
+	
+// 	Eigen::Vector3d Row_bx1(A, objects[0].y, 1 );
+// 	Eigen::Vector3d Row_bx2(B, objects[1].y, 1 );
+// 	Eigen::Vector3d Row_bx3(C, objects[2].y, 1 );
+	
+// 	bx.row(0) << -Row_bx1.transpose();
+// 	bx.row(1) << -Row_bx2.transpose();
+// 	bx.row(2) << -Row_bx3.transpose();
+
+// 	//std::cout<<"dany ho calcolato b"<<std::endl;
+
+// 	Eigen::Vector3d Row_by1(A, objects[0].x, 1 );
+// 	Eigen::Vector3d Row_by2(B, objects[1].x, 1 );
+// 	Eigen::Vector3d Row_by3(C, objects[2].x, 1 );
+	
+// 	by.row(0) << Row_by1.transpose();
+// 	by.row(1) << Row_by2.transpose();
+// 	by.row(2) << Row_by3.transpose();
+
+// 	//std::cout<<"dany ho calcolato by"<<std::endl;
+
+// 	Eigen::Vector3d Row_a1(objects[0].x, objects[0].y, 1 );
+// 	Eigen::Vector3d Row_a2(objects[1].x, objects[1].y, 1 );
+// 	Eigen::Vector3d Row_a3(objects[2].x, objects[2].y, 1 );
+
+// 	a.row(0) << -Row_a1.transpose();
+// 	a.row(1) << -Row_a2.transpose();
+// 	a.row(2) << -Row_a3.transpose();
+
+// 	/std::cout<<"dany ho calcolato a"<<std::endl;
+
+// 	//CorretObjectPos.x = 
+// }
 
 void setLabel(cv::Mat& im, const std::string label, std::vector<cv::Point>& contour)
 {

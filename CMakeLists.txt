@@ -3,6 +3,16 @@ cmake_minimum_required(VERSION 2.8)
 project( DisplayImage )
 find_package( OpenCV REQUIRED )
 
+include_directories(cmake_modules ${Boost_INCLUDE_DIR})
+find_package(Eigen3 REQUIRED COMPONENTS Dense Geometry)
+
+
+if ( EIGEN3_FOUND )
+  INCLUDE_DIRECTORIES(${EIGEN3_INCLUDE_DIRS})
+else()
+    message(STATUS "This program requires the Eigen Headers, and will not be compiled.")
+endif()
+
 
 include_directories(include ${Boost_INCLUDE_DIR})
 
@@ -14,7 +24,7 @@ target_link_libraries( camera_hand ${OpenCV_LIBS} )
 
 
 
-
+include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/include )
 
 
 

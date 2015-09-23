@@ -10,7 +10,7 @@
 #include <string>
 //#include <math.h> 
 #include <stdio.h>
-
+#include <eigen3/Eigen/Dense>
 //ros
 //#include <ros/ros.h>
 
@@ -54,7 +54,7 @@ class Camera
 		double frame_width;
 		double frame_height;
 		Point pos_object;
-		Point CorretObjectPos;
+		std::vector<cv::Point> CorretObjectPos;
 		std::vector<KeyPoint> kp1;
 		Mat des1;
 
@@ -64,7 +64,8 @@ class Camera
 		//void setMouseCallback();
 		// void CallBackFunc(int event, int x, int y, int flags, void* userdata);
 		void DuplicateScene(Mat &frame_t);
-		void GetButton();
+		void ShapeDetect();
+		void GetCenter(std::vector<cv::Point> objects);
 
 		Camera()
 		{	
