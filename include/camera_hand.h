@@ -53,22 +53,24 @@ class Camera
 		//Eigen::Vector2d Data_point;
 		double frame_width;
 		double frame_height;
-		Point pos_object;
+		static Point pos_object;
+		Point pos_object_real;
 		std::vector<cv::Point> CorretObjectPos;
 		std::vector<KeyPoint> kp1;
 		Mat des1;
 
-
 	public:
 		void ControllCamera();
-		//void setMouseCallback();
-		// void CallBackFunc(int event, int x, int y, int flags, void* userdata);
+		// void setMouseCallback();
+		static void CallBackFunc(int event, int x, int y, int flags, void* userdata);
 		void DuplicateScene(Mat &frame_t);
 		void ShapeDetect();
 		void GetCenter(std::vector<cv::Point> objects);
 
 		Camera()
 		{	
+
+			// pos_object_real = pos_object;
 			//ros::param::get("~Data_point", Data_point);
 		}
 
@@ -87,7 +89,7 @@ static double angle(cv::Point pt1, cv::Point pt2, cv::Point pt0);
 
 
 
-
+Point Camera::pos_object;
 
 
 

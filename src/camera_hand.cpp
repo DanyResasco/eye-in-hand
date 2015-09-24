@@ -14,7 +14,7 @@ int main(int argc, char** argv)
 
 	camera_local.ControllCamera();
 	// // //set the callback function for any mouse event
- // 	camera_local.setMouseCallback("CAMERA_ROBOT", CallBackFunc, NULL);
+ 
 
 	camera_local.ShapeDetect();
 	// //setMouseCallback("CAMERA_ROBOT", camera_local.CallBackFunc, NULL);
@@ -118,7 +118,7 @@ void Camera::ControllCamera()
 	// Note that this doesn't copy the data
 // 	Mat croppedImage = image(myROI);
 
-
+	setMouseCallback("CAMERA_ROBOT", CallBackFunc, NULL);
 
 }
 
@@ -144,7 +144,7 @@ void Camera::ShapeDetect()
 	// We'll put the labels in this destination image
 	cv::Mat dst = scene.clone();
 	std::vector<Point2f>center( contours.size() );
-  	std::vector<float>radius( contours.size() );
+  	std::vector<float>radius_cerchio( contours.size() );
   	int num_bott_cerchio = 0;
 
 	for (int i = 0; i < contours.size(); i++)
@@ -201,7 +201,7 @@ void Camera::ShapeDetect()
 
 	        if (std::abs(1 - ((double)r.width / r.height)) <= 0.2 && std::abs(1 - (area / (CV_PI * std::pow(radius, 2)))) <= 0.2)
 	        {
-	        	minEnclosingCircle( (Mat)contours[i], center[i], radius[i] );
+	        	minEnclosingCircle( (Mat)contours[i], center[i], radius_cerchio[i] );
 	        	//GetCenter(contours[i]);
 	            setLabel(dst, "CIR", contours[i]);
 	            num_bott_cerchio ++;
@@ -218,11 +218,11 @@ void Camera::ShapeDetect()
   // /// Apply the Hough Transform to find the circles
  //  	HoughCircles( src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows/8, 90, 80, 0, 0 );
  //  	std::cout<<"dany cerco i bottoni"<<std::endl;
-	std::vector<double> distance;
-	distance.resize(circles.size());
+	std::vector<int> distance;
+	distance.resize(num_bott_cerchio);
 	// std::cout<<"numero di cerchi "<<circles.size()<<std::endl;
   // /// Draw the circles detected
-	for( size_t i = 0; i < num_bott_cerchio.size(); i++ )
+	for( size_t i = 0; i < num_bott_cerchio; i++ )
 	{	
 	// 	// std::cout<<"dany sono dentro al for"<<std::endl;
 	//   	  Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
@@ -233,12 +233,16 @@ void Camera::ShapeDetect()
 	//       circle( scene, center, radius, Scalar(0,0,255), 3, 8, 0 );
 
 	    //distance between circle[i] and select point
-	    double local_dist;
-	    local_dist = norm((pos_object - center[i]));
+	    int  local_dist;
+	    cv::Point baricentro;
+	    baricentro.x = floor(center[i].x);
+	    baricentro.y = floor(center[i].y);
+
+	    local_dist = norm((pos_object - baricentro));
 	    distance.push_back(local_dist);
 	}
 
-	  double min_d = distance[0];
+	  int min_d = distance[0];
 	  int index_circle;
 	  for(int i=0; i< distance.size(); i++)
 	  {
@@ -253,7 +257,7 @@ void Camera::ShapeDetect()
 	  		continue;
 	  	}
 
-	  }
+		}
 
   // CorretObjectPos.x = cvRound(circles[index_circle][0]);
   // CorretObjectPos.y = cvRound(circles[index_circle][1]);
@@ -271,51 +275,6 @@ void Camera::ShapeDetect()
   
 }
 
-// void Camera::GetCenter(std::vector<cv::Point> objects)
-// {
-// 	cv::Point center;
-// 	Eigen::Matrix3d bx = Eigen::Matrix3d::Zero();
-// 	Eigen::Matrix3d by= Eigen::Matrix3d::Zero();;
-// 	Eigen::Matrix3d a= Eigen::Matrix3d::Zero();;
-
-// 	double A,B,C;
-// 	A = pow(objects[0].x,2) +pow(objects[0].y,2);
-// 	B = pow(objects[1].x,2) +pow(objects[1].y,2);
-// 	C = pow(objects[2].x,2) +pow(objects[2].y,2); 
-// 	//std::cout<<"dany ho calcolato a,b,c"<<std::endl;
-	
-// 	Eigen::Vector3d Row_bx1(A, objects[0].y, 1 );
-// 	Eigen::Vector3d Row_bx2(B, objects[1].y, 1 );
-// 	Eigen::Vector3d Row_bx3(C, objects[2].y, 1 );
-	
-// 	bx.row(0) << -Row_bx1.transpose();
-// 	bx.row(1) << -Row_bx2.transpose();
-// 	bx.row(2) << -Row_bx3.transpose();
-
-// 	//std::cout<<"dany ho calcolato b"<<std::endl;
-
-// 	Eigen::Vector3d Row_by1(A, objects[0].x, 1 );
-// 	Eigen::Vector3d Row_by2(B, objects[1].x, 1 );
-// 	Eigen::Vector3d Row_by3(C, objects[2].x, 1 );
-	
-// 	by.row(0) << Row_by1.transpose();
-// 	by.row(1) << Row_by2.transpose();
-// 	by.row(2) << Row_by3.transpose();
-
-// 	//std::cout<<"dany ho calcolato by"<<std::endl;
-
-// 	Eigen::Vector3d Row_a1(objects[0].x, objects[0].y, 1 );
-// 	Eigen::Vector3d Row_a2(objects[1].x, objects[1].y, 1 );
-// 	Eigen::Vector3d Row_a3(objects[2].x, objects[2].y, 1 );
-
-// 	a.row(0) << -Row_a1.transpose();
-// 	a.row(1) << -Row_a2.transpose();
-// 	a.row(2) << -Row_a3.transpose();
-
-// 	/std::cout<<"dany ho calcolato a"<<std::endl;
-
-// 	//CorretObjectPos.x = 
-// }
 
 void setLabel(cv::Mat& im, const std::string label, std::vector<cv::Point>& contour)
 {
@@ -376,32 +335,17 @@ static double angle(cv::Point pt1, cv::Point pt2, cv::Point pt0)
 
 
 
+void Camera::CallBackFunc(int event, int x, int y, int flags, void* userdata)
+{
+    if ( flags == (EVENT_FLAG_CTRLKEY + EVENT_FLAG_LBUTTON) )
+    {
+       std::cout << "Left mouse button is clicked while pressing CTRL key - position (" << x << ", " << y << ")" <<std::endl;
+    }
 
+    pos_object.x = x;
+    pos_object.y = y;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-// void Camera::CallBackFunc(int event, int x, int y, int flags, void* userdata)
-// {
-//     if ( flags == (EVENT_FLAG_CTRLKEY + EVENT_FLAG_LBUTTON) )
-//     {
-//        std::cout << "Left mouse button is clicked while pressing CTRL key - position (" << x << ", " << y << ")" <<std::endl;
-//     }
-
-//     pos_object.x = x;
-//     pos_object.y = y;
-    
-// }
+}
 
 
 // void Camera::DuplicateScene()
