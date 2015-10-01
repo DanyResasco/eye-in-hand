@@ -5,24 +5,30 @@ using namespace cv;
 int main(int argc, char** argv)
 {
 	//ros::init(argc, argv, "Robot_hand_scene");
-	char k;
-
-	//k=cvWaitKey(0);
-
-	// //ros::NodeHandle nodeH;
 	Camera camera_local;
+	
+	char key;
 
-	camera_local.ControllCamera();
+	key = cv::waitKey(30);
+
+	if (key == 27)                 // break if `esc' key was pressed. 
+	{
+		std::cout<<"hai premuto esc chiudo il programma"<<std::cout;
+		return 0;
+	}
+	// //ros::NodeHandle nodeH;
+	bool check;
+
+	
+	// std::string nome_finestra ("CAMERA_ROBOT");
+	check = camera_local.ControllCamera();
 	// // //set the callback function for any mouse event
+ 	
+	camera_local.ControlManager(check);
+
+
  
-
-	camera_local.ShapeDetect();
-	// //setMouseCallback("CAMERA_ROBOT", camera_local.CallBackFunc, NULL);
-
-	// while(k != 'ESC')
-	// {
-		Mat frame_;
-		// cam.read(frame_);
+	
   //   	camera_local.DuplicateScene(frame_);
   //   }
 		std::cout<<"ciao dany"<<std::endl;
@@ -41,15 +47,16 @@ int main(int argc, char** argv)
 
 
 
-void Camera::ControllCamera()
+bool Camera::ControllCamera()
 {
 	// cv::VideoCapture cam(0); //open the camera
 
 	//create a window
-	namedWindow("CAMERA_ROBOT", CV_WINDOW_AUTOSIZE);
-
+	// namedWindow(nome, CV_WINDOW_AUTOSIZE);
+	bool ok;
 	// if (!cam.isOpened())  //if not success read the the file
 	// {
+		ok = false;
 		std::cout<<"ciao dany non ho la cam accesa"<<std::endl;
        //	std::cout<<"Unable to read stream from specified device"<<std::endl;
     	//Mat image;
@@ -70,6 +77,7 @@ void Camera::ControllCamera()
 	
 	// else
 	// {
+	//	 ok= true;
 	// 	std::cout<<"ciao dany ho la cam accesa e luchino fa il birichino"<<std::endl;
 	// 	frame_width = cam.get(CV_CAP_PROP_FRAME_WIDTH);
 	// 	frame_height = cam.get(CV_CAP_PROP_FRAME_HEIGHT);
@@ -87,7 +95,7 @@ void Camera::ControllCamera()
 	//              break;
 	//         }
 
-	//         imshow("CAMERA_ROBOT", frame);
+	        // imshow("CAMERA_ROBOT", scene);
 	//     }
 	// 	// cam.read(scene);
 	// 	// sift = cv2.SIFT();
@@ -117,10 +125,72 @@ void Camera::ControllCamera()
 	// Crop the full image to that image contained by the rectangle myROI
 	// Note that this doesn't copy the data
 // 	Mat croppedImage = image(myROI);
-
-	setMouseCallback("CAMERA_ROBOT", CallBackFunc, NULL);
+	// char k = cv::waitKey(30);
+	// if(k !=10)
+	// {	
+	// 	setMouseCallback("CAMERA_ROBOT", CallBackFunc, NULL);
+	// }
+	return ok;
 
 }
+
+void Camera::ControlManager(bool CamORfile)
+{
+	char key;
+	key = cv::waitKey(0);
+	namedWindow("CAMERA_ROBOT", CV_WINDOW_AUTOSIZE);
+ 	while(key != 27)
+ 	{
+		if (CamORfile == true)
+	 	{
+	 		//camera is open
+				// Mat frame_;
+				// cam.read(frame_);
+				// imshow("CAMERA_ROBOT",frame_);
+
+
+			
+
+	 	}
+	 	else
+	 	{
+	 		//read by file
+	 		// imshow("CAMERA_ROBOT", scene);
+	 		// if( waitKey (30) >= 0) break;
+	 	//}
+
+		//camera_local.ShapeDetect();
+		// //setMouseCallback("CAMERA_ROBOT", camera_local.CallBackFunc, NULL);
+
+		
+			
+			
+			
+
+			setMouseCallback("CAMERA_ROBOT", CallBackFunc, NULL);
+				imshow("CAMERA_ROBOT", scene);
+	 		if( waitKey (30) >= 0) break;
+	 	}
+	}
+
+//cv::waitKey(0);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void Camera::ShapeDetect()
 { 
@@ -337,9 +407,10 @@ static double angle(cv::Point pt1, cv::Point pt2, cv::Point pt0)
 
 void Camera::CallBackFunc(int event, int x, int y, int flags, void* userdata)
 {
-    if ( flags == (EVENT_FLAG_CTRLKEY + EVENT_FLAG_LBUTTON) )
+    if   ( event == EVENT_LBUTTONDOWN )
     {
-       std::cout << "Left mouse button is clicked while pressing CTRL key - position (" << x << ", " << y << ")" <<std::endl;
+       std::cout << "Left mouse button is clicked. Save the position (" << x << ", " << y << ")" <<std::endl;
+
     }
 
     pos_object.x = x;
