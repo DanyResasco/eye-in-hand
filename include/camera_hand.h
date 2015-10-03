@@ -54,8 +54,9 @@ class Camera
 		double frame_width;
 		double frame_height;
 		static Point pos_object;
+		static int press_buttom;
 		Point pos_object_real;
-		std::vector<cv::Point> CorretObjectPos;
+		cv::Point CorretObjectPos;
 		std::vector<KeyPoint> kp1;
 		Mat des1;
 
@@ -91,6 +92,7 @@ static double angle(cv::Point pt1, cv::Point pt2, cv::Point pt0);
 
 
 Point Camera::pos_object;
+int Camera::press_buttom = 0;
 
 
 

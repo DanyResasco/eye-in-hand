@@ -1,0 +1,2 @@
+/home/daniela/Desktop/pollini/Code_project/eye-in-hand/build/CMakeFiles/camera_hand.dir
+/home/daniela/Desktop/pollini/Code_project/eye-in-hand/build/CMakeFiles/test.dir

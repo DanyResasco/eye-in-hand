@@ -53,7 +53,7 @@ CMAKE_EDIT_COMMAND = /usr/bin/cmake-gui
 CMAKE_SOURCE_DIR = /home/daniela/Desktop/pollini/Code_project/eye-in-hand
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/daniela/Desktop/pollini/Code_project/eye-in-hand
+CMAKE_BINARY_DIR = /home/daniela/Desktop/pollini/Code_project/eye-in-hand/build
 
 #=============================================================================
 # Target rules for target CMakeFiles/camera_hand.dir
@@ -62,7 +62,7 @@ CMAKE_BINARY_DIR = /home/daniela/Desktop/pollini/Code_project/eye-in-hand
 CMakeFiles/camera_hand.dir/all:
 	$(MAKE) -f CMakeFiles/camera_hand.dir/build.make CMakeFiles/camera_hand.dir/depend
 	$(MAKE) -f CMakeFiles/camera_hand.dir/build.make CMakeFiles/camera_hand.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/daniela/Desktop/pollini/Code_project/eye-in-hand/CMakeFiles  1
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/daniela/Desktop/pollini/Code_project/eye-in-hand/build/CMakeFiles  1
 	@echo "Built target camera_hand"
 .PHONY : CMakeFiles/camera_hand.dir/all
 
@@ -72,9 +72,9 @@ all: CMakeFiles/camera_hand.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/camera_hand.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/daniela/Desktop/pollini/Code_project/eye-in-hand/CMakeFiles 1
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/daniela/Desktop/pollini/Code_project/eye-in-hand/build/CMakeFiles 1
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/camera_hand.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/daniela/Desktop/pollini/Code_project/eye-in-hand/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/daniela/Desktop/pollini/Code_project/eye-in-hand/build/CMakeFiles 0
 .PHONY : CMakeFiles/camera_hand.dir/rule
 
 # Convenience name for target.
@@ -97,7 +97,7 @@ clean: CMakeFiles/camera_hand.dir/clean
 CMakeFiles/test.dir/all:
 	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/depend
 	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/daniela/Desktop/pollini/Code_project/eye-in-hand/CMakeFiles  2
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/daniela/Desktop/pollini/Code_project/eye-in-hand/build/CMakeFiles  2
 	@echo "Built target test"
 .PHONY : CMakeFiles/test.dir/all
 
@@ -107,9 +107,9 @@ all: CMakeFiles/test.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/test.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/daniela/Desktop/pollini/Code_project/eye-in-hand/CMakeFiles 1
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/daniela/Desktop/pollini/Code_project/eye-in-hand/build/CMakeFiles 1
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/test.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/daniela/Desktop/pollini/Code_project/eye-in-hand/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/daniela/Desktop/pollini/Code_project/eye-in-hand/build/CMakeFiles 0
 .PHONY : CMakeFiles/test.dir/rule
 
 # Convenience name for target.

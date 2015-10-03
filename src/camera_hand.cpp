@@ -22,16 +22,8 @@ int main(int argc, char** argv)
 	
 	// std::string nome_finestra ("CAMERA_ROBOT");
 	check = camera_local.ControllCamera();
-	// // //set the callback function for any mouse event
- 	
-	camera_local.ControlManager(check);
-
-
- 
 	
-  //   	camera_local.DuplicateScene(frame_);
-  //   }
-		std::cout<<"ciao dany"<<std::endl;
+ 	std::cout<<"ciao dany"<<std::endl;
 
 	// while (ros::ok())
 	// {
@@ -50,53 +42,57 @@ int main(int argc, char** argv)
 bool Camera::ControllCamera()
 {
 	// cv::VideoCapture cam(0); //open the camera
-
+	char key;
+	key = cv::waitKey(0);
 	//create a window
-	// namedWindow(nome, CV_WINDOW_AUTOSIZE);
-	bool ok;
-	// if (!cam.isOpened())  //if not success read the the file
-	// {
-		ok = false;
-		std::cout<<"ciao dany non ho la cam accesa"<<std::endl;
-       //	std::cout<<"Unable to read stream from specified device"<<std::endl;
-    	//Mat image;
-   		// Mat img = imread("MyPic.JPG", CV_LOAD_IMAGE_UNCHANGED);;   // Read the file
-   		// VideoCapture cap("NOME_DEL_FILE_CHE_DEVE_LEGGERE.avi"); // open the video file for reading
-       	scene = imread("/home/daniela/Desktop/pollini/bott.jpg", CV_LOAD_IMAGE_UNCHANGED);
-	    if(!scene.data ) // Check for invalid input
-	    {
-	        std::cout<<"Could not open or find the image"<<std::endl;
-	       
-	    }	
-	    // imshow("CAMERA_ROBOT", cap);
-	    // imshow("CAMERA_ROBOT", img);
-	    // imshow("CAMERA_ROBOT", scene);
-	    // waitKey(0); //wait infinite time for a keypress
+	namedWindow("CAMERA_ROBOT", CV_WINDOW_AUTOSIZE);
 
-	// }
-	
-	// else
-	// {
-	//	 ok= true;
-	// 	std::cout<<"ciao dany ho la cam accesa e luchino fa il birichino"<<std::endl;
-	// 	frame_width = cam.get(CV_CAP_PROP_FRAME_WIDTH);
-	// 	frame_height = cam.get(CV_CAP_PROP_FRAME_HEIGHT);
+	bool CamORfile = false ; //= cam.isOpened();
+	int first_Step = 1;
+ 	
+ 	while(key != 27)
+ 	{
+		if (CamORfile == true)
+	 	{
+	 		//camera is open
+				// Mat frame_;
+				// cam.read(frame_);
+	 			// 	frame_width = cam.get(CV_CAP_PROP_FRAME_WIDTH);
+				// 	frame_height = cam.get(CV_CAP_PROP_FRAME_HEIGHT);
+
+				// imshow("CAMERA_ROBOT",frame_);
+	 	}
+	 	else
+	 	{
+	 		//std::cout<<"ciao dany non ho la cam accesa"<<std::endl;
+       		//	std::cout<<"Unable to read stream from specified device"<<std::endl;
+       		scene = imread("/home/daniela/Desktop/pollini/bott.jpg", CV_LOAD_IMAGE_UNCHANGED);
+		    if(!scene.data ) // Check for invalid input
+		    {
+		        std::cout<<"Could not open or find the image"<<std::endl; 
+		    }
+
+		 	imshow("CAMERA_ROBOT", scene);
+	 	}
+
+	 	if(first_Step == 1)
+	 	{
+	 		//set the callback function for any mouse event
+			setMouseCallback("CAMERA_ROBOT", CallBackFunc, NULL);
+			if(press_buttom ==1 )	//wait the mouse event
+			{
+				ShapeDetect();
+				first_Step = 0;
+			}
+			 // if( waitKey (30) >= 0) break;
+		}
+		
+	 	if( waitKey (30) >= 0) break;
+		
+		
+	}
 
 
-	// 	while (1)
- //    	{
-	//         Mat frame;
-
-	//         bool bSuccess = cam.read(frame); // read a new frame from video
-
-	//          if (!bSuccess) //if not success, break loop
-	//         {
-	//              std::cout << "Cannot read a frame from video stream" <<std::endl;
-	//              break;
-	//         }
-
-	        // imshow("CAMERA_ROBOT", scene);
-	//     }
 	// 	// cam.read(scene);
 	// 	// sift = cv2.SIFT();
 	// 	// kp1, des1 = sift.detectAndCompute(scene,None);
@@ -130,66 +126,9 @@ bool Camera::ControllCamera()
 	// {	
 	// 	setMouseCallback("CAMERA_ROBOT", CallBackFunc, NULL);
 	// }
-	return ok;
+	return CamORfile;
 
 }
-
-void Camera::ControlManager(bool CamORfile)
-{
-	char key;
-	key = cv::waitKey(0);
-	namedWindow("CAMERA_ROBOT", CV_WINDOW_AUTOSIZE);
- 	while(key != 27)
- 	{
-		if (CamORfile == true)
-	 	{
-	 		//camera is open
-				// Mat frame_;
-				// cam.read(frame_);
-				// imshow("CAMERA_ROBOT",frame_);
-
-
-			
-
-	 	}
-	 	else
-	 	{
-	 		//read by file
-	 		// imshow("CAMERA_ROBOT", scene);
-	 		// if( waitKey (30) >= 0) break;
-	 	//}
-
-		//camera_local.ShapeDetect();
-		// //setMouseCallback("CAMERA_ROBOT", camera_local.CallBackFunc, NULL);
-
-		
-			
-			
-			
-
-			setMouseCallback("CAMERA_ROBOT", CallBackFunc, NULL);
-				imshow("CAMERA_ROBOT", scene);
-	 		if( waitKey (30) >= 0) break;
-	 	}
-	}
-
-//cv::waitKey(0);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 void Camera::ShapeDetect()
@@ -213,9 +152,12 @@ void Camera::ShapeDetect()
 
 	// We'll put the labels in this destination image
 	cv::Mat dst = scene.clone();
-	std::vector<Point2f>center( contours.size() );
-  	std::vector<float>radius_cerchio( contours.size() );
+	// // std::vector<Point2f>center(contours.size()  );
+	// // std::vector<Moments> mu(contours.size() );
+	// std::vector<std::vector<cv::Point> > circle;
+	// // std::vector<float>radius_cerchio( contours.size() );
   	int num_bott_cerchio = 0;
+  	std::vector<std::vector<cv::Point> > circle;
 
 	for (int i = 0; i < contours.size(); i++)
 	{
@@ -271,73 +213,73 @@ void Camera::ShapeDetect()
 
 	        if (std::abs(1 - ((double)r.width / r.height)) <= 0.2 && std::abs(1 - (area / (CV_PI * std::pow(radius, 2)))) <= 0.2)
 	        {
-	        	minEnclosingCircle( (Mat)contours[i], center[i], radius_cerchio[i] );
+
 	        	//GetCenter(contours[i]);
 	            setLabel(dst, "CIR", contours[i]);
 	            num_bott_cerchio ++;
+	            circle.push_back(contours[i]);
+	            std::cout<<"numero di cerchi "<<num_bott_cerchio<<std::endl;
+	            std::cout<<"circle.size(): "<<circle.size()<<std::endl;
 	        }
 	    }
-	} // end of for() loop
- //    std::vector<Vec3f> circles;
-
- //    if(src_gray.empty())
- //    {
- //     std::cout<<"src_gray è vuota"<<std::endl;
-	// }
-
-  // /// Apply the Hough Transform to find the circles
- //  	HoughCircles( src_gray, circles, CV_HOUGH_GRADIENT, 1, src_gray.rows/8, 90, 80, 0, 0 );
- //  	std::cout<<"dany cerco i bottoni"<<std::endl;
-	std::vector<int> distance;
-	distance.resize(num_bott_cerchio);
-	// std::cout<<"numero di cerchi "<<circles.size()<<std::endl;
-  // /// Draw the circles detected
-	for( size_t i = 0; i < num_bott_cerchio; i++ )
-	{	
-	// 	// std::cout<<"dany sono dentro al for"<<std::endl;
-	//   	  Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
-	//       int radius = cvRound(circles[i][2]);
-	//       // circle center
-	//       circle( scene, center, 3, Scalar(0,255,0), -1, 8, 0 );
-	//       // circle outline
-	//       circle( scene, center, radius, Scalar(0,0,255), 3, 8, 0 );
-
-	    //distance between circle[i] and select point
-	    int  local_dist;
-	    cv::Point baricentro;
-	    baricentro.x = floor(center[i].x);
-	    baricentro.y = floor(center[i].y);
-
-	    local_dist = norm((pos_object - baricentro));
-	    distance.push_back(local_dist);
 	}
+	//FindACenter()
+	std::vector<Point2f>center(circle.size()  );
+	std::vector<Moments> mu(circle.size() );
+	std::vector<float>radius_cerchio( circle.size() );
+	std::vector<int> distance;
+	std::vector<Point2f> mc( circle.size() );
 
-	  int min_d = distance[0];
-	  int index_circle;
-	  for(int i=0; i< distance.size(); i++)
-	  {
-	  	if(min_d > distance[i])
-	  	{
-	  		min_d = distance[i];
-	  		index_circle = i;
-	  	}
-	  	
-	  	else
-	  	{
-	  		continue;
-	  	}
+	if(num_bott_cerchio > 0)
+	{
+		for(int i=0; i<circle.size();i++)
+		{	// Get the moments
+		   	mu[i] = moments( circle[i], false );
+		   	// std::cout<<"mu: "<<mu[i].m10 <<mu[i].m00 <<mu[i].m01 <<std::endl;
+		   	mc[i] = Point2f( mu[i].m10/mu[i].m00 , mu[i].m01/mu[i].m00 ); 
+		   	// std::cout<<"mc: "<<mc[i]<<std::endl;
+		   	int  local_dist;
+	 		cv::Point baricentro;
+	 		baricentro.x = floor(mc[i].x);
+			baricentro.y = floor(mc[i].y);
+			// std::cout<<"center i x: "<<baricentro.x <<std::endl;
+			// std::cout<<"center i y: "<<baricentro.y <<std::endl;
+
+			local_dist = norm((pos_object - baricentro));
+			distance.push_back(local_dist);
+		}
+				
+		//std::cout<<"distance.size: "<<distance.size()<<std::endl; 
+
+		int min_d = distance[0];
+		int index_circle;
+		for(int i=0; i< distance.size(); i++)
+		{
+		   	if(min_d > distance[i])
+		   	{
+				min_d = distance[i];
+		   		index_circle = i;
+		   		//std::cout<<"index circle: "<<index_circle<<std::endl;
+		   	}
+					  	
+		  	else
+		 	{
+				continue;
+		  	}
 
 		}
 
-  // CorretObjectPos.x = cvRound(circles[index_circle][0]);
-  // CorretObjectPos.y = cvRound(circles[index_circle][1]);
-
-
-
-  // /// Show your results
-  // namedWindow( "Hough Circle Transform Demo", CV_WINDOW_AUTOSIZE );
-  // imshow( "Hough Circle Transform Demo", scene );
-	cv::imshow("src", scene);
+		CorretObjectPos.x = floor(mc[index_circle].x);
+		CorretObjectPos.y = floor(mc[index_circle].y);
+		std::cout<<"hai premuto: "<<CorretObjectPos.x<<  CorretObjectPos.y <<std::endl;
+		setLabel(dst, "BOTP", circle[index_circle]);
+	}
+	else
+	{
+		std::cout<<"nessun bottone trovato"<<std::endl;
+	}
+	
+	//cv::imshow("src", scene);
 	cv::imshow("dst", dst);
 	cv::waitKey(0);
 
@@ -410,12 +352,14 @@ void Camera::CallBackFunc(int event, int x, int y, int flags, void* userdata)
     if   ( event == EVENT_LBUTTONDOWN )
     {
        std::cout << "Left mouse button is clicked. Save the position (" << x << ", " << y << ")" <<std::endl;
-
+        pos_object.x = x;
+    	pos_object.y = y;
+   		press_buttom = 1;
     }
 
-    pos_object.x = x;
-    pos_object.y = y;
+   
 
+    //cv2.rectangle(img,(384,0),(510,128),(0,255,0),3)
 }
 
 
