@@ -62,13 +62,10 @@ class Camera
 
 	public:
 		bool ControllCamera();
-		// void setMouseCallback();
 		static void CallBackFunc(int event, int x, int y, int flags, void* userdata);
 		void DuplicateScene(Mat &frame_t);
 		void ShapeDetect();
-		void GetCenter(std::vector<cv::Point> objects);
-		void ControlManager(bool CamORfile);
-
+		
 		Camera()
 		{	
 

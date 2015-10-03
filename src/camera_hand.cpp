@@ -84,7 +84,6 @@ bool Camera::ControllCamera()
 				ShapeDetect();
 				first_Step = 0;
 			}
-			 // if( waitKey (30) >= 0) break;
 		}
 		
 	 	if( waitKey (30) >= 0) break;
@@ -93,19 +92,6 @@ bool Camera::ControllCamera()
 	}
 
 
-	// 	// cam.read(scene);
-	// 	// sift = cv2.SIFT();
-	// 	// kp1, des1 = sift.detectAndCompute(scene,None);
-
-	// 	imshow("CAMERA_ROBOT", scene);
-
-	// 	//if esc key is pressed break loop
-	// 	// if(waitKey(30) == 27)
-	// 	// {
-	// 	// 	break;
-	// 	// }
-	
-	// }
 //posso farlo solo se ho fatto la calibrazione
 // 	cv::Matx31f hom_pt(point_in_image.x, point_in_image.y, 1);
 // hom_pt = camera_intrinsics_mat.inv()*hom_pt; //put in world coordinates
@@ -283,8 +269,6 @@ void Camera::ShapeDetect()
 	cv::imshow("dst", dst);
 	cv::waitKey(0);
 
-
-  
 }
 
 
