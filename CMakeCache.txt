@@ -158,9 +158,6 @@ DisplayImage_SOURCE_DIR:STATIC=/home/daniela/Desktop/pollini/Code_project/eye-in
 //Path to a file.
 EIGEN3_INCLUDE_DIR:PATH=/usr/include/eigen3
 
-//The directory containing a CMake configuration file for Eigen.
-Eigen_DIR:PATH=Eigen_DIR-NOTFOUND
-
 //Path where debug 3rdparty OpenCV dependencies are located
 OpenCV_3RDPARTY_LIB_DIR_DBG:PATH=/usr/local/share/OpenCV/3rdparty/lib
 

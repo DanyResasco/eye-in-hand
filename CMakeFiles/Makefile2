@@ -56,73 +56,38 @@ CMAKE_SOURCE_DIR = /home/daniela/Desktop/pollini/Code_project/eye-in-hand
 CMAKE_BINARY_DIR = /home/daniela/Desktop/pollini/Code_project/eye-in-hand
 
 #=============================================================================
-# Target rules for target CMakeFiles/camera_hand.dir
+# Target rules for target CMakeFiles/camera.dir
 
 # All Build rule for target.
-CMakeFiles/camera_hand.dir/all:
-	$(MAKE) -f CMakeFiles/camera_hand.dir/build.make CMakeFiles/camera_hand.dir/depend
-	$(MAKE) -f CMakeFiles/camera_hand.dir/build.make CMakeFiles/camera_hand.dir/build
+CMakeFiles/camera.dir/all:
+	$(MAKE) -f CMakeFiles/camera.dir/build.make CMakeFiles/camera.dir/depend
+	$(MAKE) -f CMakeFiles/camera.dir/build.make CMakeFiles/camera.dir/build
 	$(CMAKE_COMMAND) -E cmake_progress_report /home/daniela/Desktop/pollini/Code_project/eye-in-hand/CMakeFiles  1
-	@echo "Built target camera_hand"
-.PHONY : CMakeFiles/camera_hand.dir/all
+	@echo "Built target camera"
+.PHONY : CMakeFiles/camera.dir/all
 
 # Include target in all.
-all: CMakeFiles/camera_hand.dir/all
+all: CMakeFiles/camera.dir/all
 .PHONY : all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/camera_hand.dir/rule: cmake_check_build_system
+CMakeFiles/camera.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/daniela/Desktop/pollini/Code_project/eye-in-hand/CMakeFiles 1
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/camera_hand.dir/all
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/camera.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/daniela/Desktop/pollini/Code_project/eye-in-hand/CMakeFiles 0
-.PHONY : CMakeFiles/camera_hand.dir/rule
+.PHONY : CMakeFiles/camera.dir/rule
 
 # Convenience name for target.
-camera_hand: CMakeFiles/camera_hand.dir/rule
-.PHONY : camera_hand
+camera: CMakeFiles/camera.dir/rule
+.PHONY : camera
 
 # clean rule for target.
-CMakeFiles/camera_hand.dir/clean:
-	$(MAKE) -f CMakeFiles/camera_hand.dir/build.make CMakeFiles/camera_hand.dir/clean
-.PHONY : CMakeFiles/camera_hand.dir/clean
+CMakeFiles/camera.dir/clean:
+	$(MAKE) -f CMakeFiles/camera.dir/build.make CMakeFiles/camera.dir/clean
+.PHONY : CMakeFiles/camera.dir/clean
 
 # clean rule for target.
-clean: CMakeFiles/camera_hand.dir/clean
-.PHONY : clean
-
-#=============================================================================
-# Target rules for target CMakeFiles/test.dir
-
-# All Build rule for target.
-CMakeFiles/test.dir/all:
-	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/depend
-	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/build
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/daniela/Desktop/pollini/Code_project/eye-in-hand/CMakeFiles  2
-	@echo "Built target test"
-.PHONY : CMakeFiles/test.dir/all
-
-# Include target in all.
-all: CMakeFiles/test.dir/all
-.PHONY : all
-
-# Build rule for subdir invocation for target.
-CMakeFiles/test.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/daniela/Desktop/pollini/Code_project/eye-in-hand/CMakeFiles 1
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/test.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/daniela/Desktop/pollini/Code_project/eye-in-hand/CMakeFiles 0
-.PHONY : CMakeFiles/test.dir/rule
-
-# Convenience name for target.
-test: CMakeFiles/test.dir/rule
-.PHONY : test
-
-# clean rule for target.
-CMakeFiles/test.dir/clean:
-	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/clean
-.PHONY : CMakeFiles/test.dir/clean
-
-# clean rule for target.
-clean: CMakeFiles/test.dir/clean
+clean: CMakeFiles/camera.dir/clean
 .PHONY : clean
 
 #=============================================================================

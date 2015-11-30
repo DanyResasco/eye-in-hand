@@ -2,9 +2,16 @@
 #include <camera_hand.h>
 
 using namespace cv;
+RNG rng(12345);
 
 int main(int argc, char** argv)
 {
+	if (CV_MAJOR_VERSION == 2)
+std::cout<<"Errore! Sto usando opencv 2!"<<std::endl;
+if (CV_MAJOR_VERSION == 3)
+std::cout<<"Ok sto usando opencv 3!"<<std::endl;
+
+
 	Camera camera_local;
 	
 	char key;
@@ -19,10 +26,11 @@ int main(int argc, char** argv)
 	
 	bool check;
 
+	std::cout<<"ciao dany"<<std::endl;
 	camera_local.ControllCamera();
 	
 	
- 	std::cout<<"ciao dany"<<std::endl;
+ 	
 
 
 	return 0;
@@ -33,17 +41,17 @@ int main(int argc, char** argv)
 void Camera::ControllCamera()
 {
 	// input data from calibration code
-	FileStorage fs;
-    fs.open("out_camera_data.xml", FileStorage::READ);
-    FileNode n = fs.root();
-    for (FileNodeIterator current = n.begin(); current != n.end(); current++)
-    {
-        FileNode item = *current;
-        //Mat v;
-        item["Camera_Matrix"] >> Camera_Matrix;
-        item["Distortion_Coefficients"] >> Distortion_Coefficients;
-        // std::cout << Camera_Matrix <<std::endl;
-    } 
+	// FileStorage fs;
+ //    fs.open("out_camera_data.xml", FileStorage::READ);
+ //    FileNode n = fs.root();
+ //    for (FileNodeIterator current = n.begin(); current != n.end(); current++)
+ //    {
+ //        FileNode item = *current;
+ //        //Mat v;
+ //        item["Camera_Matrix"] >> Camera_Matrix;
+ //        item["Distortion_Coefficients"] >> Distortion_Coefficients;
+ //        // std::cout << Camera_Matrix <<std::endl;
+ //    } 
 
 	// cv::VideoCapture cam(0); //open the camera
 	char key;
@@ -69,7 +77,7 @@ void Camera::ControllCamera()
 	 	{
 	 		//std::cout<<"ciao dany non ho la cam accesa"<<std::endl;
        		//	std::cout<<"Unable to read stream from specified device"<<std::endl;
-       		scene = imread("/home/daniela/Desktop/pollini/bott.jpg", CV_LOAD_IMAGE_UNCHANGED);
+       		scene = imread("/home/daniela/Desktop/pollini/bott1.jpg", CV_LOAD_IMAGE_UNCHANGED);
 		    if(!scene.data ) // Check for invalid input
 		    {
 		        std::cout<<"Could not open or find the image"<<std::endl; 
@@ -78,18 +86,24 @@ void Camera::ControllCamera()
 		 	imshow("CAMERA_ROBOT", scene);
 	 	}
 
-	 	// while(first_Step != 0)
 	 	if (first_Step == 1)
 	 	{
 	 		//set the callback function for any mouse event
 			setMouseCallback("CAMERA_ROBOT", CallBackFunc, NULL);
-			if(press_buttom ==1 )	//wait the mouse event
+			//std::cout<<"preso bott"<<std::endl;
+			if(press_buttom == 1 )	//wait the mouse event
 			{
+				// std::cout<<"prima di shape"<<std::endl;
 				ShapeDetect();
 			}
 		}
-		Mat scene2 = scene.clone();
-		DetectAndMove(scene2);
+		//if user has press the buttom
+		if(start == 1)
+		{
+			cv::Mat scene2 = scene.clone();
+			GetDisparityMap(scene2);
+			DetectAndMove(scene2);
+		}
 	 	if( waitKey (30) >= 0) break;
 	}
 }
@@ -97,6 +111,7 @@ void Camera::ControllCamera()
 
 void Camera::ShapeDetect()
 { 
+	// std::vector<geometry> Shape_;
 	Mat src_gray;
     /// Convert it to gray
   	cvtColor( scene, src_gray, CV_BGR2GRAY );
@@ -106,23 +121,22 @@ void Camera::ShapeDetect()
   	// Convert to binary image using Canny
 	Mat bw;
 	cv::Canny(src_gray, bw, 0, 50, 5);
-
+	
 	// Find contours
 	std::vector<std::vector<cv::Point> > contours;
 	cv::findContours(bw.clone(), contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 
+	// Shape_.resize(contours.size());
 	// The array for storing the approximation curve
 	std::vector<cv::Point> approx;
 
 	// We'll put the labels in this destination image
 	cv::Mat dst = scene.clone();
-	// // std::vector<Point2f>center(contours.size()  );
-	// // std::vector<Moments> mu(contours.size() );
-	// std::vector<std::vector<cv::Point> > circle;
-	// // std::vector<float>radius_cerchio( contours.size() );
-  	int num_bott_cerchio = 0;
-  	// std::vector<std::vector<cv::Point> > circle;
+	// std::vecto<int> = Index_Shape;
+	std::vector<cv::Point>  Center_Shape;
+	std::vector<std::vector<cv::Point> > Shape_local;;
 
+	//std::cout<<"trovati i contorni"<<std::endl;
 	for (int i = 0; i < contours.size(); i++)
 	{
 	    // Approximate contour with accuracy proportional
@@ -157,14 +171,18 @@ void Camera::ShapeDetect()
 	        // to determine the shape of the contour
 	        if (vtc == 4 && mincos >= -0.1 && maxcos <= 0.3)
 	        {
-	            // Detect rectangle or square
+	            // Detect geometry.Shape_contours or square
 	            cv::Rect r = cv::boundingRect(contours[i]);
 	            double ratio = std::abs(1 - (double)r.width / r.height);
 
 	            setLabel(dst, ratio <= 0.02 ? "SQU" : "RECT", contours[i]);
+	            
+	            Center_Shape.push_back(FindACenter(contours[i]));
+	            Shape_local.push_back(contours[i]);
+	            
 	        }
 	        else if (vtc == 5 && mincos >= -0.34 && maxcos <= -0.27)
-	            setLabel(dst, "PENTA", contours[i]);
+	             setLabel(dst, "PENTA", contours[i]);
 	        else if (vtc == 6 && mincos >= -0.55 && maxcos <= -0.45)
 	            setLabel(dst, "HEXA", contours[i]);
     	}
@@ -178,145 +196,116 @@ void Camera::ShapeDetect()
 	        if (std::abs(1 - ((double)r.width / r.height)) <= 0.2 && std::abs(1 - (area / (CV_PI * std::pow(radius, 2)))) <= 0.2)
 	        {
 
-	        	//GetCenter(contours[i]);
 	            setLabel(dst, "CIR", contours[i]);
-	            num_bott_cerchio ++;
-	            circle.push_back(contours[i]);
-	            //std::cout<<"numero di cerchi "<<num_bott_cerchio<<std::endl;
-	            //std::cout<<"circle.size(): "<<circle.size()<<std::endl;
+	            Center_Shape.push_back(FindACenter(contours[i]));
+	            Shape_local.push_back(contours[i]);         
 	        }
 	    }
 	}
-	//FindACenter()
-	std::vector<Point2f>center(circle.size()  );
-	std::vector<Moments> mu(circle.size() );
-	std::vector<float>radius_cerchio( circle.size() );
-	std::vector<int> distance;
-	std::vector<Point2f> mc( circle.size() );
 
-	if(num_bott_cerchio > 0)
+	std::pair<int, bool> info_geometry;
+
+	info_geometry = FindAMinDistanceButton(Center_Shape);
+
+	if(info_geometry.second == true)
 	{
-		for(int i=0; i<circle.size();i++)
-		{	// Get the moments
-		   	mu[i] = moments( circle[i], false );
-		   	// std::cout<<"mu: "<<mu[i].m10 <<mu[i].m00 <<mu[i].m01 <<std::endl;
-		   	mc[i] = Point2f( mu[i].m10/mu[i].m00 , mu[i].m01/mu[i].m00 ); 
-		   	// std::cout<<"mc: "<<mc[i]<<std::endl;
-		   	int  local_dist;
-	 		cv::Point baricentro;
-	 		baricentro.x = floor(mc[i].x);
-			baricentro.y = floor(mc[i].y);
-			// std::cout<<"center i x: "<<baricentro.x <<std::endl;
-			// std::cout<<"center i y: "<<baricentro.y <<std::endl;
+		std::cout<<"** Tasto premuto correttamente **"<<std::endl;
+		first_Step = 0;
+		press_buttom = 0;
+		BottonCHosen.Center_.x = floor(Center_Shape[info_geometry.first].x);
+		BottonCHosen.Center_.y = floor(Center_Shape[info_geometry.first].y);
+		//std::cout<<"hai premuto: "<<Center_.x<<  Center_.y <<std::endl;
+		setLabel(dst, "BOTP", Shape_local[info_geometry.first]);
+		BottonCHosen.Bot_C = Shape_local[info_geometry.first];
+		
+		cv::Mat convert_BcMat_;
+		cv::Mat(BottonCHosen.Bot_C).convertTo(convert_BcMat_, CV_8U) ;
+		//Detect sift
+		cv::Ptr<Feature2D> f2d = xfeatures2d::SIFT::create();
+		f2d->detect(convert_BcMat_, BottonCHosen.keyp_ );
+		
+		f2d->compute( convert_BcMat_, BottonCHosen.keyp_, BottonCHosen.descr_ );
 
-			local_dist = norm((pos_object - baricentro));
-			distance.push_back(local_dist);
-		}
-				
-		//std::cout<<"distance.size: "<<distance.size()<<std::endl; 
+		cv::imshow("dst", dst);
+		cv::waitKey(0);
 
-		int min_d = distance[0];
-		int index_circle;
-		for(int i=0; i< distance.size(); i++)
-		{
-		   	if(min_d > distance[i])
-		   	{
-				min_d = distance[i];
-		   		index_circle = i;
-		   		//std::cout<<"index circle: "<<index_circle<<std::endl;
-		   	}
-					  	
-		  	else
-		 	{
-				continue;
-		  	}
-
-		}
-		// std::cout<<"min_d: "<<min_d<<std::endl;
-		if(min_d > 90)
-		{
-			// first_Step = 1;
-			std::cout<<"Non è stato premuto correttamente il pulsante"<<std::endl;
-			std::cout<<"Premere il pulsante desiderato"<<std::endl;
-		}
-		else
-		{
-			first_Step = 0;
-			press_buttom = 0;
-			CorretObjectPos.x = floor(mc[index_circle].x);
-			CorretObjectPos.y = floor(mc[index_circle].y);
-			//std::cout<<"hai premuto: "<<CorretObjectPos.x<<  CorretObjectPos.y <<std::endl;
-			setLabel(dst, "BOTP", circle[index_circle]);
-			BottonCHosen = circle[index_circle];
-			cv::imshow("dst", dst);
-			cv::waitKey(0);
-		}
+		start = 1;
+		
 	}
 	else
 	{
-		std::cout<<"nessun bottone trovato"<<std::endl;
+		std::cout<<"riprova"<<std::endl;
 	}
-	
-	//cv::imshow("src", scene);
-	
-	
-
+		
 }
 
 
-void setLabel(cv::Mat& im, const std::string label, std::vector<cv::Point>& contour)
+std::pair<int, bool> Camera::FindAMinDistanceButton(std::vector<cv::Point> &baricentro)
 {
-	int fontface = cv::FONT_HERSHEY_SIMPLEX;
-	double scale = 0.4;
-	int thickness = 1;
-	int baseline = 0;
+	int  local_dist;
+	std::vector<int> distance;
+	std::pair<int, bool> check_bot;
+	check_bot.second = false;
+	
+	for(int i=0; i<= baricentro.size();i++)
+	{
+		local_dist = norm((pos_object - baricentro[i]));
+		// std::cout<<"distance 14: "<<local_dist<<std::endl;
 
-	cv::Size text = cv::getTextSize(label, fontface, scale, thickness, &baseline);
-	cv::Rect r = cv::boundingRect(contour);
+		distance.push_back(local_dist);	
+	}
 
-	cv::Point pt(r.x + ((r.width - text.width) / 2), r.y + ((r.height + text.height) / 2));
-	cv::rectangle(im, pt + cv::Point(0, baseline), pt + cv::Point(text.width, -text.height), CV_RGB(255,255,255), CV_FILLED);
-	cv::putText(im, label, pt, fontface, scale, CV_RGB(0,0,0), thickness, 8);
+	int min_d = distance[0];
+	check_bot.first = 0;
+	int count = 0;
+
+	for(int i=0; i < distance.size(); i++)
+	{
+	   	if((min_d >= distance[i]) && (distance[i] < 90))
+	   	{
+			min_d = distance[i];
+	   		check_bot.first = i;
+	   		check_bot.second = true;
+	   		count ++;
+	   		//std::cout<<"index: "<<index_shape <<std::endl;
+	   	}	
+	}
+
+
+	if(count == 0)
+	{
+	 	std::cout<<"Non è stato premuto correttamente il pulsante"<<std::endl;
+	 	std::cout<<"Premere nuovamente il pulsante"<<std::endl;
+		
+	}	
+
+	return check_bot;
 }
 
-static double angle(cv::Point pt1, cv::Point pt2, cv::Point pt0)
+
+
+cv::Point FindACenter(std::vector<cv::Point> &geometry)
 {
-	double dx1 = pt1.x - pt0.x;
-	double dy1 = pt1.y - pt0.y;
-	double dx2 = pt2.x - pt0.x;
-	double dy2 = pt2.y - pt0.y;
-	return (dx1*dx2 + dy1*dy2)/sqrt((dx1*dx1 + dy1*dy1)*(dx2*dx2 + dy2*dy2) + 1e-10);
+    cv::Moments m = moments(geometry, true);
+    cv::Point center(m.m10/m.m00, m.m01/m.m00);
+
+   return center;
 }
+
 
 void Camera::DetectAndMove(cv::Mat &frame)
 {
-	//-- Step 1: Detect the keypoints  using Sift Detector
-	// cv::SiftFeatureDetector detector;
- //   	// detector(1, 1, cv::SIFT::CommonParams::DEFAULT_NOCTAVES,cv::SIFT::CommonParams::DEFAULT_NOCTAVE_LAYERS,
-	// 	      // cv::SIFT::CommonParams::DEFAULT_FIRST_OCTAVE, cv::SIFT::CommonParams::FIRST_ANGLE );
-   
- //    std::vector<cv::KeyPoint> keypoints1;	//one is the original scene
- //    detector.detect(scene, keypoints1);
- //    // Add results to image and save.
- //    cv::Mat output1;
- //    cv::drawKeypoints(scene, keypoints1, output1);
- //    cv::imshow("Sift_result1.jpg", output1);
- //    cv::imwrite("Sift_result1.jpg",output1);
-  
- //    //keypoints array for input 2
- //    std::vector<cv::KeyPoint> keypoints2;
- //    detector.detect(frame,keypoints2);
- //    //output array for ouput 2
- //    cv::Mat output2;
- //    cv::drawKeypoints(frame,keypoints2,output2);
- //    cv::imshow("Sift_result2.jpg",output2);
- //    cv::imwrite("Sift_result2.jpg",output2);
-   
- //    //-- Step 2: Detect the descriptors  using Sift extractor
- //    cv::SiftDescriptorExtractor extractor;
- //    cv::Mat descriptors1,descriptors2;
- //    extractor.compute(scene,keypoints1,descriptors1);
- //    extractor.compute(frame,keypoints2,descriptors2);
+	cv::Mat frame_cv;
+	frame.convertTo(frame_cv, CV_8U); 
+	//-- Step 1: Sift Detector
+	cv::Ptr<Feature2D> f2d = xfeatures2d::SIFT::create(); 
+	//-- Step 1.1: Detect the keypoints:
+	std::vector<KeyPoint> keypoints_2;    
+	f2d->detect( frame_cv, keypoints_2 );
+	//-- Step 1.2: Calculate descriptors (feature vectors)    
+	cv::Mat descriptors_2;    
+	f2d->compute( frame_cv, keypoints_2, descriptors_2 );
+	std::cout<<"finito"<<std::endl;
 
  //    //-- Step 3: Matching descriptor vectors using FLANN matcher
  //    FlannBasedMatcher matcher;
@@ -386,7 +375,64 @@ void Camera::DetectAndMove(cv::Mat &frame)
 
 
 
+ }
+
+void Camera::GetDisparityMap(cv::Mat &frame_cv)
+{
+	std::cout<<"disparity"<<std::endl;
+	int ndisparities = 16*5;  // < Range of disparity 
+  	int SADWindowSize = 21; //< Size of the block window. Must be odd 
+	cv::Ptr<StereoBM> stereo = cv::StereoBM::create(ndisparities, SADWindowSize);
+ //    disparity = stereo.compute(imgL,imgR)
+	cv::Mat OR_scene;
+	cv::Mat new_frame;
+    /// Convert it to gray
+  	cvtColor( scene, OR_scene, CV_BGR2GRAY );
+  	cvtColor( frame_cv, new_frame, CV_BGR2GRAY );
+
+	Mat imgDisparity16S = Mat( scene.rows, scene.cols, CV_16S );
+	imgDisparity8U = Mat( scene.rows, scene.cols, CV_8U );
+
+	if( OR_scene.empty() || new_frame.empty() )
+	{ 	
+	 	std::cout<< " --(!) Error reading images " << std::endl; 
+	 	exit; 
+	}
+
+
+	Ptr<StereoBM> sbm = StereoBM::create( ndisparities, SADWindowSize );
+
+	//  -- 3. Calculate the disparity image
+	sbm->compute( OR_scene, new_frame, imgDisparity8U );
+
+	  //-- Check its extreme values
+	double minVal; double maxVal;
+
+	minMaxLoc( imgDisparity16S, &minVal, &maxVal );
+
+	  // printf("Min disp: %f Max value: %f \n", minVal, maxVal);
+
+	//  -- 4. Display it as a CV_8UC1 image
+	imgDisparity16S.convertTo( imgDisparity8U, CV_8U, 255/(maxVal - minVal));
+
+	  // namedWindow( "windowDisparity", CV_WINDOW_AUTOSIZE );
+	  // cv::imshow( "windowDisparity", imgDisparity8U );
+	  cv::waitKey(0);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -406,4 +452,27 @@ void Camera::CallBackFunc(int event, int x, int y, int flags, void* userdata)
 
 }
 
+void setLabel(cv::Mat& im, const std::string label, std::vector<cv::Point>& contour)
+{
+	int fontface = cv::FONT_HERSHEY_SIMPLEX;
+	double scale = 0.4;
+	int thickness = 1;
+	int baseline = 0;
+
+	cv::Size text = cv::getTextSize(label, fontface, scale, thickness, &baseline);
+	cv::Rect r = cv::boundingRect(contour);
+
+	cv::Point pt(r.x + ((r.width - text.width) / 2), r.y + ((r.height + text.height) / 2));
+	cv::rectangle(im, pt + cv::Point(0, baseline), pt + cv::Point(text.width, -text.height), CV_RGB(255,255,255), CV_FILLED);
+	cv::putText(im, label, pt, fontface, scale, CV_RGB(0,0,0), thickness, 8);
+}
+
+static double angle(cv::Point pt1, cv::Point pt2, cv::Point pt0)
+{
+	double dx1 = pt1.x - pt0.x;
+	double dy1 = pt1.y - pt0.y;
+	double dx2 = pt2.x - pt0.x;
+	double dy2 = pt2.y - pt0.y;
+	return (dx1*dx2 + dy1*dy2)/sqrt((dx1*dx1 + dy1*dy1)*(dx2*dx2 + dy2*dy2) + 1e-10);
+}
 

@@ -102,78 +102,41 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named camera_hand
+# Target rules for targets named camera
 
 # Build rule for target.
-camera_hand: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 camera_hand
-.PHONY : camera_hand
+camera: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 camera
+.PHONY : camera
 
 # fast build rule for target.
-camera_hand/fast:
-	$(MAKE) -f CMakeFiles/camera_hand.dir/build.make CMakeFiles/camera_hand.dir/build
-.PHONY : camera_hand/fast
+camera/fast:
+	$(MAKE) -f CMakeFiles/camera.dir/build.make CMakeFiles/camera.dir/build
+.PHONY : camera/fast
 
-#=============================================================================
-# Target rules for targets named test
-
-# Build rule for target.
-test: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 test
-.PHONY : test
-
-# fast build rule for target.
-test/fast:
-	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/build
-.PHONY : test/fast
-
-src/camera_hand.o: src/camera_hand.cpp.o
-.PHONY : src/camera_hand.o
+src/prova_camera_dany.o: src/prova_camera_dany.cpp.o
+.PHONY : src/prova_camera_dany.o
 
 # target to build an object file
-src/camera_hand.cpp.o:
-	$(MAKE) -f CMakeFiles/camera_hand.dir/build.make CMakeFiles/camera_hand.dir/src/camera_hand.cpp.o
-.PHONY : src/camera_hand.cpp.o
+src/prova_camera_dany.cpp.o:
+	$(MAKE) -f CMakeFiles/camera.dir/build.make CMakeFiles/camera.dir/src/prova_camera_dany.cpp.o
+.PHONY : src/prova_camera_dany.cpp.o
 
-src/camera_hand.i: src/camera_hand.cpp.i
-.PHONY : src/camera_hand.i
-
-# target to preprocess a source file
-src/camera_hand.cpp.i:
-	$(MAKE) -f CMakeFiles/camera_hand.dir/build.make CMakeFiles/camera_hand.dir/src/camera_hand.cpp.i
-.PHONY : src/camera_hand.cpp.i
-
-src/camera_hand.s: src/camera_hand.cpp.s
-.PHONY : src/camera_hand.s
-
-# target to generate assembly for a file
-src/camera_hand.cpp.s:
-	$(MAKE) -f CMakeFiles/camera_hand.dir/build.make CMakeFiles/camera_hand.dir/src/camera_hand.cpp.s
-.PHONY : src/camera_hand.cpp.s
-
-src/test.o: src/test.cpp.o
-.PHONY : src/test.o
-
-# target to build an object file
-src/test.cpp.o:
-	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/test.cpp.o
-.PHONY : src/test.cpp.o
-
-src/test.i: src/test.cpp.i
-.PHONY : src/test.i
+src/prova_camera_dany.i: src/prova_camera_dany.cpp.i
+.PHONY : src/prova_camera_dany.i
 
 # target to preprocess a source file
-src/test.cpp.i:
-	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/test.cpp.i
-.PHONY : src/test.cpp.i
+src/prova_camera_dany.cpp.i:
+	$(MAKE) -f CMakeFiles/camera.dir/build.make CMakeFiles/camera.dir/src/prova_camera_dany.cpp.i
+.PHONY : src/prova_camera_dany.cpp.i
 
-src/test.s: src/test.cpp.s
-.PHONY : src/test.s
+src/prova_camera_dany.s: src/prova_camera_dany.cpp.s
+.PHONY : src/prova_camera_dany.s
 
 # target to generate assembly for a file
-src/test.cpp.s:
-	$(MAKE) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/test.cpp.s
-.PHONY : src/test.cpp.s
+src/prova_camera_dany.cpp.s:
+	$(MAKE) -f CMakeFiles/camera.dir/build.make CMakeFiles/camera.dir/src/prova_camera_dany.cpp.s
+.PHONY : src/prova_camera_dany.cpp.s
 
 # Help Target
 help:
@@ -181,16 +144,12 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... camera_hand"
+	@echo "... camera"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... test"
-	@echo "... src/camera_hand.o"
-	@echo "... src/camera_hand.i"
-	@echo "... src/camera_hand.s"
-	@echo "... src/test.o"
-	@echo "... src/test.i"
-	@echo "... src/test.s"
+	@echo "... src/prova_camera_dany.o"
+	@echo "... src/prova_camera_dany.i"
+	@echo "... src/prova_camera_dany.s"
 .PHONY : help
 
 

@@ -1,7 +1,15 @@
 
 cmake_minimum_required(VERSION 2.8)
 project( DisplayImage )
-find_package( OpenCV REQUIRED )
+find_package( OpenCV 3.0.0 REQUIRED )
+if( OpenCV_FOUND )
+list( APPEND ThirdParty_LIBS ${OpenCV_LIBS} )
+    include_directories( opencv_contrib ${OpenCV_INCLUDE_DIRS} )
+endif( OpenCV_FOUND )
+
+# set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} /home/daniela/OpenCV3/opencv_contrib) 
+
+
 
 include_directories(cmake_modules ${Boost_INCLUDE_DIR})
 find_package(Eigen3 REQUIRED COMPONENTS Dense Geometry)
@@ -16,11 +24,12 @@ endif()
 
 include_directories(include ${Boost_INCLUDE_DIR})
 
-add_executable( test src/test.cpp )
-add_executable( camera_hand src/camera_hand.cpp )
-target_link_libraries( test ${OpenCV_LIBS} )
-target_link_libraries( camera_hand ${OpenCV_LIBS} )
-
+#add_executable( test src/test.cpp )
+#add_executable( camera_hand src/camera_hand.cpp )
+add_executable( camera src/prova_camera_dany.cpp )
+#target_link_libraries( test ${OpenCV_LIBS} )
+#target_link_libraries( camera_hand ${OpenCV_LIBS} )
+target_link_libraries( camera ${OpenCV_LIBS} )
 
 
 
@@ -39,15 +48,12 @@ include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/include )
 # #find_package(catkin REQUIRED roscpp pcl_conversions pcl_ros pcl_msgs message_generation std_msgs geometry_msgs)
 
 
-# cmake_minimum_required(VERSION 2.8)
-# find_package( OpenCV REQUIRED )
-# add_executable( Pollini src/camera_hand.cpp )
-# target_link_libraries( Pollini ${OpenCV_LIBS} )
 
 
 
 
-# #add_definitions(-std=c++11) 
+
+add_definitions(-std=c++11) 
 
 
 

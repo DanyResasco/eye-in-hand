@@ -9,6 +9,7 @@ CMakeFiles/camera_hand.dir/src/camera_hand.cpp.o: /usr/local/include/opencv2/cor
 CMakeFiles/camera_hand.dir/src/camera_hand.cpp.o: /usr/local/include/opencv2/core/affine.hpp
 CMakeFiles/camera_hand.dir/src/camera_hand.cpp.o: /usr/local/include/opencv2/core/base.hpp
 CMakeFiles/camera_hand.dir/src/camera_hand.cpp.o: /usr/local/include/opencv2/core/bufferpool.hpp
+CMakeFiles/camera_hand.dir/src/camera_hand.cpp.o: /usr/local/include/opencv2/core/core.hpp
 CMakeFiles/camera_hand.dir/src/camera_hand.cpp.o: /usr/local/include/opencv2/core/core_c.h
 CMakeFiles/camera_hand.dir/src/camera_hand.cpp.o: /usr/local/include/opencv2/core/cvdef.h
 CMakeFiles/camera_hand.dir/src/camera_hand.cpp.o: /usr/local/include/opencv2/core/cvstd.hpp

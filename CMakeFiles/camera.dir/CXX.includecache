@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/daniela/Desktop/pollini/Code_project/eye-in-hand/src/camera_hand.cpp
+/home/daniela/Desktop/pollini/Code_project/eye-in-hand/src/prova_camera_dany.cpp
 camera_hand.h
 -
 
@@ -78,10 +78,6 @@ sse_utils.hpp
 
 /usr/local/include/opencv2/core/bufferpool.hpp
 
-/usr/local/include/opencv2/core/core.hpp
-opencv2/core.hpp
-/usr/local/include/opencv2/core/opencv2/core.hpp
-
 /usr/local/include/opencv2/core/core_c.h
 opencv2/core/types_c.h
 /usr/local/include/opencv2/core/opencv2/core/types_c.h
@@ -145,6 +141,10 @@ opencv2/core/base.hpp
 /usr/local/include/opencv2/core/opencv2/core/base.hpp
 opencv2/core/traits.hpp
 /usr/local/include/opencv2/core/opencv2/core/traits.hpp
+
+/usr/local/include/opencv2/core/ocl.hpp
+opencv2/core.hpp
+/usr/local/include/opencv2/core/opencv2/core.hpp
 
 /usr/local/include/opencv2/core/operations.hpp
 cstdio
@@ -288,10 +288,6 @@ opencv2/videoio.hpp
 opencv2/highgui/highgui_c.h
 /usr/local/include/opencv2/opencv2/highgui/highgui_c.h
 
-/usr/local/include/opencv2/highgui/highgui.hpp
-opencv2/highgui.hpp
-/usr/local/include/opencv2/highgui/opencv2/highgui.hpp
-
 /usr/local/include/opencv2/highgui/highgui_c.h
 opencv2/core/core_c.h
 /usr/local/include/opencv2/highgui/opencv2/core/core_c.h
@@ -349,10 +345,6 @@ opencv2/highgui.hpp
 /usr/local/include/opencv2/opencv2/highgui.hpp
 opencv2/imgproc/imgproc_c.h
 /usr/local/include/opencv2/opencv2/imgproc/imgproc_c.h
-
-/usr/local/include/opencv2/imgproc/imgproc.hpp
-opencv2/imgproc.hpp
-/usr/local/include/opencv2/imgproc/opencv2/imgproc.hpp
 
 /usr/local/include/opencv2/imgproc/imgproc_c.h
 opencv2/imgproc/types_c.h
@@ -460,6 +452,16 @@ opencv2/opencv.hpp
 opencv2/core/core_c.h
 /usr/local/include/opencv2/videoio/opencv2/core/core_c.h
 
+/usr/local/include/opencv2/xfeatures2d.hpp
+opencv2/features2d.hpp
+/usr/local/include/opencv2/opencv2/features2d.hpp
+opencv2/xfeatures2d/nonfree.hpp
+/usr/local/include/opencv2/opencv2/xfeatures2d/nonfree.hpp
+
+/usr/local/include/opencv2/xfeatures2d/nonfree.hpp
+opencv2/features2d.hpp
+/usr/local/include/opencv2/xfeatures2d/opencv2/features2d.hpp
+
 include/camera_hand.h
 iostream
 -
@@ -473,14 +475,22 @@ stdio.h
 -
 eigen3/Eigen/Dense
 -
-opencv2/highgui/highgui.hpp
--
-opencv2/opencv.hpp
--
-opencv2/imgproc/imgproc.hpp
--
-opencv2/core/core.hpp
--
+opencv2/core.hpp
+include/opencv2/core.hpp
+opencv2/core/utility.hpp
+include/opencv2/core/utility.hpp
+opencv2/core/ocl.hpp
+include/opencv2/core/ocl.hpp
+opencv2/imgcodecs.hpp
+include/opencv2/imgcodecs.hpp
+opencv2/highgui.hpp
+include/opencv2/highgui.hpp
 opencv2/features2d.hpp
--
+include/opencv2/features2d.hpp
+opencv2/calib3d.hpp
+include/opencv2/calib3d.hpp
+opencv2/imgproc.hpp
+include/opencv2/imgproc.hpp
+opencv2/xfeatures2d.hpp
+include/opencv2/xfeatures2d.hpp
 

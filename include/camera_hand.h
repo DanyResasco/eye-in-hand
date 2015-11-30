@@ -14,12 +14,27 @@
 //ros
 //#include <ros/ros.h>
 
-
 //opencv
+#include "opencv2/core.hpp"
+#include "opencv2/core/utility.hpp"
+#include "opencv2/core/ocl.hpp"
+#include "opencv2/imgcodecs.hpp"
+// #include "opencv2/imgcodecs.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/features2d.hpp"
+#include "opencv2/calib3d.hpp"
+#include "opencv2/imgproc.hpp"
+#include "opencv2/xfeatures2d.hpp"
 // #include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/opencv.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+// #include <opencv2/highgui/highgui.hpp>
+// #include <opencv2/opencv.hpp>
+// #include <opencv2/imgproc/imgproc.hpp>
+// #include <opencv2/features2d.hpp>
+// // #include "opencv2/xfeatures2d.hpp"
+// #include "opencv2/core/version.hpp"
+// #include <opencv2/xfeatures2d/nonfree.hpp>
+// #include <opencv2/xfeatures2d/nonfree.hpp>
+// #include <opencv2/nonfree.hpp>
 // #include <opencv2/core/core_c.h>
 // #include <opencv2/core/core.hpp>
 // #include <opencv2/flann/miniflann.hpp>
@@ -32,7 +47,7 @@
 // #include <opencv2/ml/ml.hpp>
 // #include <opencv2/highgui/highgui_c.h>
 // #include <opencv2/highgui/highgui.hpp>
-// #include <opencv2/contrib/contrib.hpp>
+
 
 
 
@@ -45,27 +60,42 @@ class Camera
 {
 	private:
 		// ros::NodeHandle nodeH;
-		Mat scene;
+		cv::Mat scene;
 		// Mat frame_;
-		Mat duplicate_scene;
-		Mat objcet_recognition;
+		cv::Mat duplicate_scene;
+		cv::Mat objcet_recognition;
 		std::string CAMERA_ROBOT;
-		//Eigen::Vector2d Data_point;
 		double frame_width;
 		double frame_height;
 		static Point pos_object;
 		static int press_buttom;
-		Point pos_object_real;
-		cv::Point CorretObjectPos;
+		cv::Point pos_object_real;
 		std::vector<KeyPoint> kp1;
-		Mat des1;
+		cv::Mat des1;
+		int first_Step = 1;
+		Mat disparity;
+		int start = 0;
+		cv::Mat imgDisparity8U; //disparity map
+
+		struct Obj 
+		{
+			std::vector<cv::Point> Bot_C; //contour
+			cv::Point Center_;
+			std::vector<KeyPoint> keyp_;
+			cv::Mat descr_;
+
+		} BottonCHosen;
+
+
 
 	public:
-		bool ControllCamera();
+		void ControllCamera();
 		static void CallBackFunc(int event, int x, int y, int flags, void* userdata);
 		void DuplicateScene(Mat &frame_t);
 		void ShapeDetect();
-		
+		std::pair<int, bool> FindAMinDistanceButton(std::vector<cv::Point> &baricentro);
+		void DetectAndMove(cv::Mat &frame);
+		void GetDisparityMap(cv::Mat &frame_cv);
 		Camera()
 		{	
 
@@ -85,6 +115,7 @@ class Camera
 void setLabel(cv::Mat& im, const std::string label, std::vector<cv::Point>& contour);
 
 static double angle(cv::Point pt1, cv::Point pt2, cv::Point pt0);
+cv::Point FindACenter(std::vector<cv::Point> &geometry);
 
 
 
