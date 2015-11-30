@@ -6,12 +6,11 @@ RNG rng(12345);
 
 int main(int argc, char** argv)
 {
+
 	if (CV_MAJOR_VERSION == 2)
 std::cout<<"Errore! Sto usando opencv 2!"<<std::endl;
 if (CV_MAJOR_VERSION == 3)
 std::cout<<"Ok sto usando opencv 3!"<<std::endl;
-
-
 	Camera camera_local;
 	
 	char key;
@@ -28,10 +27,7 @@ std::cout<<"Ok sto usando opencv 3!"<<std::endl;
 
 	std::cout<<"ciao dany"<<std::endl;
 	camera_local.ControllCamera();
-	
-	
- 	
-
+	 	
 
 	return 0;
 }
@@ -41,6 +37,7 @@ std::cout<<"Ok sto usando opencv 3!"<<std::endl;
 void Camera::ControllCamera()
 {
 	// input data from calibration code
+
 	// FileStorage fs;
  //    fs.open("out_camera_data.xml", FileStorage::READ);
  //    FileNode n = fs.root();
@@ -104,6 +101,7 @@ void Camera::ControllCamera()
 			GetDisparityMap(scene2);
 			DetectAndMove(scene2);
 		}
+
 	 	if( waitKey (30) >= 0) break;
 	}
 }
@@ -198,11 +196,11 @@ void Camera::ShapeDetect()
 
 	            setLabel(dst, "CIR", contours[i]);
 	            Center_Shape.push_back(FindACenter(contours[i]));
-	            Shape_local.push_back(contours[i]);         
+
+	            Shape_local.push_back(contours[i]);
 	        }
 	    }
 	}
-
 	std::pair<int, bool> info_geometry;
 
 	info_geometry = FindAMinDistanceButton(Center_Shape);
@@ -230,7 +228,6 @@ void Camera::ShapeDetect()
 		cv::waitKey(0);
 
 		start = 1;
-		
 	}
 	else
 	{
@@ -280,9 +277,8 @@ std::pair<int, bool> Camera::FindAMinDistanceButton(std::vector<cv::Point> &bari
 	}	
 
 	return check_bot;
+
 }
-
-
 
 cv::Point FindACenter(std::vector<cv::Point> &geometry)
 {
@@ -306,6 +302,7 @@ void Camera::DetectAndMove(cv::Mat &frame)
 	cv::Mat descriptors_2;    
 	f2d->compute( frame_cv, keypoints_2, descriptors_2 );
 	std::cout<<"finito"<<std::endl;
+
 
  //    //-- Step 3: Matching descriptor vectors using FLANN matcher
  //    FlannBasedMatcher matcher;
@@ -356,26 +353,7 @@ void Camera::DetectAndMove(cv::Mat &frame)
 	//   }
 
 	//   waitKey(0);
-	 // SIFT sift;
-// void Camera::DuplicateScene(Mat &frame_t)
-// {
-// 	std::vetor<KeyPoint> kp2;
-// 	Mat des2;
-	
-// 	//Initiate SIFT detector
-// 	sift = cv2.SIFT()
-
-// 	// find the keypoints and descriptors with SIFT
-// 	//kp1, des1 = sift.detectAndCompute(img1,None)
-// 	kp2, des2 = sift.detectAndCompute(img2,None)
-
-// 	// BFMatcher with default params
-// 	bf = cv2.BFMatcher()
-// 	matches = bf.knnMatch(des1,des2, k=2)
-
-
-
- }
+}
 
 void Camera::GetDisparityMap(cv::Mat &frame_cv)
 {
@@ -419,25 +397,6 @@ void Camera::GetDisparityMap(cv::Mat &frame_cv)
 	  // cv::imshow( "windowDisparity", imgDisparity8U );
 	  cv::waitKey(0);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
-
 
 
 void Camera::CallBackFunc(int event, int x, int y, int flags, void* userdata)
