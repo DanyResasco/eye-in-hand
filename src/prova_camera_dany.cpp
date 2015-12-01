@@ -216,15 +216,21 @@ void Camera::ShapeDetect()
 		setLabel(dst, "BOTP", Shape_local[info_geometry.first]);
 		BottonCHosen.Bot_C = Shape_local[info_geometry.first];
 		
+		// Sift
+		//il valore 30 è stato dato per centrare meglio il bottone selezionato lasciando in vista
+		//altri punti di riferimento
+		cv::Mat roi(scene, Rect(BottonCHosen.Center_.x - 30,BottonCHosen.Center_.y - 40,100, 100));
+		BottonCHosen.figure_= roi.clone();
+		cv::imshow("CAMERA_ROBOT", roi);
 		cv::Mat convert_BcMat_;
-		cv::Mat(BottonCHosen.Bot_C).convertTo(convert_BcMat_, CV_8U) ;
+		scene.convertTo(convert_BcMat_, CV_8U) ;
 		//Detect sift
 		cv::Ptr<Feature2D> f2d = xfeatures2d::SIFT::create();
 		f2d->detect(convert_BcMat_, BottonCHosen.keyp_ );
 		
 		f2d->compute( convert_BcMat_, BottonCHosen.keyp_, BottonCHosen.descr_ );
 
-		cv::imshow("dst", dst);
+		// cv::imshow("dst", dst);
 		cv::waitKey(0);
 
 		start = 1;
@@ -232,8 +238,7 @@ void Camera::ShapeDetect()
 	else
 	{
 		std::cout<<"riprova"<<std::endl;
-	}
-		
+	}		
 }
 
 
@@ -253,7 +258,7 @@ std::pair<int, bool> Camera::FindAMinDistanceButton(std::vector<cv::Point> &bari
 	}
 
 	int min_d = distance[0];
-	check_bot.first = 0;
+	// check_bot.first = 1;
 	int count = 0;
 
 	for(int i=0; i < distance.size(); i++)
@@ -273,8 +278,10 @@ std::pair<int, bool> Camera::FindAMinDistanceButton(std::vector<cv::Point> &bari
 	{
 	 	std::cout<<"Non è stato premuto correttamente il pulsante"<<std::endl;
 	 	std::cout<<"Premere nuovamente il pulsante"<<std::endl;
-		
+		check_bot.second = false;
+		check_bot.first = 1;
 	}	
+	std::cout<<"check_bot.first: "<<check_bot.first<<std::endl;
 
 	return check_bot;
 
@@ -304,20 +311,20 @@ void Camera::DetectAndMove(cv::Mat &frame)
 	std::cout<<"finito"<<std::endl;
 
 
- //    //-- Step 3: Matching descriptor vectors using FLANN matcher
- //    FlannBasedMatcher matcher;
- //    std::vector< DMatch > matches;
- //    matcher.match( descriptors1, descriptors2, matches );
+ 	//-- Step 3: Matching descriptor vectors using FLANN matcher
+ 	FlannBasedMatcher matcher;
+ 	std::vector< DMatch > matches;
+    matcher.match( BottonCHosen.descr_, descriptors_2, matches );
 
- //    double max_dist = 0; double min_dist = 100;
+    double max_dist = 0; double min_dist = 100;
 
 	// //-- Quick calculation of max and min distances between keypoints
-	// for( int i = 0; i < descriptors1.rows; i++ )
-	// { 
-	// 	double dist = matches[i].distance;
-	//     if( dist < min_dist ) min_dist = dist;
-	//     if( dist > max_dist ) max_dist = dist;
-	// }
+	for( int i = 0; i < BottonCHosen.descr_.rows; i++ )
+	{ 
+	 	double dist = matches[i].distance;
+	    if( dist < min_dist ) min_dist = dist;
+	    if( dist > max_dist ) max_dist = dist;
+	}
 
 	//   std::cout<<"-- Max dist : %f \n" << max_dist<<std::endl;
 	//   std::cout<<"-- Min dist : %f \n" << min_dist<<std::endl;
@@ -326,33 +333,33 @@ void Camera::DetectAndMove(cv::Mat &frame)
 	//   //-- or a small arbitary value ( 0.02 ) in the event that min_dist is very
 	//   //-- small)
 	//   //-- PS.- radiusMatch can also be used here.
-	//   std::vector< DMatch > good_matches;
+	std::vector< DMatch > good_matches;
 
-	//   for( int i = 0; i < descriptors1.rows; i++ )
-	//   { 
-	//   	if( matches[i].distance <= max(2*min_dist, 0.02) )
-	//     { 
-	//     	good_matches.push_back( matches[i]); 
-	//     }
-	//   }
+	for( int i = 0; i < BottonCHosen.descr_.rows; i++ )
+	{ 
+	 	if( matches[i].distance <= max(2*min_dist, 0.02) )
+	    { 
+		   	good_matches.push_back( matches[i]); 
+	    }
+    }
 
 	//   //-- Draw only "good" matches
-	//   Mat img_matches;
-	//   drawMatches( scene, keypoints1, frame, keypoints2, good_matches, img_matches, 
-	//   				Scalar::all(-1), Scalar::all(-1),std::vector<char>(), 
-	//   				DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
+	Mat img_matches;
+	drawMatches( BottonCHosen.figure_, BottonCHosen.keyp_, frame_cv, keypoints_2, good_matches, img_matches, 
+	  				Scalar::all(-1), Scalar::all(-1),std::vector<char>(), 
+	  				DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
 
-	//   //-- Show detected matches
-	//   imshow( "Good Matches", img_matches );
+	//-- Show detected matches
+	imshow( "Good Matches", img_matches );
 
-	//   for( int i = 0; i < (int)good_matches.size(); i++ )
-	//   { 
+	for( int i = 0; i < (int)good_matches.size(); i++ )
+	{ 
 	  	
-	//   	std::cout<< "-- Good Match [%d] Keypoint 1: %d  -- Keypoint 2: %d  \n" << i<<"\t"<< good_matches[i].queryIdx <<"\t"<< good_matches[i].trainIdx<<std::endl;
+	  	std::cout<< "-- Good Match [%d] Keypoint 1: %d  -- Keypoint 2: %d  \n" << i<<"\t"<< good_matches[i].queryIdx <<"\t"<< good_matches[i].trainIdx<<std::endl;
 
-	//   }
+	}
 
-	//   waitKey(0);
+	waitKey(0);
 }
 
 void Camera::GetDisparityMap(cv::Mat &frame_cv)
@@ -382,20 +389,23 @@ void Camera::GetDisparityMap(cv::Mat &frame_cv)
 
 	//  -- 3. Calculate the disparity image
 	sbm->compute( OR_scene, new_frame, imgDisparity8U );
+	Depth = imgDisparity8U.at<double>(BottonCHosen.Center_.y,BottonCHosen.Center_.x);
+	std::cout<<"Depth: "<<Depth<<std::endl;
 
 	  //-- Check its extreme values
-	double minVal; double maxVal;
+	// double minVal; double maxVal;
 
-	minMaxLoc( imgDisparity16S, &minVal, &maxVal );
+	// minMaxLoc( imgDisparity16S, &minVal, &maxVal );
 
 	  // printf("Min disp: %f Max value: %f \n", minVal, maxVal);
 
 	//  -- 4. Display it as a CV_8UC1 image
-	imgDisparity16S.convertTo( imgDisparity8U, CV_8U, 255/(maxVal - minVal));
+	// imgDisparity16S.convertTo( imgDisparity8U, CV_8U, 255/(maxVal - minVal));
 
+	
 	  // namedWindow( "windowDisparity", CV_WINDOW_AUTOSIZE );
 	  // cv::imshow( "windowDisparity", imgDisparity8U );
-	  cv::waitKey(0);
+	  // cv::waitKey(0);
 }
 
 

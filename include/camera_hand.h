@@ -76,6 +76,7 @@ class Camera
 		Mat disparity;
 		int start = 0;
 		cv::Mat imgDisparity8U; //disparity map
+		double Depth;
 
 		struct Obj 
 		{
@@ -83,7 +84,7 @@ class Camera
 			cv::Point Center_;
 			std::vector<KeyPoint> keyp_;
 			cv::Mat descr_;
-
+			cv::Mat figure_;
 		} BottonCHosen;
 
 
