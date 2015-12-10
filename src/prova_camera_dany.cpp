@@ -37,18 +37,17 @@ std::cout<<"Ok sto usando opencv 3!"<<std::endl;
 void Camera::ControllCamera()
 {
 	// input data from calibration code
+	// cv::Mat myMatrix2;
+	// FileStorage fs("/home/daniela/Desktop/pollini/Code_project/eye-in-hand/src/prova.xml", FileStorage::READ);
+	// fs["myMatrix"] >> myMatrix2;
+	// fs.release();
+	// std::cout<<"myMatrix2: "<<myMatrix2<<std::endl;
 
-	// FileStorage fs;
- //    fs.open("out_camera_data.xml", FileStorage::READ);
- //    FileNode n = fs.root();
- //    for (FileNodeIterator current = n.begin(); current != n.end(); current++)
- //    {
- //        FileNode item = *current;
- //        //Mat v;
- //        item["Camera_Matrix"] >> Camera_Matrix;
- //        item["Distortion_Coefficients"] >> Distortion_Coefficients;
- //        // std::cout << Camera_Matrix <<std::endl;
- //    } 
+  	//fs["Camera_Matrix"] >> Camera_Matrix;
+    // fs["Distortion_Coefficients"] >> Distortion_Coefficients;
+
+	//cv::Mat R = Mat::eye(10, 10, CV_32S); da vedere la dimensione
+	// stereoRectify(Camera_Matrix, Distortion_Coefficients, Camera_Matrix, Distortion_Coefficients, Size imageSize, R, InputArray T, OutputArray R1, OutputArray R2, OutputArray P1, OutputArray P2, perspective_transformation_matrix, int flags=CALIB_ZERO_DISPARITY, double alpha=-1, Size newImageSize=Size(), Rect* validPixROI1=0, Rect* validPixROI2=0 );
 
 	// cv::VideoCapture cam(0); //open the camera
 	char key;
@@ -74,13 +73,17 @@ void Camera::ControllCamera()
 	 	{
 	 		//std::cout<<"ciao dany non ho la cam accesa"<<std::endl;
        		//	std::cout<<"Unable to read stream from specified device"<<std::endl;
-       		scene = imread("/home/daniela/Desktop/pollini/bott1.jpg", CV_LOAD_IMAGE_UNCHANGED);
+       		scene = imread("/home/daniela/Desktop/pollini/ascensore1.JPG", CV_LOAD_IMAGE_UNCHANGED);
+       		// std::cout<<"scene size: "<<scene.cols<<'\t'<<scene.rows<<std::endl;
+       		// std::cout<<"n righe: "<<scene.rows <<'\t'<<"n colonne: "<<scene.cols<<std::endl;
 		    if(!scene.data ) // Check for invalid input
 		    {
 		        std::cout<<"Could not open or find the image"<<std::endl; 
 		    }
 
 		 	imshow("CAMERA_ROBOT", scene);
+
+
 	 	}
 
 	 	if (first_Step == 1)
@@ -96,10 +99,18 @@ void Camera::ControllCamera()
 		}
 		//if user has press the buttom
 		if(start == 1)
-		{
-			cv::Mat scene2 = scene.clone();
-			GetDisparityMap(scene2);
-			DetectAndMove(scene2);
+		{		
+			// scene2 = scene.clone();
+			scene2 = imread("/home/daniela/Desktop/pollini/ascensore2.JPG", CV_LOAD_IMAGE_UNCHANGED);
+			// std::cout<<"scene2 size: "<<scene2.cols<<'\t'<<scene2.rows<<std::endl;
+			if(!scene2.data ) // Check for invalid input
+		    {
+		        std::cout<<"Could not open or find the image"<<std::endl; 
+		    }
+		    else
+		    {	
+		    	DetectWithSift(scene2);		
+			}
 		}
 
 	 	if( waitKey (30) >= 0) break;
@@ -212,24 +223,30 @@ void Camera::ShapeDetect()
 		press_buttom = 0;
 		BottonCHosen.Center_.x = floor(Center_Shape[info_geometry.first].x);
 		BottonCHosen.Center_.y = floor(Center_Shape[info_geometry.first].y);
-		//std::cout<<"hai premuto: "<<Center_.x<<  Center_.y <<std::endl;
+		// std::cout<<"hai premuto: "<<BottonCHosen.Center_.x<< '\t'<< BottonCHosen.Center_.y <<std::endl;
 		setLabel(dst, "BOTP", Shape_local[info_geometry.first]);
 		BottonCHosen.Bot_C = Shape_local[info_geometry.first];
 		
 		// Sift
 		//il valore 30 è stato dato per centrare meglio il bottone selezionato lasciando in vista
 		//altri punti di riferimento
-		cv::Mat roi(scene, Rect(BottonCHosen.Center_.x - 30,BottonCHosen.Center_.y - 40,100, 100));
-		BottonCHosen.figure_= roi.clone();
+
+
+		std::pair<int,int> value = FindMaxValue(dst, BottonCHosen.Center_ );
+		// cv::Mat roi(scene, Rect(BottonCHosen.Center_.x -30,BottonCHosen.Center_.y -40,100, 100));
+		cv::Mat roi(scene, Rect(BottonCHosen.Center_.x - 30,BottonCHosen.Center_.y - 40,value.first, value.second));
+		// std::cout<<"diff: "<<BottonCHosen.Center_.x - 30 - dst.cols<<std::endl;
+		cv::Mat convert_BcMat_ = roi.clone(); 
+
+		// BottonCHosen.figure_= roi.clone();
 		cv::imshow("CAMERA_ROBOT", roi);
-		cv::Mat convert_BcMat_;
-		scene.convertTo(convert_BcMat_, CV_8U) ;
+		// cv::Mat convert_BcMat_;
+		convert_BcMat_.convertTo(BottonCHosen.figure_, CV_8U) ;
 		//Detect sift
 		cv::Ptr<Feature2D> f2d = xfeatures2d::SIFT::create();
-		f2d->detect(convert_BcMat_, BottonCHosen.keyp_ );
+		f2d->detect(BottonCHosen.figure_, BottonCHosen.keyp_ );
 		
-		f2d->compute( convert_BcMat_, BottonCHosen.keyp_, BottonCHosen.descr_ );
-
+		f2d->compute( BottonCHosen.figure_, BottonCHosen.keyp_, BottonCHosen.descr_ );
 		// cv::imshow("dst", dst);
 		cv::waitKey(0);
 
@@ -240,6 +257,36 @@ void Camera::ShapeDetect()
 		std::cout<<"riprova"<<std::endl;
 	}		
 }
+
+std::pair<int,int> FindMaxValue(cv::Mat &matrix, cv::Point &point )
+{
+	std::pair<int,int> dist;
+	// std::cout<<"point x: " <<point.x<<'\t'<<"point y: "<<point.y<<std::endl;
+	// std::cout<<"matrix x: " <<matrix.cols<<'\t'<<"matrix y: "<<matrix.rows<<std::endl;
+	cv::Point point2(point.x-30, point.y -40);
+	cv::Rect rect(point, matrix.size());
+	
+	if((point2.x)+100 < matrix.cols )
+	{
+		dist.first = 100;
+	}
+	else
+		dist.first = matrix.cols - point2.x;
+
+	if((point2.y)+100 < matrix.rows )
+	{
+		dist.second = 100;
+	}
+	else
+		dist.second = matrix.rows - point2.y;
+
+	// std::cout<<"dist first: "<<dist.first<<'\t'<<"dist second: "<<dist.second<<std::endl;
+	return dist;
+}
+
+
+
+
 
 
 std::pair<int, bool> Camera::FindAMinDistanceButton(std::vector<cv::Point> &baricentro)
@@ -281,7 +328,7 @@ std::pair<int, bool> Camera::FindAMinDistanceButton(std::vector<cv::Point> &bari
 		check_bot.second = false;
 		check_bot.first = 1;
 	}	
-	std::cout<<"check_bot.first: "<<check_bot.first<<std::endl;
+	// std::cout<<"check_bot.first: "<<check_bot.first<<std::endl;
 
 	return check_bot;
 
@@ -296,10 +343,11 @@ cv::Point FindACenter(std::vector<cv::Point> &geometry)
 }
 
 
-void Camera::DetectAndMove(cv::Mat &frame)
+void Camera::DetectWithSift(cv::Mat &frame)
 {
 	cv::Mat frame_cv;
 	frame.convertTo(frame_cv, CV_8U); 
+
 	//-- Step 1: Sift Detector
 	cv::Ptr<Feature2D> f2d = xfeatures2d::SIFT::create(); 
 	//-- Step 1.1: Detect the keypoints:
@@ -308,8 +356,7 @@ void Camera::DetectAndMove(cv::Mat &frame)
 	//-- Step 1.2: Calculate descriptors (feature vectors)    
 	cv::Mat descriptors_2;    
 	f2d->compute( frame_cv, keypoints_2, descriptors_2 );
-	std::cout<<"finito"<<std::endl;
-
+	// std::cout<<"finito"<<std::endl;
 
  	//-- Step 3: Matching descriptor vectors using FLANN matcher
  	FlannBasedMatcher matcher;
@@ -326,20 +373,16 @@ void Camera::DetectAndMove(cv::Mat &frame)
 	    if( dist > max_dist ) max_dist = dist;
 	}
 
-	//   std::cout<<"-- Max dist : %f \n" << max_dist<<std::endl;
-	//   std::cout<<"-- Min dist : %f \n" << min_dist<<std::endl;
-
-	//   //-- Draw only "good" matches (i.e. whose distance is less than 2*min_dist,
-	//   //-- or a small arbitary value ( 0.02 ) in the event that min_dist is very
-	//   //-- small)
-	//   //-- PS.- radiusMatch can also be used here.
 	std::vector< DMatch > good_matches;
+	std::vector<cv::Point> pointIm2;
 
 	for( int i = 0; i < BottonCHosen.descr_.rows; i++ )
 	{ 
 	 	if( matches[i].distance <= max(2*min_dist, 0.02) )
 	    { 
-		   	good_matches.push_back( matches[i]); 
+		   	good_matches.push_back( matches[i]);
+
+		   	pointIm2.push_back((keypoints_2[matches[i].trainIdx]).pt); 
 	    }
     }
 
@@ -352,12 +395,24 @@ void Camera::DetectAndMove(cv::Mat &frame)
 	//-- Show detected matches
 	imshow( "Good Matches", img_matches );
 
-	for( int i = 0; i < (int)good_matches.size(); i++ )
-	{ 
-	  	
-	  	std::cout<< "-- Good Match [%d] Keypoint 1: %d  -- Keypoint 2: %d  \n" << i<<"\t"<< good_matches[i].queryIdx <<"\t"<< good_matches[i].trainIdx<<std::endl;
+	//ROI of second image
+	cv::Point centerIm2;
+	centerIm2 = FindACenter(pointIm2);
+	
+	std::pair<int,int> value = FindMaxValue(frame_cv, centerIm2 );
+	
+	cv::Mat roi(frame_cv, Rect(centerIm2.x - 30,centerIm2.y - 40, value.first, value.second));
 
-	}
+	// frame2 = roi.clone();
+	imshow( "roi2", roi );
+	
+	GetDisparityMap(roi);
+	// for( int i = 0; i < (int)good_matches.size(); i++ )
+	// { 
+	  	
+	//   	std::cout<< "-- Good Match [%d] Keypoint 1: %d  -- Keypoint 2: %d  \n" << i<<"\t"<< good_matches[i].queryIdx <<"\t"<< good_matches[i].trainIdx<<std::endl;
+
+	// }
 
 	waitKey(0);
 }
@@ -367,16 +422,18 @@ void Camera::GetDisparityMap(cv::Mat &frame_cv)
 	std::cout<<"disparity"<<std::endl;
 	int ndisparities = 16*5;  // < Range of disparity 
   	int SADWindowSize = 21; //< Size of the block window. Must be odd 
-	cv::Ptr<StereoBM> stereo = cv::StereoBM::create(ndisparities, SADWindowSize);
+	// cv::Ptr<StereoBM> stereo = cv::StereoBM::create(ndisparities, SADWindowSize);
  //    disparity = stereo.compute(imgL,imgR)
 	cv::Mat OR_scene;
 	cv::Mat new_frame;
     /// Convert it to gray
-  	cvtColor( scene, OR_scene, CV_BGR2GRAY );
+  	cvtColor( BottonCHosen.figure_, OR_scene, CV_BGR2GRAY );
+  	std::cout<<"qui"<<std::endl;
   	cvtColor( frame_cv, new_frame, CV_BGR2GRAY );
 
-	Mat imgDisparity16S = Mat( scene.rows, scene.cols, CV_16S );
-	imgDisparity8U = Mat( scene.rows, scene.cols, CV_8U );
+	cv::Mat imgDisparity16S ;
+	//= Mat( scene.rows, scene.cols, CV_16S );
+	imgDisparity8U = Mat( BottonCHosen.figure_.rows, BottonCHosen.figure_.cols, CV_8U );
 
 	if( OR_scene.empty() || new_frame.empty() )
 	{ 	
@@ -384,28 +441,19 @@ void Camera::GetDisparityMap(cv::Mat &frame_cv)
 	 	exit; 
 	}
 
-
 	Ptr<StereoBM> sbm = StereoBM::create( ndisparities, SADWindowSize );
 
 	//  -- 3. Calculate the disparity image
 	sbm->compute( OR_scene, new_frame, imgDisparity8U );
-	Depth = imgDisparity8U.at<double>(BottonCHosen.Center_.y,BottonCHosen.Center_.x);
+	imgDisparity8U.convertTo(imgDisparity16S, CV_32F);
+
+	// reprojectImageTo3D(imgDisparity16S, perspective_transformation_matrix , InputArray Q, false, -1 );
+	//perspective_transformation_matrix la trovo con stereo rectify
+	Depth = imgDisparity16S.at<float>(imgDisparity16S.rows/2, imgDisparity16S.cols/2);
+	// Depth = imgDisparity8U.at<double>(BottonCHosen.Center_.y,BottonCHosen.Center_.x);
 	std::cout<<"Depth: "<<Depth<<std::endl;
 
-	  //-- Check its extreme values
-	// double minVal; double maxVal;
-
-	// minMaxLoc( imgDisparity16S, &minVal, &maxVal );
-
-	  // printf("Min disp: %f Max value: %f \n", minVal, maxVal);
-
-	//  -- 4. Display it as a CV_8UC1 image
-	// imgDisparity16S.convertTo( imgDisparity8U, CV_8U, 255/(maxVal - minVal));
-
-	
-	  // namedWindow( "windowDisparity", CV_WINDOW_AUTOSIZE );
-	  // cv::imshow( "windowDisparity", imgDisparity8U );
-	  // cv::waitKey(0);
+	 
 }
 
 
@@ -445,3 +493,7 @@ static double angle(cv::Point pt1, cv::Point pt2, cv::Point pt0)
 	return (dx1*dx2 + dy1*dy2)/sqrt((dx1*dx1 + dy1*dy1)*(dx2*dx2 + dy2*dy2) + 1e-10);
 }
 
+//calibrazione prendo Camera_Matrix trovo xyz nello spazio.. come devi trovarlo
+
+
+// dispariti la faccio sul roi di entrambe le due immagini nle mezzo trovo la z..

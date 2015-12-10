@@ -61,7 +61,11 @@ class Camera
 	private:
 		// ros::NodeHandle nodeH;
 		cv::Mat scene;
-		// Mat frame_;
+		cv::Mat scene2;
+		cv::Mat frame2;
+		cv::Mat Camera_Matrix;
+		cv::Mat Distortion_Coefficients;
+		cv::Mat perspective_transformation_matrix;
 		cv::Mat duplicate_scene;
 		cv::Mat objcet_recognition;
 		std::string CAMERA_ROBOT;
@@ -70,13 +74,10 @@ class Camera
 		static Point pos_object;
 		static int press_buttom;
 		cv::Point pos_object_real;
-		std::vector<KeyPoint> kp1;
-		cv::Mat des1;
 		int first_Step = 1;
-		Mat disparity;
 		int start = 0;
 		cv::Mat imgDisparity8U; //disparity map
-		double Depth;
+		float Depth;
 
 		struct Obj 
 		{
@@ -95,7 +96,7 @@ class Camera
 		void DuplicateScene(Mat &frame_t);
 		void ShapeDetect();
 		std::pair<int, bool> FindAMinDistanceButton(std::vector<cv::Point> &baricentro);
-		void DetectAndMove(cv::Mat &frame);
+		void DetectWithSift(cv::Mat &frame);
 		void GetDisparityMap(cv::Mat &frame_cv);
 		Camera()
 		{	
@@ -117,6 +118,13 @@ void setLabel(cv::Mat& im, const std::string label, std::vector<cv::Point>& cont
 
 static double angle(cv::Point pt1, cv::Point pt2, cv::Point pt0);
 cv::Point FindACenter(std::vector<cv::Point> &geometry);
+
+/**Function: FindMaxValue
+	*input: mat of scene, point of interest
+	*output: two integrer value
+	*Descriptio: function that calculates the max value of width and height for the roi 
+*/
+std::pair<int,int> FindMaxValue(cv::Mat &matrix, cv::Point &point );
 
 
 
