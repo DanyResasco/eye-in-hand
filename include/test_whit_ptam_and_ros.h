@@ -1,0 +1,175 @@
+#ifndef Pollini_project_h
+#define Pollini_project_h
+
+
+// #include <boost/thread/thread.hpp>
+// #include <boost/date_time/posix_time/posix_time.hpp>
+#include <iostream>
+#include <utility>
+#include <list>
+#include <string>
+//#include <math.h> 
+#include <stdio.h>
+#include <eigen3/Eigen/Dense>
+//ros
+//#include <ros/ros.h>
+
+//opencv
+#include "opencv2/core.hpp"
+#include "opencv2/core/utility.hpp"
+#include "opencv2/core/ocl.hpp"
+#include "opencv2/imgcodecs.hpp"
+// #include "opencv2/imgcodecs.hpp"
+#include "opencv2/highgui.hpp"
+#include "opencv2/features2d.hpp"
+#include "opencv2/calib3d.hpp"
+#include "opencv2/imgproc.hpp"
+#include "opencv2/xfeatures2d.hpp"
+// #include <opencv2/core/core.hpp>
+// #include <opencv2/highgui/highgui.hpp>
+// #include <opencv2/opencv.hpp>
+// #include <opencv2/imgproc/imgproc.hpp>
+// #include <opencv2/features2d.hpp>
+// // #include "opencv2/xfeatures2d.hpp"
+// #include "opencv2/core/version.hpp"
+// #include <opencv2/xfeatures2d/nonfree.hpp>
+// #include <opencv2/xfeatures2d/nonfree.hpp>
+// #include <opencv2/nonfree.hpp>
+// #include <opencv2/core/core_c.h>
+// #include <opencv2/core/core.hpp>
+// #include <opencv2/flann/miniflann.hpp>
+// #include <opencv2/imgproc/imgproc_c.h>
+// #include <opencv2/imgproc/imgproc.hpp>
+// #include <opencv2/video/video.hpp>
+// #include <opencv2/features2d/features2d.hpp>
+// #include <opencv2/objdetect/objdetect.hpp>
+// #include <opencv2/calib3d/calib3d.hpp>
+// #include <opencv2/ml/ml.hpp>
+// #include <opencv2/highgui/highgui_c.h>
+// #include <opencv2/highgui/highgui.hpp>
+
+#include <image_transport/image_transport.h>
+#include <ros/ros.h>
+#include <ros/console.h>
+#include <sensor_msgs/image_encodings.h>
+#include <cv_bridge/cv_bridge.h>
+
+
+using namespace cv;
+
+
+
+class Camera
+{
+	public:
+		ros::NodeHandle nh;
+		double video_or_photo;
+		//to convert ros msg in opencv mat
+		ros::Subscriber image_sub_;
+    	image_transport::Publisher image_pub_;
+    	// cvres_out.encoding = enc::TYPE_32FC1;
+    	// cv::Mat scene;
+
+
+
+		cv::Mat scene;
+		// cv::Mat scene2;
+		// cv::Mat frame2;
+		// cv::Mat Camera_Matrix;
+		// cv::Mat Distortion_Coefficients;
+		// cv::Mat perspective_transformation_matrix;
+		// cv::Mat duplicate_scene;
+		// cv::Mat objcet_recognition;
+		// std::string CAMERA_ROBOT;
+		// double frame_width;
+		// double frame_height;
+		// static Point pos_object;
+		// static int press_buttom;
+		// cv::Point pos_object_real;
+		// int first_Step = 1;
+		// int start = 0;
+		// cv::Mat imgDisparity8U; //disparity map
+		// float Depth;
+
+		// struct Obj 
+		// {
+		// 	std::vector<cv::Point> Bot_C; //contour
+		// 	cv::Point Center_;
+		// 	std::vector<KeyPoint> keyp_;
+		// 	cv::Mat descr_;
+		// 	cv::Mat figure_;
+		// } BottonCHosen;
+
+
+		image_transport::ImageTransport it;
+  	   image_transport::Subscriber sub;
+
+		Camera();
+		~Camera(){};
+
+	private:
+		// void ControllCamera();
+		// static void CallBackFunc(int event, int x, int y, int flags, void* userdata);
+		// void DuplicateScene(Mat &frame_t);
+		// void ShapeDetect();
+		// std::pair<int, bool> FindAMinDistanceButton(std::vector<cv::Point> &baricentro);
+		// void DetectWithSift(cv::Mat &frame);
+		// void GetDisparityMap(cv::Mat &frame_cv);
+		void imageCb(const sensor_msgs::ImageConstPtr& msg);
+		// Camera()
+		// {	
+
+		// 	// pos_object_real = pos_object;
+		// 	//ros::param::get("~Data_point", Data_point);
+		// }
+
+
+
+
+	
+
+};
+
+
+
+// void setLabel(cv::Mat& im, const std::string label, std::vector<cv::Point>& contour);
+
+// static double angle(cv::Point pt1, cv::Point pt2, cv::Point pt0);
+// cv::Point FindACenter(std::vector<cv::Point> &geometry);
+
+/**Function: FindMaxValue
+	*input: mat of scene, point of interest
+	*output: two integrer value
+	*Descriptio: function that calculates the max value of width and height for the roi 
+*/
+// std::pair<int,int> FindMaxValue(cv::Mat &matrix, cv::Point &point );
+
+
+
+// Point Camera::pos_object;
+// int Camera::press_buttom = 0;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#endif

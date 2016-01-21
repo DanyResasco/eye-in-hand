@@ -1,33 +1,15 @@
 <launch>
 
-	<arg name="Data_point" default="1,1" />
+	
+	<arg name="spin_rate" default="50" />
+	<arg name="video_or_photo" default="0" />
 	
 
-	<node name="Camera_demo" pkg="Pollini" type="Camera" respawn="false" output="screen" >
- 		
-		<param name="Data_point" type="Eigen::Vector2d" value="$(arg Data_point)"/>
+	<node name="Camera_demo" pkg="eye_in_hand" type="testa" output="screen" >
+ 	
+		<param name="spin_rate" value="$(arg spin_rate)" />
+		<param name="video_or_photo" value="$(arg video_or_photo)" />
 		
-
-	</node>
-
-	<!-- <arg name="influence" default="4" />
-	<arg name="velocity_max" default="10" />
-
-
-
-	<node name="desperate_housewife_MP" pkg="desperate_housewife" type="phobic_motion_planning" respawn="false" output="screen" >
-
-		<param name="influence" value="$(arg influence)" />
-		<param name="velocity_max" value="$(arg velocity_max)" />
-
-		
-	</node> -->
- 	<!-- <group if="$(arg use_robot_sim)">
-        <param name="robot_description" command="$(find xacro)/xacro.py $(find vito_description)/robot/$(arg robot_name).urdf.xacro use_mimic_tag:=false"/>
-    </group> -->
-<!-- 
-	<node name="my_rviz" pkg="rviz" type="rviz" respawn="false" args="-d $(find desperate_housewife)/launch/rviz_config.rviz" output="screen"> -->
-
   </node>
 
 
