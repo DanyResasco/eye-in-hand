@@ -1,12 +1,13 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(eye_in_hand)
 
+find_package( OpenCV REQUIRED)
 
-find_package( OpenCV 3.0.0 REQUIRED )
-if( OpenCV_FOUND )
-list( APPEND ThirdParty_LIBS ${OpenCV_LIBS} )
-    include_directories( opencv_contrib ${OpenCV_INCLUDE_DIRS} )
-endif( OpenCV_FOUND )
+# find_package( OpenCV 3.0.0 REQUIRED )
+# if( OpenCV_FOUND )
+# list( APPEND ThirdParty_LIBS ${OpenCV_LIBS} )
+#     include_directories( opencv_contrib ${OpenCV_INCLUDE_DIRS} )
+# endif( OpenCV_FOUND )
 
 # set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} /home/daniela/OpenCV3/opencv_contrib) 
 
@@ -91,12 +92,12 @@ endif(DOXYGEN_FOUND)
 # )
 
 
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-#   geometry_msgs
-#   sensor_msgs
-#  )
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  geometry_msgs
+  sensor_msgs
+ )
 
 catkin_package(
   DEPENDS orocos_kdl
@@ -115,18 +116,9 @@ catkin_package(
 add_executable(testa src/test_whit_ptam_and_ros.cpp)
 # add_executable(testa src/image_converter.cpp)
 add_dependencies(testa testa_gencpp ${PROJECT_NAME})
-target_link_libraries(testa ${catkin_LIBRARIES} ${OpenCV_LIBS})
+target_link_libraries(testa ${catkin_LIBRARIES} ${OpenCV_LIBS} opencv_nonfree)
 
 
 
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
-
-# install(TARGETS ${PROJECT_NAME}
-#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-#   )
-
-# <!-- install(FILES desperate_housewife_controllers.xml -->
-  # DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})

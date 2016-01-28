@@ -6,6 +6,7 @@
 	
 
 	<node name="Camera_demo" pkg="eye_in_hand" type="testa" output="screen" >
+	<rosparam command="load" file="$(find eye_in_hand)/Config/code_param.yaml" />
  	
 		<param name="spin_rate" value="$(arg spin_rate)" />
 		<param name="video_or_photo" value="$(arg video_or_photo)" />

@@ -15,16 +15,16 @@
 //#include <ros/ros.h>
 
 //opencv
-#include "opencv2/core.hpp"
-#include "opencv2/core/utility.hpp"
-#include "opencv2/core/ocl.hpp"
-#include "opencv2/imgcodecs.hpp"
+// #include "opencv2/core.hpp"
+// #include "opencv2/core/utility.hpp"
+// #include "opencv2/core/ocl.hpp"
 // #include "opencv2/imgcodecs.hpp"
-#include "opencv2/highgui.hpp"
-#include "opencv2/features2d.hpp"
-#include "opencv2/calib3d.hpp"
-#include "opencv2/imgproc.hpp"
-#include "opencv2/xfeatures2d.hpp"
+// #include "opencv2/imgcodecs.hpp"
+// #include "opencv2/highgui.hpp"
+// #include "opencv2/features2d.hpp"
+// #include "opencv2/calib3d.hpp"
+// #include "opencv2/imgproc.hpp"
+// #include "opencv2/xfeatures2d.hpp"
 // #include <opencv2/core/core.hpp>
 // #include <opencv2/highgui/highgui.hpp>
 // #include <opencv2/opencv.hpp>
@@ -48,11 +48,24 @@
 // #include <opencv2/highgui/highgui_c.h>
 // #include <opencv2/highgui/highgui.hpp>
 
-#include <image_transport/image_transport.h>
 #include <ros/ros.h>
-#include <ros/console.h>
-#include <sensor_msgs/image_encodings.h>
+#include <image_transport/image_transport.h>
 #include <cv_bridge/cv_bridge.h>
+#include <sensor_msgs/image_encodings.h>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+// #include "cv_bridge/CvBridge.h"
+// #include <linux/videodev2.h>
+// #include <asm/types.h>  
+
+//sift
+#include <stdio.h>
+#include <iostream>
+#include "opencv2/core/core.hpp"
+#include "opencv2/features2d/features2d.hpp"
+#include "opencv2/nonfree/features2d.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/nonfree/nonfree.hpp"
 
 
 using namespace cv;
@@ -73,6 +86,7 @@ class Camera
 
 
 		cv::Mat scene;
+		int arrived_cam = 0;;
 		// cv::Mat scene2;
 		// cv::Mat frame2;
 		// cv::Mat Camera_Matrix;
@@ -91,31 +105,43 @@ class Camera
 		// cv::Mat imgDisparity8U; //disparity map
 		// float Depth;
 
-		// struct Obj 
-		// {
-		// 	std::vector<cv::Point> Bot_C; //contour
-		// 	cv::Point Center_;
-		// 	std::vector<KeyPoint> keyp_;
-		// 	cv::Mat descr_;
-		// 	cv::Mat figure_;
-		// } BottonCHosen;
+		double threshold_sift;
+
+		struct Obj 
+		{
+			std::vector<cv::Point> Bot_C; //contour
+			cv::Point Center_;
+			std::vector<KeyPoint> keyp_;
+			cv::Mat descr_;
+			cv::Mat figure_;
+		} BottonCHosen;
 
 
-		image_transport::ImageTransport it;
+		image_transport::ImageTransport it_;
   	   image_transport::Subscriber sub;
+  	   std::string camera_topic_;
+  	   static Point pos_object;
+		static int press_buttom;
+		static int first_Step ;
+		double Finish = 1;
+
+		// sensor_msgs::cv_bridge bridge_;
+
+		int start = 0;
 
 		Camera();
 		~Camera(){};
+		void ControllCamera();
 
 	private:
-		// void ControllCamera();
-		// static void CallBackFunc(int event, int x, int y, int flags, void* userdata);
+		
+		static void CallBackFunc(int event, int x, int y, int flags, void* userdata);
 		// void DuplicateScene(Mat &frame_t);
-		// void ShapeDetect();
-		// std::pair<int, bool> FindAMinDistanceButton(std::vector<cv::Point> &baricentro);
+		void ShapeDetect();
+		std::pair<int, bool> FindAMinDistanceButton(std::vector<cv::Point> &baricentro);
 		// void DetectWithSift(cv::Mat &frame);
 		// void GetDisparityMap(cv::Mat &frame_cv);
-		void imageCb(const sensor_msgs::ImageConstPtr& msg);
+		void ImageConverter(const sensor_msgs::ImageConstPtr& msg);
 		// Camera()
 		// {	
 
@@ -132,22 +158,23 @@ class Camera
 
 
 
-// void setLabel(cv::Mat& im, const std::string label, std::vector<cv::Point>& contour);
+void setLabel(cv::Mat& im, const std::string label, std::vector<cv::Point>& contour);
 
-// static double angle(cv::Point pt1, cv::Point pt2, cv::Point pt0);
-// cv::Point FindACenter(std::vector<cv::Point> &geometry);
+static double angle(cv::Point pt1, cv::Point pt2, cv::Point pt0);
+cv::Point FindACenter(std::vector<cv::Point> &geometry);
 
 /**Function: FindMaxValue
 	*input: mat of scene, point of interest
 	*output: two integrer value
 	*Descriptio: function that calculates the max value of width and height for the roi 
 */
-// std::pair<int,int> FindMaxValue(cv::Mat &matrix, cv::Point &point );
+std::pair<int,int> FindMaxValue(cv::Mat &matrix, cv::Point &point );
 
 
 
-// Point Camera::pos_object;
-// int Camera::press_buttom = 0;
+Point Camera::pos_object;
+int Camera::press_buttom = 0;
+int Camera::first_Step = 1;
 
 
 

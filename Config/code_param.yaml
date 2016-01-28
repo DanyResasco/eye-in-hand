@@ -1,0 +1,3 @@
+threshold_sift: 0.04
+edge_threshold_sift: 10.0
+magnification_sift: 3.0
