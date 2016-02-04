@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(eye_in_hand)
 
-find_package( OpenCV REQUIRED)
+find_package( OpenCV 2.4 REQUIRED)
 
 # find_package( OpenCV 3.0.0 REQUIRED )
 # if( OpenCV_FOUND )
@@ -113,10 +113,16 @@ catkin_package(
   LIBRARIES ${PROJECT_NAME})
 
 
-add_executable(testa src/test_whit_ptam_and_ros.cpp)
-# add_executable(testa src/image_converter.cpp)
-add_dependencies(testa testa_gencpp ${PROJECT_NAME})
-target_link_libraries(testa ${catkin_LIBRARIES} ${OpenCV_LIBS} opencv_nonfree)
+# add_executable(testa src/test_whit_ptam_and_ros.cpp)
+# # add_executable(testa src/image_converter.cpp)
+# add_dependencies(testa testa_gencpp ${PROJECT_NAME})
+# target_link_libraries(testa ${catkin_LIBRARIES} ${OpenCV_LIBS} opencv_nonfree)
+
+
+add_executable(prova_dany src/dany_test.cpp)
+# add_executable(prova_dany src/image_converter.cpp)
+add_dependencies(prova_dany prova_dany_gencpp ${PROJECT_NAME})
+target_link_libraries(prova_dany ${catkin_LIBRARIES} ${OpenCV_LIBS} opencv_nonfree)
 
 
 

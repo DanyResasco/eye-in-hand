@@ -68,6 +68,8 @@
 #include "opencv2/nonfree/nonfree.hpp"
 
 
+
+
 using namespace cv;
 
 
@@ -124,7 +126,7 @@ class Camera
 		static int press_buttom;
 		static int first_Step ;
 		double Finish = 1;
-
+		bool move_camera_end;
 		// sensor_msgs::cv_bridge bridge_;
 
 		int start = 0;
@@ -132,16 +134,20 @@ class Camera
 		Camera();
 		~Camera(){};
 		void ControllCamera();
+		void DetectWithSift(cv::Mat &frame);
+		bool MoveCamera();
 
 	private:
 		
 		static void CallBackFunc(int event, int x, int y, int flags, void* userdata);
 		// void DuplicateScene(Mat &frame_t);
 		void ShapeDetect();
-		std::pair<int, bool> FindAMinDistanceButton(std::vector<cv::Point> &baricentro);
-		// void DetectWithSift(cv::Mat &frame);
+		// int FindAMinDistanceButton(std::vector<cv::Point> &baricentro);
+		std::pair<int, bool> FindAMinDistanceButton(std::vector<cv::Point> &baricentro, cv::Point &point_);
+		
 		// void GetDisparityMap(cv::Mat &frame_cv);
 		void ImageConverter(const sensor_msgs::ImageConstPtr& msg);
+		std::pair<std::vector<cv::Point> ,std::vector<std::vector<cv::Point>> > FindContours(cv::Mat bw, cv::Mat camera);
 		// Camera()
 		// {	
 

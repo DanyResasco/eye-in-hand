@@ -125,31 +125,86 @@ void Camera::ShapeDetect()
 { 
 	// std::vector<geometry> Shape_;
 	Mat src_gray;
+	cv::Mat dst = scene.clone();
     /// Convert it to gray
   	cvtColor( scene, src_gray, CV_BGR2GRAY );
 
   	// Reduce the noise so we avoid false circle detection
   	GaussianBlur( src_gray, src_gray, Size(9, 9), 2, 2 );
   	// Convert to binary image using Canny
-	Mat bw;
+	cv::Mat bw;
 	cv::Canny(src_gray, bw, 0, 50, 5);
+	std::pair<std::vector<cv::Point> ,std::vector<std::vector<cv::Point> >> CenterAndContours;
+	CenterAndContours = FindContours(bw.clone(), dst.clone());
 	
+	// std::cout<<"Shape_local: "<<Shape_local.size()<<std::endl;;
+
+	std::pair<int,bool> info_geometry;
+	cv::Point point_b;
+	point_b.x = pos_object.x;
+	point_b.y = pos_object.y;
+
+	
+
+	info_geometry = FindAMinDistanceButton(CenterAndContours.first,point_b);
+	
+	if(info_geometry.second == true)
+	{
+		std::cout<<"** Tasto premuto correttamente **"<<std::endl;
+		first_Step = 0;
+		press_buttom = 0;
+		BottonCHosen.Center_.x = floor(CenterAndContours.first[info_geometry.first].x);
+		BottonCHosen.Center_.y = floor(CenterAndContours.first[info_geometry.first].y);
+		// std::cout<<"hai premuto: "<<BottonCHosen.Center_.x<< '\t'<< BottonCHosen.Center_.y <<std::endl;
+		setLabel(dst, "BOTP", CenterAndContours.second[info_geometry.first]);
+		BottonCHosen.Bot_C = CenterAndContours.second[info_geometry.first];
+
+		std::pair<int,int> value = FindMaxValue(dst, BottonCHosen.Center_ );
+		cv::Mat roi(scene, Rect(BottonCHosen.Center_.x - 30,BottonCHosen.Center_.y - 40,value.first, value.second));
+		cv::Mat convert_BcMat_ = roi.clone(); 
+
+		convert_BcMat_.convertTo(BottonCHosen.figure_, CV_8U) ;
+		//Detect sift
+		 /* threshold      = 0.04;
+       		edge_threshold = 10.0;
+       		magnification  = 3.0;    */ 
+	    // SIFT feature detector and feature extractor
+	    cv::SiftFeatureDetector detector( 0.01, 3.0 );
+	    cv::SiftDescriptorExtractor extractor( 2.0 );
+
+	    detector.detect(BottonCHosen.figure_, BottonCHosen.keyp_ );
+	    extractor.compute( BottonCHosen.figure_, BottonCHosen.keyp_, BottonCHosen.descr_ );
+
+		cv::imshow("dst", dst);
+		cv::waitKey(0);
+
+		// start = 1;
+		Finish = 0;
+		move_camera_end = true;
+		first_Step = 0;
+	}
+	else
+	{
+		std::cout<<"ripremi nuovamente il pulsante"<<std::endl;
+		press_buttom = 0;
+	}		
+}
+
+std::pair<std::vector<cv::Point> ,std::vector<std::vector<cv::Point> >> Camera::FindContours(cv::Mat bw, cv::Mat camera)
+{
 	// Find contours
+	std::pair<std::vector<cv::Point> ,std::vector<std::vector<cv::Point>> > CenterAndContours;
 	std::vector<std::vector<cv::Point> > contours;
 	cv::findContours(bw.clone(), contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 
-	// Shape_.resize(contours.size());
 	// The array for storing the approximation curve
 	std::vector<cv::Point> approx;
 
 	// We'll put the labels in this destination image
-	cv::Mat dst = scene.clone();
-	// std::vecto<int> = Index_Shape;
-	std::vector<cv::Point>  Center_Shape;
-	std::vector<std::vector<cv::Point> > Shape_local;;
+	cv::Mat dst = camera.clone();
 
 	//std::cout<<"trovati i contorni"<<std::endl;
-	for (int i = 0; i < contours.size(); i++)
+	for (unsigned int i = 0; i < contours.size(); i++)
 	{
 	    // Approximate contour with accuracy proportional
 	    // to the contour perimeter
@@ -189,8 +244,8 @@ void Camera::ShapeDetect()
 
 	            setLabel(dst, ratio <= 0.02 ? "SQU" : "RECT", contours[i]);
 	            
-	            Center_Shape.push_back(FindACenter(contours[i]));
-	            Shape_local.push_back(contours[i]);
+	            CenterAndContours.first.push_back(FindACenter(contours[i]));
+	            CenterAndContours.second.push_back(contours[i]);
 	            
 	        }
 	        else if (vtc == 5 && mincos >= -0.34 && maxcos <= -0.27)
@@ -209,70 +264,26 @@ void Camera::ShapeDetect()
 	        {
 
 	            setLabel(dst, "CIR", contours[i]);
-	            Center_Shape.push_back(FindACenter(contours[i]));
+	            CenterAndContours.first.push_back(FindACenter(contours[i]));
 
-	            Shape_local.push_back(contours[i]);
+	            CenterAndContours.second.push_back(contours[i]);
 	        }
 	    }
 	}
-	// std::cout<<"Shape_local: "<<Shape_local.size()<<std::endl;;
 
-	std::pair<int, bool> info_geometry;
-
-	info_geometry = FindAMinDistanceButton(Center_Shape);
-
-	if(info_geometry.second == true)
-	{
-		std::cout<<"** Tasto premuto correttamente **"<<std::endl;
-		first_Step = 0;
-		press_buttom = 0;
-		BottonCHosen.Center_.x = floor(Center_Shape[info_geometry.first].x);
-		BottonCHosen.Center_.y = floor(Center_Shape[info_geometry.first].y);
-		// std::cout<<"hai premuto: "<<BottonCHosen.Center_.x<< '\t'<< BottonCHosen.Center_.y <<std::endl;
-		setLabel(dst, "BOTP", Shape_local[info_geometry.first]);
-		BottonCHosen.Bot_C = Shape_local[info_geometry.first];
-		
-		// Sift
-		//il valore 30 è stato dato per centrare meglio il bottone selezionato lasciando in vista
-		//altri punti di riferimento
-
-		std::pair<int,int> value = FindMaxValue(dst, BottonCHosen.Center_ );
-			// cv::Mat roi(scene, Rect(BottonCHosen.Center_.x - 30,BottonCHosen.Center_.y - 40, dst.cols - BottonCHosen.Center_.x,dst.rows - BottonCHosen.Center_.y)); 
-		// cv::Mat roi(scene, Rect(BottonCHosen.Center_.x -30,BottonCHosen.Center_.y -40,100, 100));
-		cv::Mat roi(scene, Rect(BottonCHosen.Center_.x - 30,BottonCHosen.Center_.y - 40,value.first, value.second));
-		// std::cout<<"diff: "<<BottonCHosen.Center_.x - 30 - dst.cols<<std::endl;
-		cv::Mat convert_BcMat_ = roi.clone(); 
-
-		// BottonCHosen.figure_= roi.clone();
-		// cv::imshow("CAMERA_ROBOT", roi);
-		// cv::Mat convert_BcMat_;
-		convert_BcMat_.convertTo(BottonCHosen.figure_, CV_8U) ;
-		//Detect sift
-		 /* threshold      = 0.04;
-       		edge_threshold = 10.0;
-       		magnification  = 3.0;    */ 
-	    // SIFT feature detector and feature extractor
-	    cv::SiftFeatureDetector detector( 0.01, 3.0 );
-	    cv::SiftDescriptorExtractor extractor( 2.0 );
-     //   		   cv::SiftFeatureDetector detector;
-	    // cv::SiftDescriptorExtractor extractor;
-	    detector.detect(BottonCHosen.figure_, BottonCHosen.keyp_ );
-	    extractor.compute( BottonCHosen.figure_, BottonCHosen.keyp_, BottonCHosen.descr_ );
-
-		cv::imshow("dst", dst);
-		cv::waitKey(0);
-
-		// start = 1;
-		Finish = 0;
-		move_camera_end = true;
-		first_Step = 0;
-	}
-	else
-	{
-		std::cout<<"ripremi nuovamente il pulsante"<<std::endl;
-		press_buttom = 0;
-	}		
+	return CenterAndContours;
 }
+
+
+
+
+
+
+
+
+
+
+
 
 std::pair<int,int> FindMaxValue(cv::Mat &matrix, cv::Point &point )
 {
@@ -305,16 +316,16 @@ std::pair<int,int> FindMaxValue(cv::Mat &matrix, cv::Point &point )
 
 
 
-std::pair<int, bool> Camera::FindAMinDistanceButton(std::vector<cv::Point> &baricentro)
+std::pair<int,bool> Camera::FindAMinDistanceButton(std::vector<cv::Point> &baricentro, cv::Point &point_)
 {
 	int  local_dist;
 	std::vector<int> distance;
 	std::pair<int, bool> check_bot;
 	check_bot.second = false;
 	
-	for(int i=0; i<= baricentro.size();i++)
+	for(unsigned int i=0; i<= baricentro.size();i++)
 	{
-		local_dist = norm((pos_object - baricentro[i]));
+		local_dist = norm((point_ - baricentro[i]));
 		// std::cout<<"distance 14: "<<local_dist<<std::endl;
 
 		distance.push_back(local_dist);	
@@ -324,7 +335,7 @@ std::pair<int, bool> Camera::FindAMinDistanceButton(std::vector<cv::Point> &bari
 	// check_bot.first = 1;
 	int count = 0;
 
-	for(int i=0; i < distance.size(); i++)
+	for(unsigned int i=0; i < distance.size(); i++)
 	{
 	   	if((min_d >= distance[i]) && (distance[i] < 90))
 	   	{
@@ -336,7 +347,7 @@ std::pair<int, bool> Camera::FindAMinDistanceButton(std::vector<cv::Point> &bari
 	   	}	
 	}
 
-
+	
 	if(count == 0)
 	{
 	 	std::cout<<"Non è stato premuto correttamente il pulsante"<<std::endl;
@@ -348,6 +359,7 @@ std::pair<int, bool> Camera::FindAMinDistanceButton(std::vector<cv::Point> &bari
 	// std::cout<<"check_bot.first: "<<check_bot.first<<std::endl;
 
 	return check_bot;
+	
 
 }
 
@@ -447,77 +459,67 @@ void Camera::DetectWithSift(cv::Mat &frame)
 	imshow( "Good Matches", img_matches );
 		waitKey(0);
 
+	cv::Mat src_gray;
+    /// Convert it to gray
+  	cvtColor( frame, src_gray, CV_BGR2GRAY );
+
+  	// Reduce the noise so we avoid false circle detection
+  	GaussianBlur( src_gray, src_gray, Size(9, 9), 2, 2 );
+  	// Convert to binary image using Canny
+	cv::Mat bw;
+	cv::Canny(src_gray, bw, 0, 50, 5);
+	std::pair<std::vector<cv::Point> ,std::vector<std::vector<cv::Point> > > CenterAndContours;
+    CenterAndContours = FindContours(bw, frame);
+
 
 	// // //ROI of second image
-	cv::Point centerIm2;
+	
 	// // std::cout<<"pointIm2: "<<std::endl;
-	if(pointIm2 >0)
+	cv::Point centerIm2;
+	if(pointIm2.size() >0)
 	{
 		if(pointIm2.size() == 1)
 		{
-			centerIm2 = pointIm2;
+			centerIm2 = pointIm2[0];
 		}
 		else
 		{
 			centerIm2 = FindACenter(pointIm2);
-				std::cout<<"test"<<std::endl;
+			std::cout<<"test"<<std::endl;
 		}	
 		
-		std::pair<int,int> value = FindMaxValue(frame, centerIm2 );
-		cv::Mat roi(frame, Rect(centerIm2.x-30 ,centerIm2.y-40 ,value.first, value.second));
-		imshow( "roi2", roi );
-		std::cout<<"qui 2"<<std::endl;
+		std::pair<int,bool> info_geometry;
+		info_geometry = FindAMinDistanceButton(CenterAndContours.first,centerIm2);
+
+	    cv::Point centerIm2;
+		
+		if(info_geometry.second == true)
+		{
+			
+			centerIm2.x = floor(CenterAndContours.first[info_geometry.first].x);
+			centerIm2.y = floor(CenterAndContours.first[info_geometry.first].y);	
+		}
+
+
+
+		setLabel(frame, "quiP", CenterAndContours.second[info_geometry.first]);
+
+
+
+
+
+		// std::pair<int,int> value = FindMaxValue(frame, centerIm2 );
+		// cv::Mat roi(frame, Rect(centerIm2.x-30 ,centerIm2.y-40 ,value.first, value.second));
+		imshow( "roi2", frame );
+		// std::cout<<"qui 2"<<std::endl;
 		
 	}
 	else
 		std::cout<<"non sono stati trovate corrispondenze. rieseguire la procedura"<<std::endl;
-	// GetDisparityMap(roi);
-	// for( int i = 0; i < (int)good_matches.size(); i++ )
-	// { 
-	  	
-	//   	std::cout<< "-- Good Match [%d] Keypoint 1: %d  -- Keypoint 2: %d  \n" << i<<"\t"<< good_matches[i].queryIdx <<"\t"<< good_matches[i].trainIdx<<std::endl;
 
-	// }
 }
 
-// void Camera::GetDisparityMap(cv::Mat &frame_cv)
-// {
-// 	std::cout<<"disparity"<<std::endl;
-// 	int ndisparities = 16*5;  // < Range of disparity 
-//   	int SADWindowSize = 21; //< Size of the block window. Must be odd 
-// 	// cv::Ptr<StereoBM> stereo = cv::StereoBM::create(ndisparities, SADWindowSize);
-//  //    disparity = stereo.compute(imgL,imgR)
-// 	cv::Mat OR_scene;
-// 	cv::Mat new_frame;
-//     /// Convert it to gray
-//   	cvtColor( BottonCHosen.figure_, OR_scene, CV_BGR2GRAY );
-//   	std::cout<<"qui"<<std::endl;
-//   	cvtColor( frame_cv, new_frame, CV_BGR2GRAY );
 
-// 	cv::Mat imgDisparity16S ;
-// 	//= Mat( scene.rows, scene.cols, CV_16S );
-// 	imgDisparity8U = Mat( BottonCHosen.figure_.rows, BottonCHosen.figure_.cols, CV_8U );
-
-// 	if( OR_scene.empty() || new_frame.empty() )
-// 	{ 	
-// 	 	std::cout<< " --(!) Error reading images " << std::endl; 
-// 	 	exit; 
-// 	}
-
-// 	Ptr<StereoBM> sbm = StereoBM::create( ndisparities, SADWindowSize );
-
-// 	//  -- 3. Calculate the disparity image
-// 	sbm->compute( OR_scene, new_frame, imgDisparity8U );
-// 	imgDisparity8U.convertTo(imgDisparity16S, CV_32F);
-
-// 	// reprojectImageTo3D(imgDisparity16S, perspective_transformation_matrix , InputArray Q, false, -1 );
-// 	//perspective_transformation_matrix la trovo con stereo rectify
-// 	Depth = imgDisparity16S.at<float>(imgDisparity16S.rows/2, imgDisparity16S.cols/2);
-// 	// Depth = imgDisparity8U.at<double>(BottonCHosen.Center_.y,BottonCHosen.Center_.x);
-// 	std::cout<<"Depth: "<<Depth<<std::endl;
-
-	 
-// }
 
 
 
@@ -543,11 +545,4 @@ static double angle(cv::Point pt1, cv::Point pt2, cv::Point pt0)
 	double dx2 = pt2.x - pt0.x;
 	double dy2 = pt2.y - pt0.y;
 	return (dx1*dx2 + dy1*dy2)/sqrt((dx1*dx1 + dy1*dy1)*(dx2*dx2 + dy2*dy2) + 1e-10);
-}
-
-bool Camera::MoveCamera()
-{
-	
-
-
 }
