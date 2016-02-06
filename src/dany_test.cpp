@@ -138,50 +138,58 @@ void Camera::ShapeDetect()
 	CenterAndContours = FindContours(bw.clone(), dst.clone());
 	
 	// std::cout<<"Shape_local: "<<Shape_local.size()<<std::endl;;
-
-	std::pair<int,bool> info_geometry;
-	cv::Point point_b;
-	point_b.x = pos_object.x;
-	point_b.y = pos_object.y;
-
-	
-
-	info_geometry = FindAMinDistanceButton(CenterAndContours.first,point_b);
-	
-	if(info_geometry.second == true)
+	if(CenterAndContours.second.size() > 0)
 	{
-		std::cout<<"** Tasto premuto correttamente **"<<std::endl;
-		first_Step = 0;
-		press_buttom = 0;
-		BottonCHosen.Center_.x = floor(CenterAndContours.first[info_geometry.first].x);
-		BottonCHosen.Center_.y = floor(CenterAndContours.first[info_geometry.first].y);
-		// std::cout<<"hai premuto: "<<BottonCHosen.Center_.x<< '\t'<< BottonCHosen.Center_.y <<std::endl;
-		setLabel(dst, "BOTP", CenterAndContours.second[info_geometry.first]);
-		BottonCHosen.Bot_C = CenterAndContours.second[info_geometry.first];
+		std::pair<int,bool> info_geometry;
+		cv::Point point_b;
+		point_b.x = pos_object.x;
+		point_b.y = pos_object.y;
 
-		std::pair<int,int> value = FindMaxValue(dst, BottonCHosen.Center_ );
-		cv::Mat roi(scene, Rect(BottonCHosen.Center_.x - 30,BottonCHosen.Center_.y - 40,value.first, value.second));
-		cv::Mat convert_BcMat_ = roi.clone(); 
+		
 
-		convert_BcMat_.convertTo(BottonCHosen.figure_, CV_8U) ;
-		//Detect sift
-		 /* threshold      = 0.04;
-       		edge_threshold = 10.0;
-       		magnification  = 3.0;    */ 
-	    // SIFT feature detector and feature extractor
-	    cv::SiftFeatureDetector detector( 0.01, 3.0 );
-	    cv::SiftDescriptorExtractor extractor( 2.0 );
+		info_geometry = FindAMinDistanceButton(CenterAndContours.first,point_b);
+		
+		if(info_geometry.second == true)
+		{
+			std::cout<<"** Tasto premuto correttamente **"<<std::endl;
+			first_Step = 0;
+			press_buttom = 0;
+			BottonCHosen.Center_.x = floor(CenterAndContours.first[info_geometry.first].x);
+			BottonCHosen.Center_.y = floor(CenterAndContours.first[info_geometry.first].y);
+			// std::cout<<"hai premuto: "<<BottonCHosen.Center_.x<< '\t'<< BottonCHosen.Center_.y <<std::endl;
+			setLabel(dst, "BOTP", CenterAndContours.second[info_geometry.first]);
+			BottonCHosen.Bot_C = CenterAndContours.second[info_geometry.first];
 
-	    detector.detect(BottonCHosen.figure_, BottonCHosen.keyp_ );
-	    extractor.compute( BottonCHosen.figure_, BottonCHosen.keyp_, BottonCHosen.descr_ );
+			std::pair<int,int> value = FindMaxValue(dst, BottonCHosen.Center_ );
+			cv::Mat roi(scene, Rect(BottonCHosen.Center_.x - 30,BottonCHosen.Center_.y - 40,value.first, value.second));
+			cv::Mat convert_BcMat_ = roi.clone(); 
 
-		cv::imshow("dst", dst);
-		cv::waitKey(0);
+			convert_BcMat_.convertTo(BottonCHosen.figure_, CV_8U) ;
+			//Detect sift
+			 /* threshold      = 0.04;
+	       		edge_threshold = 10.0;
+	       		magnification  = 3.0;    */ 
+		    // SIFT feature detector and feature extractor
+		    cv::SiftFeatureDetector detector( 0.01, 3.0 );
+		    cv::SiftDescriptorExtractor extractor( 2.0 );
 
-		// start = 1;
-		Finish = 0;
-		move_camera_end = true;
-		first_Step = 0;
+		    detector.detect(BottonCHosen.figure_, BottonCHosen.keyp_ );
+		    extractor.compute( BottonCHosen.figure_, BottonCHosen.keyp_, BottonCHosen.descr_ );
+
+			cv::imshow("dst", dst);
+			cv::waitKey(0);
+
+			// start = 1;
+			Finish = 0;
+			move_camera_end = true;
+			first_Step = 0;
+		}
+		else
+		{
+			press_buttom = 0;
+			std::cout<<"ripremi nuovamente il pulsante"<<std::endl;
+		}
+
 	}
 	else
 	{
@@ -270,7 +278,8 @@ std::pair<std::vector<cv::Point> ,std::vector<std::vector<cv::Point> >> Camera::
 	        }
 	    }
 	}
-
+	// imshow("circle", dst);
+	// waitKey(0);
 	return CenterAndContours;
 }
 
@@ -374,9 +383,6 @@ cv::Point FindACenter(std::vector<cv::Point> &geometry)
 
 void Camera::DetectWithSift(cv::Mat &frame)
 {
-	// cv::Mat frame_cv;
-	// frame.convertTo(frame_cv, CV_8U); 
-
 	//Detect sift
 		 /* threshold      = 0.04;
        		edge_threshold = 10.0;
@@ -391,32 +397,13 @@ void Camera::DetectWithSift(cv::Mat &frame)
 	// cv::SiftDescriptorExtractor extractor;
 	detector.detect(frame, keyp_ );
 	extractor.compute( frame, keyp_, descr_ );
-
-	// matching descriptors
-	// cv::BFMatcher matcher;
-	// std::vector<DMatch> matches;
-	// matcher.match(BottonCHosen.descr_, descr_, matches);
-
-	// drawing the results
-	// namedWindow("matches", 1);
-	// cv::Mat img_matches;
-	// drawMatches(BottonCHosen.figure_, BottonCHosen.keyp_, frame, keyp_, matches, img_matches);
-	// imshow("matches", img_matches);
-	// waitKey(0);
-
-
-
-
-
-
-
  	
  	// -- Step 2: Matching descriptor vectors using FLANN matcher
  	FlannBasedMatcher matcher;
  	std::vector< DMatch > matches;
     matcher.match( BottonCHosen.descr_, descr_, matches );
 
-    double max_dist = 0; double min_dist = 50;
+    double max_dist = 0; double min_dist = 70;
 
     std::cout<<"good_matches.size(): "<<matches.size()<<std::endl;
       // std::cout<<"BottonCHosen.descr_.rows: "<<BottonCHosen.descr_.rows<<std::endl;
@@ -432,14 +419,9 @@ void Camera::DetectWithSift(cv::Mat &frame)
 	std::vector< DMatch > good_matches;
 	std::vector<cv::Point> pointIm2;
 
-	// Mat img_matches;
-	// drawMatches( BottonCHosen.figure_, BottonCHosen.keyp_, frame, keyp_, matches, img_matches, 
-	//   				Scalar::all(-1), Scalar::all(-1),std::vector<char>(), 
-	//   				DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
-
 	for( int i = 0; i < BottonCHosen.descr_.rows; i++ )
 	{ 
-	 	if( matches[i].distance <= max(2*min_dist, 0.02) )
+	 	if( matches[i].distance <= max(min_dist, 0.02) )
 	    { 
 		   	good_matches.push_back( matches[i]);
 
@@ -448,75 +430,32 @@ void Camera::DetectWithSift(cv::Mat &frame)
 	    }
     }
 
-	// // //-- Draw only "good" matches
+	//-- Draw only "good" matches
 	Mat img_matches;
 	drawMatches( BottonCHosen.figure_, BottonCHosen.keyp_, frame, keyp_, good_matches, img_matches, 
 	  				Scalar::all(-1), Scalar::all(-1),std::vector<char>(), 
 	  				DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
 
-	// imshow("BottonCHosen.figure_",BottonCHosen.figure_);
-	//-- Show detected matches
-	imshow( "Good Matches", img_matches );
-		waitKey(0);
+	//-- Localize the object
+	std::vector<Point2f> obj;
+	std::vector<Point> scene_point;
 
-	cv::Mat src_gray;
-    /// Convert it to gray
-  	cvtColor( frame, src_gray, CV_BGR2GRAY );
-
-  	// Reduce the noise so we avoid false circle detection
-  	GaussianBlur( src_gray, src_gray, Size(9, 9), 2, 2 );
-  	// Convert to binary image using Canny
-	cv::Mat bw;
-	cv::Canny(src_gray, bw, 0, 50, 5);
-	std::pair<std::vector<cv::Point> ,std::vector<std::vector<cv::Point> > > CenterAndContours;
-    CenterAndContours = FindContours(bw, frame);
-
-
-	// // //ROI of second image
-	
-	// // std::cout<<"pointIm2: "<<std::endl;
-	cv::Point centerIm2;
-	if(pointIm2.size() >0)
+	for( int i = 0; i < good_matches.size(); i++ )
 	{
-		if(pointIm2.size() == 1)
-		{
-			centerIm2 = pointIm2[0];
-		}
-		else
-		{
-			centerIm2 = FindACenter(pointIm2);
-			std::cout<<"test"<<std::endl;
-		}	
-		
-		std::pair<int,bool> info_geometry;
-		info_geometry = FindAMinDistanceButton(CenterAndContours.first,centerIm2);
-
-	    cv::Point centerIm2;
-		
-		if(info_geometry.second == true)
-		{
-			
-			centerIm2.x = floor(CenterAndContours.first[info_geometry.first].x);
-			centerIm2.y = floor(CenterAndContours.first[info_geometry.first].y);	
-		}
-
-
-
-		setLabel(frame, "quiP", CenterAndContours.second[info_geometry.first]);
-
-
-
-
-
-		// std::pair<int,int> value = FindMaxValue(frame, centerIm2 );
-		// cv::Mat roi(frame, Rect(centerIm2.x-30 ,centerIm2.y-40 ,value.first, value.second));
-		imshow( "roi2", frame );
-		// std::cout<<"qui 2"<<std::endl;
-		
+	    //-- Get the keypoints from the good matches
+	    obj.push_back( BottonCHosen.keyp_[ good_matches[i].queryIdx ].pt );
+	    scene_point.push_back( keyp_[ good_matches[i].trainIdx ].pt );
 	}
-	else
-		std::cout<<"non sono stati trovate corrispondenze. rieseguire la procedura"<<std::endl;
-
+	if(scene_point.size() >0)
+	{
+		setLabel(frame, "quip", scene_point);
+		imshow("Object detection",frame);
+		waitKey(0);
+	}
+	
+	//-- Show detected matches
+	// imshow( "Good Matches", img_matches );
+	// waitKey(0);
 }
 
 
