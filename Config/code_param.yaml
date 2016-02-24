@@ -1,3 +1,12 @@
-threshold_sift: 0.04
-edge_threshold_sift: 10.0
-magnification_sift: 3.0
+cam_model: Pinhole
+cam_width: 640
+cam_height: 480
+cam_fx: 542.589444
+cam_fy: 540.825211
+cam_cx: 304.671829
+cam_cy: 209.938017
+cam_d0: -0.097079
+cam_d1: 0.115189
+cam_d2: -0.005712
+cam_d3: 0.000509
+ptam_scale: 0.5

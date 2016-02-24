@@ -1,17 +1,32 @@
 <launch>
 
 	
-	<arg name="spin_rate" default="50" />
-	<arg name="video_or_photo" default="0" />
 	
 
-	<node name="Camera_demo" pkg="eye_in_hand" type="prova_dany" output="screen" >
-	<rosparam command="load" file="$(find eye_in_hand)/Config/code_param.yaml" />
- 	
-		<param name="spin_rate" value="$(arg spin_rate)" />
-		<param name="video_or_photo" value="$(arg video_or_photo)" />
-		
+	<node name="Camera_" pkg="eye_in_hand" type="prova_dany" output="screen" >
   </node>
+      <include file="$(find eye_in_hand)/launch/image_maind.launch"/>
+
+
+   <!-- <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen" >
+    <param name="video_device" value="/dev/video1" />
+    <param name="image_width" value="640" />
+    <param name="image_height" value="480" />
+    <param name="pixel_format" value="yuyv" />
+    <param name="camera_frame_id" value="usb_cam" />
+    <param name="io_method" value="mmap"/>
+  </node>
+  <node name="image_view" pkg="image_view" type="image_view" respawn="false" output="screen">
+    <remap from="image" to="/camera/image_raw"/>
+    <param name="autosize" value="true" />
+  </node> -->
+  
+
+    <node name="ptam" pkg="ptam" type="ptam" clear_params="true" output="screen">
+      <remap from="image" to="$(optenv IMAGE /camera/output_video)" />
+        <remap from="pose" to="pose"/>
+      <rosparam file="$(find ptam)/PtamFixParams.yaml"/>
+    </node>
 
 
 </launch>

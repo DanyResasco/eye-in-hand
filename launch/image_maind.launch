@@ -1,0 +1,14 @@
+<launch>
+
+	
+	<arg name="spin_rate" default="50" />
+	<arg name="video_or_photo" default="0" />
+
+    <node name="Camera_demo" pkg="eye_in_hand" type="ptam_test_dany" output="screen" >
+		<rosparam command="load" file="$(find eye_in_hand)/Config/code_param.yaml" />
+
+		<param name="spin_rate" value="$(arg spin_rate)" />
+		<param name="video_or_photo" value="$(arg video_or_photo)" />
+	</node>
+
+</launch>

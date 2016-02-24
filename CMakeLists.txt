@@ -44,8 +44,6 @@ find_package(catkin REQUIRED
   std_msgs
   geometry_msgs 
   sensor_msgs
-  lwr_controllers
-  calibration
   image_transport
   cv_bridge
 )
@@ -70,14 +68,14 @@ include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS} ${OpenCV
 # add a target to generate API documentation with Doxygen
 
 
-find_package(Doxygen)
-if(DOXYGEN_FOUND)
-  configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doxygen.in @ONLY)
-  add_custom_target(doc
-  ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/doxygen.in
-  WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-  COMMENT "Generating API documentation with Doxygen" VERBATIM)
-endif(DOXYGEN_FOUND)
+# find_package(Doxygen)
+# if(DOXYGEN_FOUND)
+#   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/doxygen.in @ONLY)
+#   add_custom_target(doc
+#   ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/doxygen.in
+#   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+#   COMMENT "Generating API documentation with Doxygen" VERBATIM)
+# endif(DOXYGEN_FOUND)
 
 
 # <!-- add_message_files(
@@ -119,10 +117,15 @@ catkin_package(
 # target_link_libraries(testa ${catkin_LIBRARIES} ${OpenCV_LIBS} opencv_nonfree)
 
 
-add_executable(prova_dany src/dany_test.cpp)
+add_executable(prova_dany src/main_image_.cpp)
 # add_executable(prova_dany src/image_converter.cpp)
 add_dependencies(prova_dany prova_dany_gencpp ${PROJECT_NAME})
 target_link_libraries(prova_dany ${catkin_LIBRARIES} ${OpenCV_LIBS} opencv_nonfree)
+
+add_executable(ptam_test_dany src/dany_test.cpp)
+# add_executable(prova_dany src/image_converter.cpp)
+add_dependencies(ptam_test_dany ptam_test_dany_gencpp ${PROJECT_NAME})
+target_link_libraries(ptam_test_dany ${catkin_LIBRARIES} ${OpenCV_LIBS} opencv_nonfree)
 
 
 

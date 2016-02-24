@@ -1,5 +1,6 @@
 // using namespace std;
 #include <test_whit_ptam_and_ros.h>
+#include <function_camera.hpp>
 
 using namespace cv;
 RNG rng(12345);
@@ -22,27 +23,21 @@ int main(int argc, char **argv)
 		
 	while ( ros::ok() )
     {
+    	/*if camera ok*/
         if(node.arrived_cam ==1)
-        {
-            	
+        {            	
     		if(node.Finish == 1)
     		{
     			imshow("CAMERA_ROBOT",  node.scene);
-    			// std::cout<<"qui"<<std::endl;
     			node.ControllCamera();
     			waitKey(0);
     		}
 
-    		// bool move_camera_end = node.MoveCamera();
-    		if(node.move_camera_end == true)
-    		{
-    			node.DetectWithSift(node.scene);
-    		}
-    		
+
     		
     	}
             
-            //relax to fit output rate
+        //relax to fit output rate
         rate.sleep(); 
         ros::spinOnce();            
     }
@@ -52,58 +47,85 @@ int main(int argc, char **argv)
 
 Camera::Camera(): it_(nh)
 {
-	ros::param::get("~video_or_photo", video_or_photo);
-	ROS_DEBUG( "video_or_photo %lf", video_or_photo);
+	// ros::param::get("~video_or_photo", video_or_photo);
+	// ROS_DEBUG( "video_or_photo %lf", video_or_photo);
+	ROS_INFO("COSTRUTTORE NODE DANY_TEST");
+	nh.param<double>("ptam_scale",ptam_scale, 0);
 
-	nh.param<double>("/Camera_demo/threshold_sift",threshold_sift,0.01);
-	std::cout<<"threshold_sift: "<<threshold_sift<<std::endl;
-	
-    image_pub_ = it_.advertise("/camera/output_video", 1);	
-	sub = it_.subscribe("/usb_cam/image_raw", 1, &Camera::ImageConverter, this);
+	/*Set the camera parameter from calibration. Change this parameter at code_param.yaml */
+	double cam_fx, cam_d0, cam_d1, cam_d2, cam_d3, cam_fy, cam_cx, cam_cy;
+	nh.param<double>("/Camera_demo/cam_d0",cam_d0, -0.097079);
+	nh.param<double>("/Camera_demo/cam_d1",cam_d1, 0.115189);
+	nh.param<double>("/Camera_demo/cam_d2",cam_d2,-0.005712);
+	nh.param<double>("/Camera_demo/cam_d3",cam_d3, 0.000509);
+
+	nh.param<double>("/Camera_demo/cam_fx",cam_fx, 0);
+	nh.param<double>("/Camera_demo/cam_fy",cam_fy, 0);
+	nh.param<double>("/Camera_demo/cam_cx",cam_cx, 0);
+	nh.param<double>("/Camera_demo/cam_cy",cam_cy, 0);
+
+	Camera_Matrix = cv::Mat(3,3,CV_32FC1,0.0f);
+	Camera2_S03 = cv::Mat(3,3,CV_32FC1,0.0f);
+
+ 	Camera_Matrix.at<float>(0,0) = cam_fx;
+ 	Camera_Matrix.at<float>(0,1) = 0;
+ 	Camera_Matrix.at<float>(0,2) = cam_cx;
+ 	Camera_Matrix.at<float>(1,0) = 0;
+ 	Camera_Matrix.at<float>(1,1) = cam_fy;
+ 	Camera_Matrix.at<float>(1,2) = cam_cy;
+ 	Camera_Matrix.at<float>(2,0) = 0;
+ 	Camera_Matrix.at<float>(2,1) = 0;
+ 	Camera_Matrix.at<float>(2,2) = 1;
+
+ 	Cam_par_distortion = cv::Mat(1,4,CV_32FC1,0.0f);
+ 	Cam_par_distortion.at<float>(0,0) = cam_d0;
+ 	Cam_par_distortion.at<float>(0,1) = cam_d1;
+ 	Cam_par_distortion.at<float>(0,2) = cam_d2;
+ 	Cam_par_distortion.at<float>(0,3) = cam_d3; 
+
+	sub = it_.subscribe("/camera/output_video", 1, &Camera::ImageConverter, this);
 	move_camera_end = false;
 
+	ptam_sub = nh.subscribe("/vslam/pose",1, &Camera::SOtreCamera, this);
 }
 
 
-void Camera::ImageConverter(const sensor_msgs::ImageConstPtr& msg)
+void Camera::ImageConverter(const sensor_msgs::Image::ConstPtr& msg)
 {
-	std::cout<<"dany ho ricevuto la camera"<<std::endl;
+	cv::Mat scene_temp;
     cv_bridge::CvImagePtr cv_ptr;
     cv_ptr = cv_bridge::toCvCopy(msg);
-    cv_ptr->image.copyTo(scene);
+    cv_ptr->image.copyTo(scene_temp);
 
-    sensor_msgs::ImagePtr msg2;
-    msg2 = cv_bridge::CvImage(std_msgs::Header(), sensor_msgs::image_encodings::MONO8, scene).toImageMsg();
-    	
-    image_pub_.publish(msg2);
+    cv::undistort(scene_temp, scene, Camera_Matrix, Cam_par_distortion);
 
 	arrived_cam = 1;
-
-      //       imshow("CAMERA_ROBOT", scene);
-    		
-    		// ControllCamera();
-    		// waitKey(0);
-    	
+	ROS_INFO("RICEVUTA CAMERA");
 }
 
 
 void Camera::ControllCamera()
 {
-	std::cout<<"ControllCamera"<<std::endl;
-	
 	if (first_Step == 1)
 	{
-	 	//set the callback function for any mouse event
+	 	/*set the callback function for any mouse event*/
 		setMouseCallback("CAMERA_ROBOT", CallBackFunc, NULL);
-		//std::cout<<"preso bott"<<std::endl;
-		if(press_buttom == 1 )	//wait the mouse event
+
+		if(press_buttom == 1 )	/*wait the mouse event*/
 		{
-			
 			ShapeDetect();
-			// first_Step = 0;
-			// std::cout<<"muovi"<<std::endl;
 		}
 	}
+	std::vector< DMatch > keyp2;
+	if(move_camera_end == true)
+    {
+    	keyp2 = DetectWithSift(scene);
+    }
+    if(sub_ptam == true)
+    {
+    	Triangulation(keyp2);
+    }
+    		
 
 }
 
@@ -123,21 +145,23 @@ void Camera::CallBackFunc(int event, int x, int y, int flags, void* userdata)
 
 void Camera::ShapeDetect()
 { 
-	// std::vector<geometry> Shape_;
 	Mat src_gray;
-	cv::Mat dst = scene.clone();
-    /// Convert it to gray
-  	cvtColor( scene, src_gray, CV_BGR2GRAY );
+	cv::Mat dst ;
+	//= scene.clone();
+    /* Convert it to gray*/
+  	cvtColor( scene, dst, CV_GRAY2RGB );
 
-  	// Reduce the noise so we avoid false circle detection
-  	GaussianBlur( src_gray, src_gray, Size(9, 9), 2, 2 );
-  	// Convert to binary image using Canny
+  	/* Reduce the noise so we avoid false circle detection*/
+  	GaussianBlur( scene, src_gray, Size(9, 9), 2, 2 );
+  	
+  	/* Convert to binary image using Canny*/
 	cv::Mat bw;
-	cv::Canny(src_gray, bw, 0, 50, 5);
+	cv::Canny(scene, bw, 0, 50, 5);
+
 	std::pair<std::vector<cv::Point> ,std::vector<std::vector<cv::Point> >> CenterAndContours;
-	CenterAndContours = FindContours(bw.clone(), dst.clone());
 	
-	// std::cout<<"Shape_local: "<<Shape_local.size()<<std::endl;;
+	CenterAndContours = FindContours(bw.clone(), dst.clone());
+	ROS_INFO("DENTRO ShapeDetect");
 	if(CenterAndContours.second.size() > 0)
 	{
 		std::pair<int,bool> info_geometry;
@@ -145,18 +169,14 @@ void Camera::ShapeDetect()
 		point_b.x = pos_object.x;
 		point_b.y = pos_object.y;
 
-		
-
 		info_geometry = FindAMinDistanceButton(CenterAndContours.first,point_b);
 		
 		if(info_geometry.second == true)
 		{
-			std::cout<<"** Tasto premuto correttamente **"<<std::endl;
-			first_Step = 0;
-			press_buttom = 0;
+			ROS_INFO("** Tasto premuto correttamente **");
+
 			BottonCHosen.Center_.x = floor(CenterAndContours.first[info_geometry.first].x);
 			BottonCHosen.Center_.y = floor(CenterAndContours.first[info_geometry.first].y);
-			// std::cout<<"hai premuto: "<<BottonCHosen.Center_.x<< '\t'<< BottonCHosen.Center_.y <<std::endl;
 			setLabel(dst, "BOTP", CenterAndContours.second[info_geometry.first]);
 			BottonCHosen.Bot_C = CenterAndContours.second[info_geometry.first];
 
@@ -165,11 +185,8 @@ void Camera::ShapeDetect()
 			cv::Mat convert_BcMat_ = roi.clone(); 
 
 			convert_BcMat_.convertTo(BottonCHosen.figure_, CV_8U) ;
-			//Detect sift
-			 /* threshold      = 0.04;
-	       		edge_threshold = 10.0;
-	       		magnification  = 3.0;    */ 
-		    // SIFT feature detector and feature extractor
+	
+		    /* SIFT feature detector and feature extractor */
 		    cv::SiftFeatureDetector detector( 0.01, 3.0 );
 		    cv::SiftDescriptorExtractor extractor( 2.0 );
 
@@ -179,7 +196,6 @@ void Camera::ShapeDetect()
 			cv::imshow("dst", dst);
 			cv::waitKey(0);
 
-			// start = 1;
 			Finish = 0;
 			move_camera_end = true;
 			first_Step = 0;
@@ -187,228 +203,63 @@ void Camera::ShapeDetect()
 		else
 		{
 			press_buttom = 0;
-			std::cout<<"ripremi nuovamente il pulsante"<<std::endl;
+			ROS_INFO("ripremi nuovamente il pulsante");
 		}
 
 	}
 	else
 	{
-		std::cout<<"ripremi nuovamente il pulsante"<<std::endl;
+		ROS_INFO("ripremi nuovamente il pulsante");
 		press_buttom = 0;
 	}		
 }
 
-std::pair<std::vector<cv::Point> ,std::vector<std::vector<cv::Point> >> Camera::FindContours(cv::Mat bw, cv::Mat camera)
+
+void Camera::SOtreCamera(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr msg)
 {
-	// Find contours
-	std::pair<std::vector<cv::Point> ,std::vector<std::vector<cv::Point>> > CenterAndContours;
-	std::vector<std::vector<cv::Point> > contours;
-	cv::findContours(bw.clone(), contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
-
-	// The array for storing the approximation curve
-	std::vector<cv::Point> approx;
-
-	// We'll put the labels in this destination image
-	cv::Mat dst = camera.clone();
-
-	//std::cout<<"trovati i contorni"<<std::endl;
-	for (unsigned int i = 0; i < contours.size(); i++)
-	{
-	    // Approximate contour with accuracy proportional
-	    // to the contour perimeter
-	   cv::approxPolyDP(cv::Mat(contours[i]), approx, cv::arcLength(cv::Mat(contours[i]), true)*0.02, true);
-
-		// Skip small or non-convex objects 
-		if (std::fabs(cv::contourArea(contours[i])) < 100 || !cv::isContourConvex(approx))
-			continue;
-
-	    if (approx.size() == 3)
-        setLabel(dst, "TRI", contours[i]);    // Triangles
-
-    	else if (approx.size() >= 4 && approx.size() <= 6)
-    	{
-	        // Number of vertices of polygonal curve
-	        int vtc = approx.size();
-
-	        // Get the degree (in cosines) of all corners
-	        std::vector<double> cos;
-	        for (int j = 2; j < vtc+1; j++)
-	            cos.push_back(angle(approx[j%vtc], approx[j-2], approx[j-1]));
-
-	        // Sort ascending the corner degree values
-	        std::sort(cos.begin(), cos.end());
-
-	        // Get the lowest and the highest degree
-	        double mincos = cos.front();
-	        double maxcos = cos.back();
-
-	        // Use the degrees obtained above and the number of vertices
-	        // to determine the shape of the contour
-	        if (vtc == 4 && mincos >= -0.1 && maxcos <= 0.3)
-	        {
-	            // Detect geometry.Shape_contours or square
-	            cv::Rect r = cv::boundingRect(contours[i]);
-	            double ratio = std::abs(1 - (double)r.width / r.height);
-
-	            setLabel(dst, ratio <= 0.02 ? "SQU" : "RECT", contours[i]);
-	            
-	            CenterAndContours.first.push_back(FindACenter(contours[i]));
-	            CenterAndContours.second.push_back(contours[i]);
-	            
-	        }
-	        else if (vtc == 5 && mincos >= -0.34 && maxcos <= -0.27)
-	             setLabel(dst, "PENTA", contours[i]);
-	        else if (vtc == 6 && mincos >= -0.55 && maxcos <= -0.45)
-	            setLabel(dst, "HEXA", contours[i]);
-    	}
-    	else
-	    {
-	        // Detect and label circles
-	        double area = cv::contourArea(contours[i]);
-	        cv::Rect r = cv::boundingRect(contours[i]);
-	        int radius = r.width / 2;
-
-	        if (std::abs(1 - ((double)r.width / r.height)) <= 0.2 && std::abs(1 - (area / (CV_PI * std::pow(radius, 2)))) <= 0.2)
-	        {
-
-	            setLabel(dst, "CIR", contours[i]);
-	            CenterAndContours.first.push_back(FindACenter(contours[i]));
-
-	            CenterAndContours.second.push_back(contours[i]);
-	        }
-	    }
-	}
-	// imshow("circle", dst);
-	// waitKey(0);
-	return CenterAndContours;
+	KDL::Frame frame_temp;
+	
+	tf::poseMsgToKDL ((msg->pose).pose, frame_temp);
+	ROS_INFO_STREAM("frame_temp: "<<frame_temp);
+	Camera2_S03.at<float>(0,0) = frame_temp.M.data[0];
+	Camera2_S03.at<float>(0,1) = frame_temp.M.data[1];
+	Camera2_S03.at<float>(0,2) = frame_temp.M.data[2];
+	Camera2_S03.at<float>(0,3) = frame_temp.p.x();
+	Camera2_S03.at<float>(1,0) = frame_temp.M.data[3];
+	Camera2_S03.at<float>(1,1) = frame_temp.M.data[4];
+	Camera2_S03.at<float>(1,2) = frame_temp.M.data[5];
+	Camera2_S03.at<float>(1,3) = frame_temp.p.y();
+	Camera2_S03.at<float>(2,0) = frame_temp.M.data[6];
+	Camera2_S03.at<float>(2,1) = frame_temp.M.data[7];
+	Camera2_S03.at<float>(2,2) = frame_temp.M.data[8];
+	Camera2_S03.at<float>(2,3) = frame_temp.p.z();
 }
 
 
-
-
-
-
-
-
-
-
-
-
-std::pair<int,int> FindMaxValue(cv::Mat &matrix, cv::Point &point )
-{
-	std::pair<int,int> dist;
-	// std::cout<<"point x: " <<point.x<<'\t'<<"point y: "<<point.y<<std::endl;
-	// std::cout<<"matrix x: " <<matrix.cols<<'\t'<<"matrix y: "<<matrix.rows<<std::endl;
-	cv::Point point2(point.x-30, point.y -40);
-	cv::Rect rect(point, matrix.size());
-	
-	if((point2.x)+100 < matrix.cols )
-	{
-		dist.first = 100;
-	}
-	else
-		dist.first = matrix.cols - point2.x;
-
-	if((point2.y)+100 < matrix.rows )
-	{
-		dist.second = 100;
-	}
-	else
-		dist.second = matrix.rows - point2.y;
-
-	// std::cout<<"dist first: "<<dist.first<<'\t'<<"dist second: "<<dist.second<<std::endl;
-	return dist;
-}
-
-
-
-
-
-
-std::pair<int,bool> Camera::FindAMinDistanceButton(std::vector<cv::Point> &baricentro, cv::Point &point_)
-{
-	int  local_dist;
-	std::vector<int> distance;
-	std::pair<int, bool> check_bot;
-	check_bot.second = false;
-	
-	for(unsigned int i=0; i<= baricentro.size();i++)
-	{
-		local_dist = norm((point_ - baricentro[i]));
-		// std::cout<<"distance 14: "<<local_dist<<std::endl;
-
-		distance.push_back(local_dist);	
-	}
-
-	int min_d = distance[0];
-	// check_bot.first = 1;
-	int count = 0;
-
-	for(unsigned int i=0; i < distance.size(); i++)
-	{
-	   	if((min_d >= distance[i]) && (distance[i] < 90))
-	   	{
-			min_d = distance[i];
-	   		check_bot.first = i;
-	   		check_bot.second = true;
-	   		count ++;
-	   		//std::cout<<"index: "<<index_shape <<std::endl;
-	   	}	
-	}
-
-	
-	if(count == 0)
-	{
-	 	std::cout<<"Non è stato premuto correttamente il pulsante"<<std::endl;
-	 	std::cout<<"Premere nuovamente il pulsante"<<std::endl;
-		check_bot.second = false;
-		check_bot.first = 1;
-
-	}	
-	// std::cout<<"check_bot.first: "<<check_bot.first<<std::endl;
-
-	return check_bot;
-	
-
-}
-
-cv::Point FindACenter(std::vector<cv::Point> &geometry)
-{
-    cv::Moments m = moments(geometry, true);
-    cv::Point center(m.m10/m.m00, m.m01/m.m00);
-
-   return center;
-}
-
-
-void Camera::DetectWithSift(cv::Mat &frame)
+std::vector< DMatch > Camera::DetectWithSift(cv::Mat &frame)
 {
 	//Detect sift
 		 /* threshold      = 0.04;
        		edge_threshold = 10.0;
        		magnification  = 3.0;    */ 
-	    // SIFT feature detector and feature extractor
-    std::cout<<"BottonCHosen.descr_.rows: "<<BottonCHosen.descr_.rows<<std::endl;
+	// SIFT feature detector and feature extractor
+    // std::cout<<"BottonCHosen.descr_.rows: "<<BottonCHosen.descr_.rows<<std::endl;
     std::vector<KeyPoint> keyp_;
 	cv::Mat descr_;   		
 	cv::SiftFeatureDetector detector( 0.01, 3.0 );
 	cv::SiftDescriptorExtractor extractor( 2.0 );
-	// cv::SiftFeatureDetector detector;
-	// cv::SiftDescriptorExtractor extractor;
+
 	detector.detect(frame, keyp_ );
 	extractor.compute( frame, keyp_, descr_ );
  	
- 	// -- Step 2: Matching descriptor vectors using FLANN matcher
+    /* -- Step 2: Matching descriptor vectors using FLANN matcher */
  	FlannBasedMatcher matcher;
  	std::vector< DMatch > matches;
     matcher.match( BottonCHosen.descr_, descr_, matches );
 
     double max_dist = 0; double min_dist = 70;
 
-    std::cout<<"good_matches.size(): "<<matches.size()<<std::endl;
-      // std::cout<<"BottonCHosen.descr_.rows: "<<BottonCHosen.descr_.rows<<std::endl;
-
-	// //-- Quick calculation of max and min distances between keypoints
+	/*-- Quick calculation of max and min distances between keypoints */
 	for( int i = 0; i < BottonCHosen.descr_.rows; i++ )
 	{ 
 	 	double dist = matches[i].distance;
@@ -430,17 +281,17 @@ void Camera::DetectWithSift(cv::Mat &frame)
 	    }
     }
 
-	//-- Draw only "good" matches
+	/*-- Draw only "good" matches */
 	Mat img_matches;
 	drawMatches( BottonCHosen.figure_, BottonCHosen.keyp_, frame, keyp_, good_matches, img_matches, 
 	  				Scalar::all(-1), Scalar::all(-1),std::vector<char>(), 
 	  				DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
 
-	//-- Localize the object
+	/*-- Localize the object */
 	std::vector<Point2f> obj;
 	std::vector<Point> scene_point;
 
-	for( int i = 0; i < good_matches.size(); i++ )
+	for(unsigned int i = 0; i < good_matches.size(); i++ )
 	{
 	    //-- Get the keypoints from the good matches
 	    obj.push_back( BottonCHosen.keyp_[ good_matches[i].queryIdx ].pt );
@@ -449,39 +300,36 @@ void Camera::DetectWithSift(cv::Mat &frame)
 	if(scene_point.size() >0)
 	{
 		setLabel(frame, "quip", scene_point);
+		cv::Rect r = cv::boundingRect(scene_point);
+		cv::Point pt(r.x + (r.width / 2), r.y + (r.height / 2));
+		Botton_2frame = pt;
+		line( frame,pt, pt , Scalar( 110, 220, 0 ),  2, 8 );
 		imshow("Object detection",frame);
 		waitKey(0);
 	}
-	
+
+    sub_ptam = true;
+
+    return good_matches;
 	//-- Show detected matches
 	// imshow( "Good Matches", img_matches );
 	// waitKey(0);
 }
 
 
-
-
-
-void setLabel(cv::Mat& im, const std::string label, std::vector<cv::Point>& contour)
+void Camera::Triangulation(std::vector< DMatch > keyp2)
 {
-	int fontface = cv::FONT_HERSHEY_SIMPLEX;
-	double scale = 0.4;
-	int thickness = 1;
-	int baseline = 0;
 
-	cv::Size text = cv::getTextSize(label, fontface, scale, thickness, &baseline);
-	cv::Rect r = cv::boundingRect(contour);
+	cv::Mat points3D(4,1,CV_64FC4);
+// cv::Mat cam0pnts(1,N,CV_64FC2);
+// cv::Mat cam1pnts(1,N,CV_64FC2);
 
-	cv::Point pt(r.x + ((r.width - text.width) / 2), r.y + ((r.height + text.height) / 2));
-	cv::rectangle(im, pt + cv::Point(0, baseline), pt + cv::Point(text.width, -text.height), CV_RGB(255,255,255), CV_FILLED);
-	cv::putText(im, label, pt, fontface, scale, CV_RGB(0,0,0), thickness, 8);
+	cv::Mat projMatr1 = Camera_Matrix;
+	cv::Mat projMatr2 = Camera_Matrix * Camera2_S03;
+
+	cv::triangulatePoints(projMatr1, projMatr2, BottonCHosen.keyp_, keyp2, points3D);
+
+
+
 }
 
-static double angle(cv::Point pt1, cv::Point pt2, cv::Point pt0)
-{
-	double dx1 = pt1.x - pt0.x;
-	double dy1 = pt1.y - pt0.y;
-	double dx2 = pt2.x - pt0.x;
-	double dy2 = pt2.y - pt0.y;
-	return (dx1*dx2 + dy1*dy2)/sqrt((dx1*dx1 + dy1*dy1)*(dx2*dx2 + dy2*dy2) + 1e-10);
-}
