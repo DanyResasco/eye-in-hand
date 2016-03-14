@@ -20,6 +20,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <geometry_msgs/Pose.h>
 #include <opencv2/highgui/highgui.hpp>
+#include <std_msgs/Bool.h>
 
 //sift
 #include <stdio.h>
@@ -29,9 +30,16 @@
 #include "opencv2/nonfree/features2d.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/nonfree/nonfree.hpp"
+
+// #include "opencv2/imgcodecs.hpp"
+
+// #include "opencv2/core/utility.hpp"
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include "opencv2/calib3d/calib3d.hpp"
 #include <tf_conversions/tf_kdl.h>
+#include <std_srvs/Empty.h>
+
+
 
 using namespace cv;
 
@@ -47,11 +55,15 @@ class Camera
     	cv::Mat Camera_Matrix;
     	cv::Mat Cam_par_distortion;
     	cv::Mat Camera2_S03;
+    	cv::Mat Im1;
+    	cv::Mat Im2;
 
 		cv::Mat scene;
 		int arrived_cam = 0;
 		double ptam_scale;
 		bool sub_ptam;
+		cv::Mat mat_;
+		ros::Subscriber srv_move;
 	
 		struct Obj 
 		{
@@ -65,6 +77,9 @@ class Camera
 		cv::Mat Point_3d; 
 		cv::Point Botton_2frame;
 
+		std::vector<cv::Point2f> KeypointIm2;
+		std::vector<Point2f> KeyPointIm1Match;
+		cv::Mat triangulatedPoints3D;
 
 		image_transport::ImageTransport it_;
 	  	image_transport::Subscriber sub;
@@ -74,12 +89,24 @@ class Camera
 		static int first_Step ;
 		double Finish = 1;
 		bool move_camera_end;
-
+		bool read_ptam;
 		int start = 0;
+		cv::Mat Image_roi2;
+		int FirstCalibration;
+		cv::Mat frame1_;
+		double RobotArmLenght;
+		double media_z;
+		double scale_factor;
+		double distanzaWebcam;
+		double So3_prev, So3_new;
+		bool SaveFirst;
+		bool sub_ptam_2;
 
 		Camera();
 		~Camera(){};
 		void ControllCamera();
+		void DetectWithSift();
+		void StereoCalibration();
 		
 
 	private:
@@ -90,8 +117,9 @@ class Camera
 		void ImageConverter(const sensor_msgs::Image::ConstPtr& msg);
 		std::pair<std::vector<cv::Point> ,std::vector<std::vector<cv::Point>> > FindContours(cv::Mat bw, cv::Mat camera);
 		void SOtreCamera(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr msg);
-		std::vector< DMatch > DetectWithSift(cv::Mat &frame);
-		void Triangulation(std::vector< DMatch > keyp2);
+		void Triangulation(cv::Mat S03_ptam);
+		void CreateAVector(std::vector<Point2f> keyp2, std::vector<Point2f> keyp_1 , cv::Mat &key_array_1, cv::Mat &key_array_2);
+		void MoveCallBack(const std_msgs::Bool::ConstPtr msg);
 };
 
 
@@ -114,9 +142,7 @@ Point Camera::pos_object;
 int Camera::press_buttom = 0;
 int Camera::first_Step = 1;
 
-
-
-
+double Media(cv::Mat triangulatedPoints3D,double RobotLenght);
 
 
 

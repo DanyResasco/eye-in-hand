@@ -111,10 +111,10 @@ catkin_package(
   LIBRARIES ${PROJECT_NAME})
 
 
-# add_executable(testa src/test_whit_ptam_and_ros.cpp)
-# # add_executable(testa src/image_converter.cpp)
-# add_dependencies(testa testa_gencpp ${PROJECT_NAME})
-# target_link_libraries(testa ${catkin_LIBRARIES} ${OpenCV_LIBS} opencv_nonfree)
+add_executable(Calibration src/calibration.cpp)
+# add_executable(testa src/image_converter.cpp)
+add_dependencies(Calibration Calibration_gencpp ${PROJECT_NAME})
+target_link_libraries(Calibration ${catkin_LIBRARIES} ${OpenCV_LIBS} opencv_nonfree)
 
 
 add_executable(prova_dany src/main_image_.cpp)

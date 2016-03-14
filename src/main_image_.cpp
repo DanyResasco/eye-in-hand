@@ -21,24 +21,22 @@ int main(int argc, char** argv)
   cv::Mat frame;
   sensor_msgs::ImagePtr msg;
 
-  ros::Rate loop_rate(5);
+  // ros::Rate loop_rate(5);
   while (nh.ok()) 
   {
     cap >> frame;
     // Check if grabbed frame is actually full with some content
     if(!frame.empty()) 
     {
+      // imshow("CAMERA_ROBOT",  frame);
       cv::Mat src_gray;
       cvtColor( frame, src_gray, CV_BGR2GRAY );
-
-      /* Reduce the noise*/
-      GaussianBlur( src_gray, src_gray,cv::Size(9, 9), 2, 2 );
 
       /*send msgs to ptam*/
       msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", src_gray).toImageMsg();
       pub.publish(msg);
-      
-      cv::waitKey(1);
+   
+      // cv::waitKey(1);
     }
     else
     {
@@ -46,6 +44,6 @@ int main(int argc, char** argv)
     }
 
     ros::spinOnce();
-    loop_rate.sleep();
+    // loop_rate.sleep();
   }
 }

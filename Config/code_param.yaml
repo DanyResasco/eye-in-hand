@@ -1,12 +1,25 @@
 cam_model: Pinhole
 cam_width: 640
 cam_height: 480
-cam_fx: 542.589444
-cam_fy: 540.825211
-cam_cx: 304.671829
-cam_cy: 209.938017
+# cam_fx: 542.589444
+# cam_fy: 540.825211
+# cam_cx: 304.671829
+# cam_cy: 209.938017
+cam_fx: 5.8280394574794718e+02
+cam_fy: 5.8280394574794718e+02
+cam_cx: 3.1950000000000000e+02
+cam_cy: 2.3950000000000000e+02
+# cam_d0: -1.1907636947904976e-01
+# cam_d1: -1.0182731171672556e-01
+# cam_d2: 1.7103486347679338e+00
+# cam_d3: 0.0
+# cam_d4: 0.0
 cam_d0: -0.097079
 cam_d1: 0.115189
 cam_d2: -0.005712
 cam_d3: 0.000509
+cam_d4: 0.00
 ptam_scale: 0.5
+RobotArmLenght: 1.0
+scale_factor: 2.0
+distanzaWebcam: 0.05

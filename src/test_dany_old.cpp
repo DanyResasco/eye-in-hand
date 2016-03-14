@@ -26,24 +26,12 @@ int main(int argc, char **argv)
     	/*if camera ok*/
         if(node.arrived_cam ==1)
         {            	
-			if (node.first_Step == 1)
-			{			    			
-    			// imshow("CAMERA_ROBOT",  node.scene);
+    		if(node.Finish == 1)
+    		{
+    			imshow("CAMERA_ROBOT",  node.scene);
     			node.ControllCamera();
-    			// waitKey(0);
+    			waitKey(0);
     		}
-    		// ROS_INFO_STREAM("ESCO DAL FIRST STEP");
-			if(node.move_camera_end == true)
-			{
-				ROS_INFO_STREAM("entrata qui");
-				// imshow("CAMERA_ROBOT_MOVE",  node.scene);
-				node.DetectWithSift();
-				// waitKey(0);
-				if(node.FirstCalibration == 1)
-				{
-					node.StereoCalibration();
-				}
-			}
     	}
             
         //relax to fit output rate
@@ -62,23 +50,17 @@ Camera::Camera(): it_(nh)
 	nh.param<double>("ptam_scale",ptam_scale, 0);
 
 	/*Set the camera parameter from calibration. Change this parameter at code_param.yaml */
-	float cam_fx, cam_d0, cam_d1, cam_d2, cam_d3,cam_d4, cam_fy, cam_cx, cam_cy;
-	nh.param<float>("/Camera_demo/cam_d0",cam_d0, -0.097079);
-	nh.param<float>("/Camera_demo/cam_d1",cam_d1, 0.115189);
-	nh.param<float>("/Camera_demo/cam_d2",cam_d2,-0.005712);
-	nh.param<float>("/Camera_demo/cam_d3",cam_d3, 0.000509);
-	nh.param<float>("/Camera_demo/cam_d4",cam_d4, 0.000509);
+	double cam_fx, cam_d0, cam_d1, cam_d2, cam_d3,cam_d4, cam_fy, cam_cx, cam_cy;
+	nh.param<double>("/Camera_demo/cam_d0",cam_d0, -0.097079);
+	nh.param<double>("/Camera_demo/cam_d1",cam_d1, 0.115189);
+	nh.param<double>("/Camera_demo/cam_d2",cam_d2,-0.005712);
+	nh.param<double>("/Camera_demo/cam_d3",cam_d3, 0.000509);
+	nh.param<double>("/Camera_demo/cam_d4",cam_d4, 0.000509);
 
-	nh.param<float>("/Camera_demo/cam_fx",cam_fx, 0);
-	nh.param<float>("/Camera_demo/cam_fy",cam_fy, 0);
-	nh.param<float>("/Camera_demo/cam_cx",cam_cx, 0);
-	nh.param<float>("/Camera_demo/cam_cy",cam_cy, 0);
-
-	nh.param<double>("/Camera_demo/RobotArmLenght",RobotArmLenght, 1);
-	nh.param<double>("/Camera_demo/scale_factor", scale_factor,2.0);
-	nh.param<double>("/Camera_demo/distanzaWebcam", distanzaWebcam,2.0);
-
-	ROS_INFO_STREAM("distanzaWebcam: " <<distanzaWebcam);
+	nh.param<double>("/Camera_demo/cam_fx",cam_fx, 0);
+	nh.param<double>("/Camera_demo/cam_fy",cam_fy, 0);
+	nh.param<double>("/Camera_demo/cam_cx",cam_cx, 0);
+	nh.param<double>("/Camera_demo/cam_cy",cam_cy, 0);
 
 	Camera_Matrix = cv::Mat(3,3,CV_32FC1,0.0f);
 	Camera2_S03 = cv::Mat(3,4,CV_32FC1,0.0f);
@@ -100,21 +82,13 @@ Camera::Camera(): it_(nh)
  	Cam_par_distortion.at<float>(0,3) = cam_d3; 
  	Cam_par_distortion.at<float>(0,3) = cam_d4; 
 
-
-
+	sub = it_.subscribe("/camera/output_video", 1, &Camera::ImageConverter, this);
 	move_camera_end = false;
 	sub_ptam = false;
 	read_ptam = false;
-	FirstCalibration = 1;
-	So3_new = 0;
-	sub_ptam_2 = true;
-	SaveFirst = true;
-
-
-
-	sub = it_.subscribe("/camera/output_video", 1, &Camera::ImageConverter, this);
 	ptam_sub = nh.subscribe("/vslam/pose",1, &Camera::SOtreCamera, this);  
 	srv_move = nh.subscribe("/moveok",1, &Camera::MoveCallBack, this);
+
 }
 
 
@@ -128,22 +102,37 @@ void Camera::ImageConverter(const sensor_msgs::Image::ConstPtr& msg)
     cv::undistort(scene_temp, scene, Camera_Matrix, Cam_par_distortion);
 
 	arrived_cam = 1;
-	// ROS_INFO_STREAM("camera");
+	// ROS_INFO("RICEVUTA CAMERA");
 }
 
 
 void Camera::ControllCamera()
 {
-	imshow("CAMERA_ROBOT",  scene);
-
- 	/*set the callback function for any mouse event*/
-	setMouseCallback("CAMERA_ROBOT", CallBackFunc, NULL);
-		waitKey(0);
-
-	if(press_buttom == 1 )	/*wait the mouse event*/
+	if (first_Step == 1)
 	{
-		ShapeDetect();
+	 	/*set the callback function for any mouse event*/
+		setMouseCallback("CAMERA_ROBOT", CallBackFunc, NULL);
+
+		if(press_buttom == 1 )	/*wait the mouse event*/
+		{
+			ShapeDetect();
+		}
 	}
+
+	std::vector< DMatch > keyp2;
+	if(move_camera_end == true)
+    {
+    	keyp2 = DetectWithSift(scene);
+    }
+    // ROS_INFO_STREAM("sub_ptam: " <<std::boolalpha<<sub_ptam);
+    // ROS_INFO_STREAM("read_ptam: " <<std::boolalpha<<read_ptam);
+
+    // if(sub_ptam == true) 
+    // {
+    // 	Triangulation();
+    // }
+    		
+
 }
 
 void Camera::CallBackFunc(int event, int x, int y, int flags, void* userdata)
@@ -162,16 +151,15 @@ void Camera::CallBackFunc(int event, int x, int y, int flags, void* userdata)
 
 void Camera::ShapeDetect()
 { 
-	
+	Im1 = scene.clone();
 	Mat src_gray;
 	cv::Mat dst ;
-
 	//= scene.clone();
     /* Convert it to gray*/
   	cvtColor( scene, dst, CV_GRAY2RGB );
-  		Im1 = dst.clone();
+
   	/* Reduce the noise so we avoid false circle detection*/
-  	// GaussianBlur( scene, src_gray, Size(9, 9), 2, 2 );
+  	GaussianBlur( scene, src_gray, Size(9, 9), 2, 2 );
   	
   	/* Convert to binary image using Canny*/
 	cv::Mat bw;
@@ -204,37 +192,20 @@ void Camera::ShapeDetect()
 			cv::Mat convert_BcMat_ = roi.clone(); 
 
 			convert_BcMat_.convertTo(BottonCHosen.figure_, CV_8U) ;
-			// convert_BcMat_.convertTo(BottonCHosen.figure_, CV_GRAY2RGB) ;
-		
-			//test
-				// points.push_back(keyp_1[i]);
-			// cv::Mat key_array_1_temp(CenterAndContours.second[info_geometry.first]);
-			// key_array_1_temp.copyTo(BottonCHosen.figure_);
-
-
-
+	
 		    /* SIFT feature detector and feature extractor */
 		    cv::SiftFeatureDetector detector( 0.01, 3.0 );
 		    cv::SiftDescriptorExtractor extractor( 2.0 );
-		    //  cv::SiftFeatureDetector detector;
-		    // cv::SiftDescriptorExtractor extractor;
 
 		    detector.detect(BottonCHosen.figure_, BottonCHosen.keyp_ );
 		    extractor.compute( BottonCHosen.figure_, BottonCHosen.keyp_, BottonCHosen.descr_ );
 
-		    // detector.detect(BottonCHosen.figure_, BottonCHosen.keyp_ );
-		    // extractor.compute( BottonCHosen.figure_, BottonCHosen.keyp_, BottonCHosen.descr_ );
-		    // cv::Mat img_keypoints_1;
-		    // ROS_INFO_STREAM("BottonCHosen.keyp_: " << BottonCHosen.keyp_.size());
-		    // drawKeypoints( BottonCHosen.figure_, BottonCHosen.keyp_, img_keypoints_1, Scalar::all(-1), DrawMatchesFlags::DEFAULT );
 			cv::imshow("dst", dst);
 			cv::waitKey(0);
-			// cv::imshow("key1", img_keypoints_1);
-			// cv::waitKey(0);
 			// cv::imshow("dst_tagliato", BottonCHosen.figure_);
 			// cv::waitKey(0);
 
-			// Finish = 0;
+			Finish = 0;
 			// move_camera_end = true;
 			first_Step = 0;
 		}
@@ -262,40 +233,32 @@ void Camera::SOtreCamera(const geometry_msgs::PoseWithCovarianceStamped::ConstPt
 	Camera2_S03.at<float>(0,0) = frame_temp.M.data[0];
 	Camera2_S03.at<float>(0,1) = frame_temp.M.data[1];
 	Camera2_S03.at<float>(0,2) = frame_temp.M.data[2];
-	
-	Camera2_S03.at<float>(0,3) = frame_temp.p.x();
+	Camera2_S03.at<float>(0,3) = 0;
+	// Camera2_S03.at<float>(0,3) = frame_temp.p.x();
 	Camera2_S03.at<float>(1,0) = frame_temp.M.data[3];
 	Camera2_S03.at<float>(1,1) = frame_temp.M.data[4];
 	Camera2_S03.at<float>(1,2) = frame_temp.M.data[5];
-
-	Camera2_S03.at<float>(1,3) = frame_temp.p.y();
+		Camera2_S03.at<float>(1,3) = 0;
+	// Camera2_S03.at<float>(1,3) = frame_temp.p.y();
 	Camera2_S03.at<float>(2,0) = frame_temp.M.data[6];
 	Camera2_S03.at<float>(2,1) = frame_temp.M.data[7];
 	Camera2_S03.at<float>(2,2) = frame_temp.M.data[8];
-
-	Camera2_S03.at<float>(2,3) = frame_temp.p.z();
+		Camera2_S03.at<float>(2,3) = 0.05;
+	// Camera2_S03.at<float>(2,3) = frame_temp.p.z();
 
 	// ROS_INFO_STREAM("Camera2_S03: "<<Camera2_S03);
 	// read_ptam = true;
-	if((sub_ptam == true) && (sub_ptam_2 == true))
+	if(sub_ptam == true)
     {
-    	Triangulation(Camera2_S03);
+    	Triangulation();
     }
 }
 
 
-void Camera::DetectWithSift()
+std::vector< DMatch > Camera::DetectWithSift(cv::Mat &frame)
 {
-	ROS_INFO_STREAM("DENTRO DetectWithSift");
-	// Im2 = frame.clone();
-	cv::Mat frame;
-	cv::Mat frame_temp;
-	frame_temp = frame1_.clone();
-
-	 	// cvtColor( frame1_, frame, CV_GRAY2RGB );
-	frame_temp.convertTo(frame, CV_8U) ;
-  	
-  	//Detect sift
+	Im2 = frame.clone();
+	//Detect sift
 		 /* threshold      = 0.04;
        		edge_threshold = 10.0;
        		magnification  = 3.0;    */ 
@@ -305,24 +268,16 @@ void Camera::DetectWithSift()
 	cv::Mat descr_;   		
 	cv::SiftFeatureDetector detector( 0.01, 3.0 );
 	cv::SiftDescriptorExtractor extractor( 2.0 );
-	// cv::SiftFeatureDetector detector;
-	// cv::SiftDescriptorExtractor extractor;
-
 
 	detector.detect(frame, keyp_ );
-	// cv::Mat img_keypoints_1;
-	// drawKeypoints( frame, keyp_, img_keypoints_1, Scalar::all(-1), DrawMatchesFlags::DEFAULT );
-	// cv::imshow("key2", img_keypoints_1);
-	// 		cv::waitKey(0);
-
 	extractor.compute( frame, keyp_, descr_ );
- 		
+ 	
     /* -- Step 2: Matching descriptor vectors using FLANN matcher */
  	FlannBasedMatcher matcher;
  	std::vector< DMatch > matches;
     matcher.match( BottonCHosen.descr_, descr_, matches );
 
-    double max_dist = 0; double min_dist = 100;
+    double max_dist = 0; double min_dist = 55;
 
 	/*-- Quick calculation of max and min distances between keypoints */
 	for( int i = 0; i < BottonCHosen.descr_.rows; i++ )
@@ -337,46 +292,47 @@ void Camera::DetectWithSift()
 
 	for( int i = 0; i < BottonCHosen.descr_.rows; i++ )
 	{ 
-	 	if( matches[i].distance <= max(2*min_dist, 0.02) )
+	 	if( matches[i].distance <= max(min_dist, 0.01) )
 	    { 
 		   	good_matches.push_back( matches[i]);
 
-		   	KeypointIm2.push_back((keyp_[matches[i].trainIdx]).pt); 
+		   	pointIm2.push_back((keyp_[matches[i].trainIdx]).pt); 
 	    }
     }
 
 	/*-- Draw only "good" matches */
 	Mat img_matches;
-	drawMatches(BottonCHosen.figure_, BottonCHosen.keyp_, frame, keyp_, good_matches, img_matches, 
+	drawMatches( BottonCHosen.figure_, BottonCHosen.keyp_, frame, keyp_, good_matches, img_matches, 
 	  				Scalar::all(-1), Scalar::all(-1),std::vector<char>(), 
 	  				DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
 
 	/*-- Localize the object */
 	// std::vector<Point2f> obj;
 	std::vector<Point> scene_point;
-	ROS_INFO_STREAM(" good_matches.size(): " << good_matches.size());
+
 	for(unsigned int i = 0; i < good_matches.size(); i++ )
 	{
 	    //-- Get the keypoints from the good matches
-	    KeyPointIm1Match.push_back( BottonCHosen.keyp_[ good_matches[i].queryIdx ].pt );
+	    obj.push_back( BottonCHosen.keyp_[ good_matches[i].queryIdx ].pt );
 	    scene_point.push_back( keyp_[ good_matches[i].trainIdx ].pt );
 	}
 
 	//test roi
-	// cv::Point centerim2 = FindACenter(scene_point);
-	// ROS_INFO_STREAM("CREATO FindACenter");
-	// std::pair<int,int> value = FindMaxValue(frame, centerim2 );
-	// cv::Mat roi(scene, Rect(centerim2.x - 30,centerim2.y - 40,value.first, value.second));
-	// cv::Mat convert_BcMat_ = roi.clone(); 
-	
+	cv::Point centerim2 = FindACenter(scene_point);
+	std::pair<int,int> value = FindMaxValue(frame, centerim2 );
+	cv::Mat roi(scene, Rect(centerim2.x - 30,centerim2.y - 40,value.first, value.second));
+	cv::Mat convert_BcMat_ = roi.clone(); 
+	convert_BcMat_.convertTo(im2, CV_8U) ;
 
-	// convert_BcMat_.convertTo(Image_roi2, CV_8U) ;
+
+
+
 	// 	//-- Show detected matches
-	imshow( "good_matches", img_matches );
-	waitKey(0);
+	// imshow( "roi2", im2 );
+	// waitKey(0);
 
-	// ROS_INFO_STREAM("scene_point.SIZE()"<< scene_point.size());
-	// ROS_INFO_STREAM("BottonCHosen.keyp_: " <<BottonCHosen.keyp_.size());
+	ROS_INFO_STREAM("scene_point.SIZE()"<< scene_point.size());
+	ROS_INFO_STREAM("BottonCHosen.keyp_: " <<BottonCHosen.keyp_.size());
 	if(scene_point.size() >0)
 	{
 		setLabel(frame, "quip", scene_point);
@@ -387,68 +343,115 @@ void Camera::DetectWithSift()
 		imshow("Object detection",frame);
 		waitKey(0);
 	}
+
+    sub_ptam = true;
+
+
+
+    return good_matches;
 }
 
 
-void Camera::StereoCalibration()
+void Camera::Triangulation()
 {
 
 	ROS_INFO("Triangulation");
 	cv::Mat key_array_1;
 	cv::Mat key_array_2;
 
- 	CreateAVector(KeypointIm2, KeyPointIm1Match , key_array_1, key_array_2);
+ 	CreateAVector(pointIm2, obj , key_array_1, key_array_2);
+ 	int number = key_array_1.rows;
+
+ 	cv::Mat points4D(1,number,CV_32FC1);
+ 	std::vector<Point2f> points3D;
+	
+ 	cv::Mat projMatr1;
+ 	projMatr1 = cv::Mat(3,4,CV_32FC1,0.0f);
  
-  	Size imgSize = BottonCHosen.figure_.size();
+
+ 	for( int i=0; i<Camera_Matrix.rows; i++)
+ 	{
+ 		for( int j=0; j<Camera_Matrix.cols; j++)
+ 		{
+ 			projMatr1.at<float>(i,j) = Camera_Matrix.at<float>(i,j);
+ 		}
+ 	}
+ 	
+ 	projMatr1.at<float>(0,3) = 0;
+ 	projMatr1.at<float>(1,3) = 0;
+ 	projMatr1.at<float>(2,3) = 0;
+
+ 	cv::Mat projMatr2;
+ 	projMatr2 = cv::Mat(3,4,CV_32FC1,0.0f);
+ 	projMatr2 = projMatr1;
+
+ 	// Size imgSize = scene.size();
+ 		Size imgSize = BottonCHosen.figure_.size();
 
 	cv::Mat_<double> R = cv::Mat::eye(3, 3, CV_64F);
 	cv::Mat_<double> T(3,1);
-	T << distanzaWebcam,0.0,0.0;
+	T << 0.0,0,0.05;
 	cv::Mat R1,R2,P1,P2,Q; 
 	cv::stereoRectify(Camera_Matrix, Cam_par_distortion, Camera_Matrix,Cam_par_distortion, imgSize,  R,  T,  R1,  R2,  P1,  P2,  Q);
+	// ROS_INFO_STREAM("P2:" << P2);
 
-	cv::Mat points4D;
+	// cv::Mat OR_scene;
+	// cv::Mat new_frame;
+	// cv::Mat imgDisparity8U ;
+	// 	// imgDisparity8U = Mat( BottonCHosen.figure_.rows, BottonCHosen.figure_.cols, CV_8U );
+	// cv::Mat imgDisparity16S;
+	// //= Mat( scene.rows, scene.cols, CV_16S );
+	// imgDisparity8U = Mat(im2.rows, im2.cols, CV_8U );
+	// // ROS_INFO("FATTO 8U");
+ //  	// std::cout<<"qui"<<std::endl;
+ //  	// cvtColor( scene, new_Im2, CV_BGR2GRAY );
+	// int ndisparities = 16*8;  // < Range of disparity 
+ //  	int SADWindowSize = 50; //< Size of the block window. Must be odd 
+	// cv::StereoBM StereoBM( ndisparities, SADWindowSize );
+
+	// //  -- 3. Calculate the disparity image
+	// ROS_INFO_STREAM("BottonCHosen.figure_" << BottonCHosen.figure_.size());
+	// ROS_INFO_STREAM("scene" << im2.size());
+	// StereoBM.operator()( BottonCHosen.figure_, im2, imgDisparity8U, CV_32F );
+	// ROS_INFO_STREAM("QUI");
+	// imgDisparity8U.convertTo(imgDisparity16S, CV_32F);
+
+	// cv::Mat _3dImage;
+	// cv::reprojectImageTo3D(imgDisparity8U, _3dImage,  Q, false, -1 );
+	// ROS_INFO_STREAM("_3dImage: " <<_3dImage);
+
+
+
+
 	cv::triangulatePoints(P1, P2, key_array_1, key_array_2, points4D);
-	// ROS_INFO_STREAM("points4D: " << points4D.size());
-	if(points4D.cols > 3 )
-	{
-		// ROS_INFO_STREAM("points4D: " << points4D.size());
-		cv::transpose(points4D, triangulatedPoints3D);
-		// ROS_INFO_STREAM("triangulatedPoints3D size: "<< triangulatedPoints3D.size());
-		cv::convertPointsFromHomogeneous(triangulatedPoints3D, triangulatedPoints3D);
-		ROS_INFO_STREAM("triangulatedPoints3D: " <<triangulatedPoints3D);
-		media_z = scale_factor * Media(triangulatedPoints3D, RobotArmLenght);
-		ROS_INFO_STREAM("MEDIA * scale_factor: "<< media_z);
-		FirstCalibration = 0;
-		sub_ptam = true;
-	}
-	
+
+	Mat triangulatedPoints3D;
+	cv::transpose(points4D, triangulatedPoints3D);
+	cv::convertPointsFromHomogeneous(triangulatedPoints3D, triangulatedPoints3D);
+	ROS_INFO_STREAM("triangulatedPoints3D: " <<triangulatedPoints3D);
 }
 
+// void Media(cv::Mat triangulatedPoints3D)
+// {
+// 	double temp = 0;
+// 	double count = 0;
 
-double Media(cv::Mat triangulatedPoints3D, double RobotLenght)
-{
-	float temp = 0;
-	float count = 0;
+// 	for(unsigned int i=0; i< triangulatedPoints3D.rows-1; i++)
+// 	{	
+// 		// double temp_distance = std::abs(triangulatedPoints3D.at<double>(i,2)) - std::abs(triangulatedPoints3D.at<double>(i+1,2)) ;
+// 		// if( temp_distance < 0.35  )
+// 		// {
+// 			temp += std::abs(triangulatedPoints3D.at<double>(i,2)); 
+// 			count +=1;
+// 		// }
+// 		// ROS_INFO_STREAM("temp: " << temp);
+// 		// ROS_INFO_STREAM("triangulatedPoints3D.at<double> i: " << i <<"valore"<< triangulatedPoints3D.at<double>(i,2));
+// 	}
 
-	for(unsigned int i=0; i< triangulatedPoints3D.rows; i++)
-	{	
+// 	double media = temp/count;
+// 	ROS_INFO_STREAM("MEDIA: "<< media);
 
-		// float temp_distance = std::abs(triangulatedPoints3D.at<float>(i,2)) - std::abs(triangulatedPoints3D.at<float>(i+1,2)) ;
-		if( std::abs(triangulatedPoints3D.at<float>(i,2)) <= RobotLenght  )
-		{
-			temp = temp + std::abs(triangulatedPoints3D.at<float>(i,2)); 
-			count = count + 1;
-
-			// ROS_INFO_STREAM("temp: " << temp);
-			// ROS_INFO_STREAM("triangulatedPoints3D.at<double> i: " << i <<"valore"<< triangulatedPoints3D.at<float>(i,2));
-		}
-	}
-
-	double media_z = temp/count;
-	
-	return media_z;
-}
+// }
 
 
 void Camera::CreateAVector(std::vector<Point2f> keyp2, std::vector<Point2f> keyp_1 , cv::Mat &key_array_1, cv::Mat &key_array_2)
@@ -486,44 +489,5 @@ void Camera::CreateAVector(std::vector<Point2f> keyp2, std::vector<Point2f> keyp
 
 void Camera::MoveCallBack(const std_msgs::Bool::ConstPtr msg)
 {
-
-	move_camera_end = msg->data;
-	frame1_ = scene.clone();
-	if(frame1_.empty())
-	{
-		ROS_ERROR("empty mat frame");
-		// return 0;
-	}
-
-	sub_ptam_2 = true;
-}
-
-
-
-void Camera::Triangulation(cv::Mat S03_ptam)
-{
-	double distance_z;
-	if(SaveFirst == true)
-	{
-		So3_prev = std::abs(S03_ptam.at<float>(2,3));
-		distance_z = media_z;
-		SaveFirst = false;
-	}
-	else
-	{
-		if(So3_prev < std::abs(S03_ptam.at<float>(2,3)))
-		{
-			ROS_INFO("pTAM da i numeri.. trova una soluzione");
-		}
-		else
-		{
-		 	So3_new = So3_new + So3_prev - std::abs(S03_ptam.at<float>(2,3));
-		 	ROS_INFO_STREAM("So3_new. " << So3_new);
-		 	ROS_INFO_STREAM("So3_prev: " << So3_prev);
-		 	distance_z =  media_z - So3_new;
-		 	So3_prev = std::abs(S03_ptam.at<float>(2,3)); 
-		 	ROS_INFO_STREAM("La webcam e'su z :" << distance_z); 
-		}
-	}
-	sub_ptam_2 = false;
+	move_camera_end = msg->true;
 }

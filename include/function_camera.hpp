@@ -1,6 +1,5 @@
 std::pair<std::vector<cv::Point> ,std::vector<std::vector<cv::Point> >> Camera::FindContours(cv::Mat bw, cv::Mat camera)
 {
-
 	// Find contours
 	std::pair<std::vector<cv::Point> ,std::vector<std::vector<cv::Point>> > CenterAndContours;
 	std::vector<std::vector<cv::Point> > contours;
@@ -80,8 +79,7 @@ std::pair<std::vector<cv::Point> ,std::vector<std::vector<cv::Point> >> Camera::
 	        }
 	    }
 	}
-	// imshow("circle", dst);
-	// waitKey(0);
+
 	return CenterAndContours;
 }
 
