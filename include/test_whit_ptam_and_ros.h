@@ -95,12 +95,14 @@ class Camera
 		int FirstCalibration;
 		cv::Mat frame1_;
 		double RobotArmLenght;
-		double media_z;
+		double media_z, media_x,media_y ;
 		double scale_factor;
 		double distanzaWebcam;
 		double So3_prev, So3_new;
 		bool SaveFirst;
 		bool sub_ptam_2;
+		double scala;
+		cv::Mat Point3dTriangulate;
 
 		Camera();
 		~Camera(){};
@@ -120,6 +122,7 @@ class Camera
 		void Triangulation(cv::Mat S03_ptam);
 		void CreateAVector(std::vector<Point2f> keyp2, std::vector<Point2f> keyp_1 , cv::Mat &key_array_1, cv::Mat &key_array_2);
 		void MoveCallBack(const std_msgs::Bool::ConstPtr msg);
+		void FindXeY(cv::Mat cameraMatrix, double media_z, cv::Mat tvec);
 };
 
 
@@ -142,8 +145,8 @@ Point Camera::pos_object;
 int Camera::press_buttom = 0;
 int Camera::first_Step = 1;
 
-double Media(cv::Mat triangulatedPoints3D,double RobotLenght);
-
+// double Media(cv::Mat triangulatedPoints3D,double RobotLenght);
+double Media(cv::Mat triangulatedPoints3D, double MaxLenght, int col);
 
 
 

@@ -93,6 +93,8 @@ Camera::Camera(): it_(nh)
  	Camera_Matrix.at<float>(2,1) = 0;
  	Camera_Matrix.at<float>(2,2) = 1;
 
+ 	ROS_INFO_STREAM("CAM ne lcostruttore: " << Camera_Matrix);
+
  	Cam_par_distortion = cv::Mat(1,5,CV_32FC1,0.0f);
  	Cam_par_distortion.at<float>(0,0) = cam_d0;
  	Cam_par_distortion.at<float>(0,1) = cam_d1;
@@ -124,11 +126,11 @@ void Camera::ImageConverter(const sensor_msgs::Image::ConstPtr& msg)
     cv_bridge::CvImagePtr cv_ptr;
     cv_ptr = cv_bridge::toCvCopy(msg);
     cv_ptr->image.copyTo(scene_temp);
-      // cv_ptr->image.copyTo(scene);
     cv::undistort(scene_temp, scene, Camera_Matrix, Cam_par_distortion);
 
+
+
 	arrived_cam = 1;
-	// ROS_INFO_STREAM("camera");
 }
 
 
@@ -158,20 +160,16 @@ void Camera::CallBackFunc(int event, int x, int y, int flags, void* userdata)
 
 }
 
-
-
 void Camera::ShapeDetect()
 { 
 	
 	Mat src_gray;
 	cv::Mat dst ;
 
-	//= scene.clone();
     /* Convert it to gray*/
   	cvtColor( scene, dst, CV_GRAY2RGB );
-  		Im1 = dst.clone();
-  	/* Reduce the noise so we avoid false circle detection*/
-  	// GaussianBlur( scene, src_gray, Size(9, 9), 2, 2 );
+  	//Im1 = dst.clone();
+
   	
   	/* Convert to binary image using Canny*/
 	cv::Mat bw;
@@ -204,38 +202,17 @@ void Camera::ShapeDetect()
 			cv::Mat convert_BcMat_ = roi.clone(); 
 
 			convert_BcMat_.convertTo(BottonCHosen.figure_, CV_8U) ;
-			// convert_BcMat_.convertTo(BottonCHosen.figure_, CV_GRAY2RGB) ;
-		
-			//test
-				// points.push_back(keyp_1[i]);
-			// cv::Mat key_array_1_temp(CenterAndContours.second[info_geometry.first]);
-			// key_array_1_temp.copyTo(BottonCHosen.figure_);
-
-
 
 		    /* SIFT feature detector and feature extractor */
 		    cv::SiftFeatureDetector detector( 0.01, 3.0 );
 		    cv::SiftDescriptorExtractor extractor( 2.0 );
-		    //  cv::SiftFeatureDetector detector;
-		    // cv::SiftDescriptorExtractor extractor;
 
 		    detector.detect(BottonCHosen.figure_, BottonCHosen.keyp_ );
 		    extractor.compute( BottonCHosen.figure_, BottonCHosen.keyp_, BottonCHosen.descr_ );
 
-		    // detector.detect(BottonCHosen.figure_, BottonCHosen.keyp_ );
-		    // extractor.compute( BottonCHosen.figure_, BottonCHosen.keyp_, BottonCHosen.descr_ );
-		    // cv::Mat img_keypoints_1;
-		    // ROS_INFO_STREAM("BottonCHosen.keyp_: " << BottonCHosen.keyp_.size());
-		    // drawKeypoints( BottonCHosen.figure_, BottonCHosen.keyp_, img_keypoints_1, Scalar::all(-1), DrawMatchesFlags::DEFAULT );
 			cv::imshow("dst", dst);
 			cv::waitKey(0);
-			// cv::imshow("key1", img_keypoints_1);
-			// cv::waitKey(0);
-			// cv::imshow("dst_tagliato", BottonCHosen.figure_);
-			// cv::waitKey(0);
-
-			// Finish = 0;
-			// move_camera_end = true;
+	
 			first_Step = 0;
 		}
 		else
@@ -275,8 +252,6 @@ void Camera::SOtreCamera(const geometry_msgs::PoseWithCovarianceStamped::ConstPt
 
 	Camera2_S03.at<float>(2,3) = frame_temp.p.z();
 
-	// ROS_INFO_STREAM("Camera2_S03: "<<Camera2_S03);
-	// read_ptam = true;
 	if((sub_ptam == true) && (sub_ptam_2 == true))
     {
     	Triangulation(Camera2_S03);
@@ -401,54 +376,136 @@ void Camera::StereoCalibration()
  
   	Size imgSize = BottonCHosen.figure_.size();
 
-	cv::Mat_<double> R = cv::Mat::eye(3, 3, CV_64F);
+	cv::Mat_<double> R = cv::Mat::eye(3, 3, CV_32FC1);
 	cv::Mat_<double> T(3,1);
 	T << distanzaWebcam,0.0,0.0;
-	cv::Mat R1,R2,P1,P2,Q; 
+	cv::Mat R1,P1,P2,Q; 
+	cv::Mat R2 = cv::Mat(3,3,CV_32FC1,0.0f);
+	
 	cv::stereoRectify(Camera_Matrix, Cam_par_distortion, Camera_Matrix,Cam_par_distortion, imgSize,  R,  T,  R1,  R2,  P1,  P2,  Q);
-
+	
+	// ROS_INFO_STREAM("R1 DET: " << determinant(R1));
+	// ROS_INFO_STREAM("R2 DET: " << determinant(R2));
 	cv::Mat points4D;
 	cv::triangulatePoints(P1, P2, key_array_1, key_array_2, points4D);
 	// ROS_INFO_STREAM("points4D: " << points4D.size());
 	if(points4D.cols > 3 )
 	{
-		// ROS_INFO_STREAM("points4D: " << points4D.size());
 		cv::transpose(points4D, triangulatedPoints3D);
-		// ROS_INFO_STREAM("triangulatedPoints3D size: "<< triangulatedPoints3D.size());
 		cv::convertPointsFromHomogeneous(triangulatedPoints3D, triangulatedPoints3D);
-		ROS_INFO_STREAM("triangulatedPoints3D: " <<triangulatedPoints3D);
-		media_z = scale_factor * Media(triangulatedPoints3D, RobotArmLenght);
-		ROS_INFO_STREAM("MEDIA * scale_factor: "<< media_z);
+		// media_z = scale_factor * Media(triangulatedPoints3D, RobotArmLenght);
+		media_z = scale_factor * Media(triangulatedPoints3D, RobotArmLenght,2);
+		ROS_INFO_STREAM("MEDIA * scale_factor su z: "<< media_z);
+
+		// media_x =  Media(triangulatedPoints3D, 1.0, 0);
+		// media_y =  Media(triangulatedPoints3D, 1.0, 1);
+		FindXeY( Camera_Matrix, media_z, T);
+		// ROS_INFO_STREAM("MEDIA * scale_factor su z: "<< media_z);
+		// ROS_INFO_STREAM("MEDIA su y: "<< media_y);
+		// ROS_INFO_STREAM("MEDIA su x: "<< media_x);
 		FirstCalibration = 0;
 		sub_ptam = true;
 	}
 	
 }
 
+void Camera::FindXeY(cv::Mat cameraMatrix, double media_z, cv::Mat tvec)
+{
+	cv::Mat uvPoint = cv::Mat::ones(3,1,CV_64F); //u,v,1
+	uvPoint.at<double>(0,0) = BottonCHosen.Center_.x; //got this point using mouse callback
+	uvPoint.at<double>(1,0) = BottonCHosen.Center_.y;
 
-double Media(cv::Mat triangulatedPoints3D, double RobotLenght)
+	double s;
+	Eigen::Matrix3d Reigen = Eigen::Matrix3d::Identity();
+	Eigen::Matrix3d CamEigen;
+
+	for(unsigned int i=0; i < cameraMatrix.rows; i++)
+	{
+		for(unsigned int j =0; j < cameraMatrix.cols; j++)
+		{
+			CamEigen(i,j) = cameraMatrix.at<float>(i,j);
+		}
+	}
+
+	
+	Eigen::Vector3d Point2D;
+	Eigen::Vector3d T;
+	Point2D[0] = uvPoint.at<double>(0,0);
+	Point2D[1] = uvPoint.at<double>(1,0);
+	Point2D[2] = uvPoint.at<double>(2,0);
+	T[0] =  tvec.at<double>(0,0);
+	T[1] =  tvec.at<double>(1,0);
+	T[2] =  tvec.at<double>(2,0);
+	
+	
+	Eigen::Vector3d prod_eigen;
+	prod_eigen = Reigen.inverse()*CamEigen.inverse()*Point2D;
+
+	Eigen::Vector3d temp2;
+	temp2 = Reigen.inverse()*T;
+	s = (media_z + temp2(2,0))/prod_eigen(2,0);
+	Eigen::Vector3d p;
+	p = Reigen.inverse()*(s*CamEigen.inverse()*Point2D - T);
+
+	ROS_INFO_STREAM("POINT 2d: " << p);
+	// Point3dTriangulate.at<double>(0,0) = p[0];
+	// Point3dTriangulate.at<double>(0,1) = p[1];
+	// Point3dTriangulate.at<double>(0,2) = p[2];
+	// ROS_INFO_STREAM("Point3dTriangulate: " << Point3dTriangulate);
+}
+
+double Media(cv::Mat triangulatedPoints3D, double MaxLenght, int col)
 {
 	float temp = 0;
 	float count = 0;
 
 	for(unsigned int i=0; i< triangulatedPoints3D.rows; i++)
 	{	
-
-		// float temp_distance = std::abs(triangulatedPoints3D.at<float>(i,2)) - std::abs(triangulatedPoints3D.at<float>(i+1,2)) ;
-		if( std::abs(triangulatedPoints3D.at<float>(i,2)) <= RobotLenght  )
+		if( std::abs(triangulatedPoints3D.at<float>(i,col)) <= MaxLenght  )
 		{
-			temp = temp + std::abs(triangulatedPoints3D.at<float>(i,2)); 
+			temp = temp + std::abs(triangulatedPoints3D.at<float>(i,col)); 
 			count = count + 1;
-
-			// ROS_INFO_STREAM("temp: " << temp);
-			// ROS_INFO_STREAM("triangulatedPoints3D.at<double> i: " << i <<"valore"<< triangulatedPoints3D.at<float>(i,2));
 		}
 	}
 
-	double media_z = temp/count;
+	double media = temp/count;
 	
-	return media_z;
+	return media;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// double Media(cv::Mat triangulatedPoints3D, double RobotLenght)
+// {
+// 	float temp = 0;
+// 	float count = 0;
+
+// 	for(unsigned int i=0; i< triangulatedPoints3D.rows; i++)
+// 	{	
+// 		if( std::abs(triangulatedPoints3D.at<float>(i,2)) <= RobotLenght  )
+// 		{
+// 			temp = temp + std::abs(triangulatedPoints3D.at<float>(i,2)); 
+// 			count = count + 1;
+// 		}
+// 	}
+
+// 	double media_z = temp/count;
+	
+// 	return media_z;
+// }
 
 
 void Camera::CreateAVector(std::vector<Point2f> keyp2, std::vector<Point2f> keyp_1 , cv::Mat &key_array_1, cv::Mat &key_array_2)
@@ -503,11 +560,15 @@ void Camera::MoveCallBack(const std_msgs::Bool::ConstPtr msg)
 void Camera::Triangulation(cv::Mat S03_ptam)
 {
 	double distance_z;
+	double distance_x;
+	double distance_y;
+	
 	if(SaveFirst == true)
 	{
 		So3_prev = std::abs(S03_ptam.at<float>(2,3));
 		distance_z = media_z;
 		SaveFirst = false;
+		// scala = So3_prev/distance_z;
 	}
 	else
 	{
@@ -518,11 +579,16 @@ void Camera::Triangulation(cv::Mat S03_ptam)
 		else
 		{
 		 	So3_new = So3_new + So3_prev - std::abs(S03_ptam.at<float>(2,3));
-		 	ROS_INFO_STREAM("So3_new. " << So3_new);
-		 	ROS_INFO_STREAM("So3_prev: " << So3_prev);
+
+		 	// ROS_INFO_STREAM("So3_new. " << So3_new);
+		 	// ROS_INFO_STREAM("So3_prev: " << So3_prev);
 		 	distance_z =  media_z - So3_new;
+		 	// distance_x = std::abs(S03_ptam.at<float>(2,1)) / scala;
+		 	// distance_y = std::abs(S03_ptam.at<float>(2,2)) / scala;
 		 	So3_prev = std::abs(S03_ptam.at<float>(2,3)); 
-		 	ROS_INFO_STREAM("La webcam e'su z :" << distance_z); 
+		 	// ROS_INFO_STREAM("La webcam su z e' in posizione :" << distance_z); 
+		 	// ROS_INFO_STREAM("La webcam su y e' in posizione :" << distance_y); 
+		 	// ROS_INFO_STREAM("La webcam su x e' in posizione :" << distance_x); 
 		}
 	}
 	sub_ptam_2 = false;
