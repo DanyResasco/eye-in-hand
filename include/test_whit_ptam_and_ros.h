@@ -63,7 +63,7 @@ class Camera
 		double ptam_scale;
 		bool sub_ptam;
 		cv::Mat mat_;
-		ros::Subscriber srv_move;
+		ros::Subscriber srv_move,movewebcamrobot;
 	
 		struct Obj 
 		{
@@ -76,6 +76,7 @@ class Camera
 
 		cv::Mat Point_3d; 
 		cv::Point Botton_2frame;
+		double move_z_robot;
 
 		std::vector<cv::Point2f> KeypointIm2;
 		std::vector<Point2f> KeyPointIm1Match;
@@ -109,7 +110,7 @@ class Camera
 		void ControllCamera();
 		void DetectWithSift();
 		void StereoCalibration();
-		
+		void Triangulation();
 
 	private:
 		
@@ -119,10 +120,11 @@ class Camera
 		void ImageConverter(const sensor_msgs::Image::ConstPtr& msg);
 		std::pair<std::vector<cv::Point> ,std::vector<std::vector<cv::Point>> > FindContours(cv::Mat bw, cv::Mat camera);
 		void SOtreCamera(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr msg);
-		void Triangulation(cv::Mat S03_ptam);
+		
 		void CreateAVector(std::vector<Point2f> keyp2, std::vector<Point2f> keyp_1 , cv::Mat &key_array_1, cv::Mat &key_array_2);
 		void MoveCallBack(const std_msgs::Bool::ConstPtr msg);
 		void FindXeY(cv::Mat cameraMatrix, double media_z, cv::Mat tvec);
+		void RobotMove(const geometry_msgs::Pose::ConstPtr& msg);
 };
 
 

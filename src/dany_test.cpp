@@ -35,13 +35,23 @@ int main(int argc, char **argv)
     		// ROS_INFO_STREAM("ESCO DAL FIRST STEP");
 			if(node.move_camera_end == true)
 			{
-				ROS_INFO_STREAM("entrata qui");
+				// ROS_INFO_STREAM("entrata qui");
 				// imshow("CAMERA_ROBOT_MOVE",  node.scene);
 				node.DetectWithSift();
 				// waitKey(0);
 				if(node.FirstCalibration == 1)
 				{
 					node.StereoCalibration();
+				}
+				else
+				{
+					ROS_INFO_STREAM("Dentro else");
+					ROS_INFO_STREAM("node.sub_ptam: " <<std::boolalpha<<node.sub_ptam);
+					ROS_INFO_STREAM("node.sub_ptam2: " <<std::boolalpha<<node.sub_ptam_2);
+					if((node.sub_ptam == true) && (node.sub_ptam_2 == true))
+					{
+				   		node.Triangulation();
+					}
 				}
 			}
     	}
@@ -78,7 +88,7 @@ Camera::Camera(): it_(nh)
 	nh.param<double>("/Camera_demo/scale_factor", scale_factor,2.0);
 	nh.param<double>("/Camera_demo/distanzaWebcam", distanzaWebcam,2.0);
 
-	ROS_INFO_STREAM("distanzaWebcam: " <<distanzaWebcam);
+	// ROS_INFO_STREAM("distanzaWebcam: " <<distanzaWebcam);
 
 	Camera_Matrix = cv::Mat(3,3,CV_32FC1,0.0f);
 	Camera2_S03 = cv::Mat(3,4,CV_32FC1,0.0f);
@@ -93,7 +103,7 @@ Camera::Camera(): it_(nh)
  	Camera_Matrix.at<float>(2,1) = 0;
  	Camera_Matrix.at<float>(2,2) = 1;
 
- 	ROS_INFO_STREAM("CAM ne lcostruttore: " << Camera_Matrix);
+ 	// ROS_INFO_STREAM("CAM ne lcostruttore: " << Camera_Matrix);
 
  	Cam_par_distortion = cv::Mat(1,5,CV_32FC1,0.0f);
  	Cam_par_distortion.at<float>(0,0) = cam_d0;
@@ -109,7 +119,7 @@ Camera::Camera(): it_(nh)
 	read_ptam = false;
 	FirstCalibration = 1;
 	So3_new = 0;
-	sub_ptam_2 = true;
+	sub_ptam_2 = false;
 	SaveFirst = true;
 
 
@@ -117,8 +127,18 @@ Camera::Camera(): it_(nh)
 	sub = it_.subscribe("/camera/output_video", 1, &Camera::ImageConverter, this);
 	ptam_sub = nh.subscribe("/vslam/pose",1, &Camera::SOtreCamera, this);  
 	srv_move = nh.subscribe("/moveok",1, &Camera::MoveCallBack, this);
+	movewebcamrobot = nh.subscribe("/moverobot",1, &Camera::RobotMove,this);
 }
+void Camera::RobotMove(const geometry_msgs::Pose::ConstPtr& msg)
+{
+	ROS_INFO_STREAM("RICEVUTO Messaggio");
+	geometry_msgs::Point position;
+	geometry_msgs::Quaternion orientation;
 
+	move_z_robot = msg->position.z;
+
+	sub_ptam_2 = true;
+}
 
 void Camera::ImageConverter(const sensor_msgs::Image::ConstPtr& msg)
 {
@@ -233,7 +253,7 @@ void Camera::ShapeDetect()
 void Camera::SOtreCamera(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr msg)
 {
 	KDL::Frame frame_temp;
-	// ROS_INFO("LEGGO TOPIC");
+	ROS_INFO("LEGGO TOPIC ptam");
 	tf::poseMsgToKDL ((msg->pose).pose, frame_temp);
 	// ROS_INFO_STREAM("frame_temp: "<<frame_temp);
 	Camera2_S03.at<float>(0,0) = frame_temp.M.data[0];
@@ -252,10 +272,7 @@ void Camera::SOtreCamera(const geometry_msgs::PoseWithCovarianceStamped::ConstPt
 
 	Camera2_S03.at<float>(2,3) = frame_temp.p.z();
 
-	if((sub_ptam == true) && (sub_ptam_2 == true))
-    {
-    	Triangulation(Camera2_S03);
-    }
+	sub_ptam = true;
 }
 
 
@@ -368,7 +385,7 @@ void Camera::DetectWithSift()
 void Camera::StereoCalibration()
 {
 
-	ROS_INFO("Triangulation");
+	ROS_INFO("StereoCalibration");
 	cv::Mat key_array_1;
 	cv::Mat key_array_2;
 
@@ -404,7 +421,7 @@ void Camera::StereoCalibration()
 		// ROS_INFO_STREAM("MEDIA su y: "<< media_y);
 		// ROS_INFO_STREAM("MEDIA su x: "<< media_x);
 		FirstCalibration = 0;
-		sub_ptam = true;
+		// sub_ptam = true;
 	}
 	
 }
@@ -448,10 +465,6 @@ void Camera::FindXeY(cv::Mat cameraMatrix, double media_z, cv::Mat tvec)
 	p = Reigen.inverse()*(s*CamEigen.inverse()*Point2D - T);
 
 	ROS_INFO_STREAM("POINT 2d: " << p);
-	// Point3dTriangulate.at<double>(0,0) = p[0];
-	// Point3dTriangulate.at<double>(0,1) = p[1];
-	// Point3dTriangulate.at<double>(0,2) = p[2];
-	// ROS_INFO_STREAM("Point3dTriangulate: " << Point3dTriangulate);
 }
 
 double Media(cv::Mat triangulatedPoints3D, double MaxLenght, int col)
@@ -472,40 +485,6 @@ double Media(cv::Mat triangulatedPoints3D, double MaxLenght, int col)
 	
 	return media;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// double Media(cv::Mat triangulatedPoints3D, double RobotLenght)
-// {
-// 	float temp = 0;
-// 	float count = 0;
-
-// 	for(unsigned int i=0; i< triangulatedPoints3D.rows; i++)
-// 	{	
-// 		if( std::abs(triangulatedPoints3D.at<float>(i,2)) <= RobotLenght  )
-// 		{
-// 			temp = temp + std::abs(triangulatedPoints3D.at<float>(i,2)); 
-// 			count = count + 1;
-// 		}
-// 	}
-
-// 	double media_z = temp/count;
-	
-// 	return media_z;
-// }
 
 
 void Camera::CreateAVector(std::vector<Point2f> keyp2, std::vector<Point2f> keyp_1 , cv::Mat &key_array_1, cv::Mat &key_array_2)
@@ -534,10 +513,6 @@ void Camera::CreateAVector(std::vector<Point2f> keyp2, std::vector<Point2f> keyp
 	key_array_1_temp.copyTo(key_array_1);
 	cv::Mat key_array_2_temp(points2);
 	key_array_2_temp.copyTo(key_array_2);
-
- 	// // ROS_INFO_STREAM("test_TRANSPOSE" << )
- 	// ROS_INFO_STREAM("key_array_1: "<< key_array_1.size());
- 	// ROS_INFO_STREAM("key_array_2: "<< key_array_2.size());
 }
 
 
@@ -552,44 +527,42 @@ void Camera::MoveCallBack(const std_msgs::Bool::ConstPtr msg)
 		// return 0;
 	}
 
-	sub_ptam_2 = true;
+	// sub_ptam_2 = true;
 }
 
 
 
-void Camera::Triangulation(cv::Mat S03_ptam)
+void Camera::Triangulation()
 {
+	ROS_INFO("Triangulation");
 	double distance_z;
-	double distance_x;
-	double distance_y;
+	double scale;
 	
 	if(SaveFirst == true)
 	{
-		So3_prev = std::abs(S03_ptam.at<float>(2,3));
+		So3_prev = std::abs(Camera2_S03.at<float>(2,3));
 		distance_z = media_z;
 		SaveFirst = false;
-		// scala = So3_prev/distance_z;
+		ROS_INFO_STREAM("Ora sono in: " << distance_z);
+
 	}
 	else
 	{
-		if(So3_prev < std::abs(S03_ptam.at<float>(2,3)))
+		if(So3_prev < std::abs(Camera2_S03.at<float>(2,3)))
 		{
-			ROS_INFO("pTAM da i numeri.. trova una soluzione");
+			ROS_INFO("PTAM da i numeri.. trova una soluzione");
 		}
 		else
 		{
-		 	So3_new = So3_new + So3_prev - std::abs(S03_ptam.at<float>(2,3));
-
-		 	// ROS_INFO_STREAM("So3_new. " << So3_new);
-		 	// ROS_INFO_STREAM("So3_prev: " << So3_prev);
-		 	distance_z =  media_z - So3_new;
-		 	// distance_x = std::abs(S03_ptam.at<float>(2,1)) / scala;
-		 	// distance_y = std::abs(S03_ptam.at<float>(2,2)) / scala;
-		 	So3_prev = std::abs(S03_ptam.at<float>(2,3)); 
-		 	// ROS_INFO_STREAM("La webcam su z e' in posizione :" << distance_z); 
-		 	// ROS_INFO_STREAM("La webcam su y e' in posizione :" << distance_y); 
-		 	// ROS_INFO_STREAM("La webcam su x e' in posizione :" << distance_x); 
+			scale = move_z_robot/std::abs(Camera2_S03.at<float>(2,3));
+		 	So3_new = So3_new + So3_prev - std::abs(Camera2_S03.at<float>(2,3));
+		 	distance_z =  media_z - So3_new*scale;
+		 	So3_prev = std::abs(Camera2_S03.at<float>(2,3));  
+		 	ROS_INFO_STREAM("Ora sono in: " << distance_z);
 		}
 	}
+
 	sub_ptam_2 = false;
+
+
 }
