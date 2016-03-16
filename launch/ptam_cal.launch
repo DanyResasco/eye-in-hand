@@ -1,0 +1,7 @@
+<launch>
+    <node name="cameracalibrator" pkg="ptam" type="cameracalibrator" clear_params="true" output="screen">
+	      <remap from="image" to="$(optenv IMAGE /camera/output_video)" />
+            <remap from="pose" to="pose"/>
+	    <rosparam file="$(find ptam)/PtamFixParams.yaml"/>
+    </node>
+</launch>

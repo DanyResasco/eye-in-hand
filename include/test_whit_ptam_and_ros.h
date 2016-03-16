@@ -57,6 +57,7 @@ class Camera
     	cv::Mat Camera2_S03;
     	cv::Mat Im1;
     	cv::Mat Im2;
+    	KDL::Frame Move_robot;
 
 		cv::Mat scene;
 		int arrived_cam = 0;
@@ -81,6 +82,7 @@ class Camera
 		std::vector<cv::Point2f> KeypointIm2;
 		std::vector<Point2f> KeyPointIm1Match;
 		cv::Mat triangulatedPoints3D;
+		KDL::Frame frame_so3_ptam;
 
 		image_transport::ImageTransport it_;
 	  	image_transport::Subscriber sub;
@@ -97,13 +99,15 @@ class Camera
 		cv::Mat frame1_;
 		double RobotArmLenght;
 		double media_z, media_x,media_y ;
-		double scale_factor;
+		double scala;
 		double distanzaWebcam;
-		double So3_prev, So3_new;
+		KDL::Frame So3_prev_ptam;
+		KDL::Frame S03_prev_robot;
 		bool SaveFirst;
 		bool sub_ptam_2;
-		double scala;
+		// double scala;
 		cv::Mat Point3dTriangulate;
+		bool scala_ok;
 
 		Camera();
 		~Camera(){};
@@ -124,7 +128,7 @@ class Camera
 		void CreateAVector(std::vector<Point2f> keyp2, std::vector<Point2f> keyp_1 , cv::Mat &key_array_1, cv::Mat &key_array_2);
 		void MoveCallBack(const std_msgs::Bool::ConstPtr msg);
 		void FindXeY(cv::Mat cameraMatrix, double media_z, cv::Mat tvec);
-		void RobotMove(const geometry_msgs::Pose::ConstPtr& msg);
+		void RobotMove(const geometry_msgs::Pose msg);
 };
 
 
