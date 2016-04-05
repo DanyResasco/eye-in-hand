@@ -46,8 +46,15 @@ find_package(catkin REQUIRED
   sensor_msgs
   image_transport
   cv_bridge
+  pcl_conversions
+  pcl_ros
 )
-
+find_package(PCL 1.7.2 REQUIRED)
+include_directories(include ${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
+find_library(KDL_LIBRARY REQUIRED NAMES orocos-kdl HINTS ${orocos_kdl_LIBRARY_DIRS})
+include_directories(include ${Boost_INCLUDE_DIR} ${catkin_INCLUDE_DIRS})
 # <!-- find_package(PCL 1.7.2 REQUIRED) -->
 
 # <!-- include_directories(${GAZEBO_INCLUDE_DIRS})
@@ -122,11 +129,16 @@ add_executable(prova_dany src/main_image_.cpp)
 add_dependencies(prova_dany prova_dany_gencpp ${PROJECT_NAME})
 target_link_libraries(prova_dany ${catkin_LIBRARIES} ${OpenCV_LIBS} opencv_nonfree)
 
-add_executable(ptam_test_dany src/dany_test.cpp)
+add_executable(ptam_test_dany src/Camera_code.cpp)
 # add_executable(prova_dany src/image_converter.cpp)
 add_dependencies(ptam_test_dany ptam_test_dany_gencpp ${PROJECT_NAME})
-target_link_libraries(ptam_test_dany ${catkin_LIBRARIES} ${OpenCV_LIBS} opencv_nonfree)
+target_link_libraries(ptam_test_dany ${catkin_LIBRARIES} ${OpenCV_LIBS} opencv_nonfree  ${PCL_LIBRARIES})
 
+
+# add_executable(ptam_test_dany src/test_vslam_pose_ptam.cpp)
+# # add_executable(prova_dany src/image_converter.cpp)
+# add_dependencies(ptam_test_dany ptam_test_dany_gencpp ${PROJECT_NAME})
+# target_link_libraries(ptam_test_dany ${catkin_LIBRARIES} ${OpenCV_LIBS} opencv_nonfree  ${PCL_LIBRARIES})
 
 
 install(DIRECTORY include/${PROJECT_NAME}/

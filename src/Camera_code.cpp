@@ -1,6 +1,7 @@
 // using namespace std;
-#include <test_whit_ptam_and_ros.h>
-#include <function_camera.hpp>
+#include <Camera_code.h>
+#include <geometry_function.hpp>
+#include <converter_file.hpp>
 
 using namespace cv;
 RNG rng(12345);
@@ -28,31 +29,16 @@ int main(int argc, char **argv)
         {            	
 			if (node.first_Step == 1)
 			{			    			
-    			// imshow("CAMERA_ROBOT",  node.scene);
     			node.ControllCamera();
-    			// waitKey(0);
     		}
     		// ROS_INFO_STREAM("ESCO DAL FIRST STEP");
 			if(node.move_camera_end == true)
 			{
-				// ROS_INFO_STREAM("entrata qui");
-				// imshow("CAMERA_ROBOT_MOVE",  node.scene);
 				node.DetectWithSift();
-				// waitKey(0);
-				// if(node.FirstCalibration == 1)
-				// {
-				// 	node.StereoCalibration();
-				// }
-				// else
-				// {
-					// ROS_INFO_STREAM("Dentro else");
-					// ROS_INFO_STREAM("node.sub_ptam: " <<std::boolalpha<<node.sub_ptam);
-					// ROS_INFO_STREAM("node.sub_ptam2: " <<std::boolalpha<<node.sub_ptam_2);
-					if((node.sub_ptam == true) && (node.sub_ptam_2 == true))
-					{
-				   		node.Triangulation();
-					}
-				// }
+				if(node.sub_ptam_2 == true)
+				{
+					node.Triangulation();
+				}
 			}
     	}
             
@@ -66,13 +52,7 @@ int main(int argc, char **argv)
 
 Camera::Camera(): it_(nh)
 {
-	// ros::param::get("~video_or_photo", video_or_photo);
-	// ROS_DEBUG( "video_or_photo %lf", video_or_photo);
-	ROS_INFO("COSTRUTTORE NODE DANY_TEST");
-	nh.param<double>("ptam_scale",ptam_scale, 0);
-
 	/*Set the camera parameter from calibration. Change this parameter at code_param.yaml */
-	float cam_fx, cam_d0, cam_d1, cam_d2, cam_d3,cam_d4, cam_fy, cam_cx, cam_cy;
 	nh.param<float>("/Camera_demo/cam_d0",cam_d0, -0.097079);
 	nh.param<float>("/Camera_demo/cam_d1",cam_d1, 0.115189);
 	nh.param<float>("/Camera_demo/cam_d2",cam_d2,-0.005712);
@@ -83,12 +63,6 @@ Camera::Camera(): it_(nh)
 	nh.param<float>("/Camera_demo/cam_fy",cam_fy, 0);
 	nh.param<float>("/Camera_demo/cam_cx",cam_cx, 0);
 	nh.param<float>("/Camera_demo/cam_cy",cam_cy, 0);
-
-	nh.param<double>("/Camera_demo/RobotArmLenght",RobotArmLenght, 1);
-	// nh.param<double>("/Camera_demo/scale_factor", scale_factor,2.0);
-	nh.param<double>("/Camera_demo/distanzaWebcam", distanzaWebcam,2.0);
-
-	// ROS_INFO_STREAM("distanzaWebcam: " <<distanzaWebcam);
 
 	Camera_Matrix = cv::Mat(3,3,CV_32FC1,0.0f);
 	Camera2_S03 = cv::Mat(3,4,CV_32FC1,0.0f);
@@ -103,8 +77,6 @@ Camera::Camera(): it_(nh)
  	Camera_Matrix.at<float>(2,1) = 0;
  	Camera_Matrix.at<float>(2,2) = 1;
 
- 	// ROS_INFO_STREAM("CAM ne lcostruttore: " << Camera_Matrix);
-
  	Cam_par_distortion = cv::Mat(1,5,CV_32FC1,0.0f);
  	Cam_par_distortion.at<float>(0,0) = cam_d0;
  	Cam_par_distortion.at<float>(0,1) = cam_d1;
@@ -113,36 +85,131 @@ Camera::Camera(): it_(nh)
  	Cam_par_distortion.at<float>(0,3) = cam_d4; 
 
 
-
+ 	//initialize the flag
 	move_camera_end = false;
-	sub_ptam = false;
-	read_ptam = false;
-	FirstCalibration = 1;
-	// So3_new = 0;
 	sub_ptam_2 = false;
 	SaveFirst = false;
-	scala_ok = false;
+	
+	
+	KDL::Vector v(1,1,1);
+	scala = v;
 
 
 
 	sub = it_.subscribe("/camera/output_video", 1, &Camera::ImageConverter, this);
-	ptam_sub = nh.subscribe("/vslam/pose",1, &Camera::SOtreCamera, this);  
-	srv_move = nh.subscribe("/moveok",1, &Camera::MoveCallBack, this);
-	movewebcamrobot = nh.subscribe("/moverobot",1, &Camera::RobotMove,this);
+	ptam_sub = nh.subscribe("/vslam/pose",1, &Camera::SOtreCamera, this);  //word in camera frame
+	movewebcamrobot = nh.subscribe("/moverobot",1, &Camera::RobotMove,this); // robot in cam frame
+	ptam_kf3d = nh.subscribe("/vslam/pc2",1,&Camera::InfoKf3d,this);	//point in word frame
+}
+
+
+
+
+void Camera::InfoKf3d(const sensor_msgs::PointCloud2::ConstPtr& msg)
+{
+	ROS_INFO_STREAM("qui InfoKf3d");
+	//Converto da pointcloud2 a pcl::XYZ
+	pcl::PointCloud<pcl::PointXYZ> Ptamkf3d;
+	pcl::PCLPointCloud2 pcl_pc;
+    pcl_conversions::toPCL(*msg, pcl_pc);
+    pcl::fromPCLPointCloud2(pcl_pc, Ptamkf3d);  	
+  	vect3d.clear();
+
+    Eigen::MatrixXd	So3_ptam_eigen(4,4); 
+    FromMatToEigen( Camera2_S03,So3_ptam_eigen );
+
+    // std::ofstream myfile1,myfile2;
+    // myfile1.open("/home/daniela/code/src/eye_in_hand/filelog_camera.txt");
+    //  myfile2.open("/home/daniela/code/src/eye_in_hand/filelog_word.txt");
+
+  	for(unsigned int i=0; i < Ptamkf3d.size(); i++)
+  	{
+
+  		Eigen::VectorXd vect_eigen(4);
+  		cv::Point3d point_temp(Ptamkf3d[i].x,Ptamkf3d[i].y,Ptamkf3d[i].z);
+  		FromCvPointToEigen(point_temp, vect_eigen);
+  		Eigen::VectorXd POint_c1_eigen(4);
+  		POint_c1_eigen = So3_ptam_eigen*vect_eigen;	//C_c_w*p_w
+  		
+  		FromEigenVectorToCvPOint(POint_c1_eigen, point_temp);
+  		// ROS_INFO_STREAM("point_temp: " <<point_temp);
+    	vect3d.push_back(point_temp);
+    	// ROS_INFO_STREAM("point_tempvect3d[i]: " <<vect3d[i]);
+
+		// if (myfile1.is_open())
+		// {
+		//   	// myfile << "POint 3d x,y,z \n";
+  // 		  		// myfile <<Ptamkf3d[i].x <<"\t"<<Ptamkf3d[i].y<< "\t" << Ptamkf3d[i].z<<"\n";
+		// 	myfile1<<POint_c1_eigen[0] << "\t" << POint_c1_eigen[1] << "\t" << POint_c1_eigen[2]<<"\n";
+		    
+		//     // ROS_INFO("STO SALVANDO");
+		// }
+
+
+		// if (myfile2.is_open())
+		// {
+		//   	// myfile << "POint 3d x,y,z \n";
+  // 		  		myfile2 <<Ptamkf3d[i].x <<"\t"<<Ptamkf3d[i].y<< "\t" << Ptamkf3d[i].z<<"\n";
+		// 	// myfile1<<POint_c1_eigen[0] << "\t" << POint_c1_eigen[1] << "\t" << POint_c1_eigen[2]<<"\n";
+		    
+		//     // ROS_INFO("STO SALVANDO");
+		// }
+
+
+
+
+		// else
+		// 	ROS_INFO("bau");
+  	}
+
+    // ProjectPointAndFindPosBot3d(vect3d);
+}
+
+
+
+void Camera::ProjectPointAndFindPosBot3d(std::vector<cv::Point3d> vect3d)
+{
+	std::vector<cv::Point3d> point_near;
+	std::vector<double> min_vect;
+	cv::Mat pc;
+	frame1_.copyTo(pc);
+
+	cv::Point2d point_temp(BottonCHosen.Center_.x, BottonCHosen.Center_.y);
+
+	for(unsigned int i=0; i < vect3d.size(); i++)
+	{
+		cv::Point2d point_;
+		point_.x =  cam_fx*vect3d[i].x/vect3d[i].z + cam_cx;
+		point_.y =  cam_fy*vect3d[i].y/vect3d[i].z + cam_cy;
+		// return_vect.push_back(point_);
+		line( pc,point_, point_ , Scalar( 220, 220, 0 ),  2, 8 );	
+		if(norm( (point_temp - point_)) <= 90)
+		{
+			point_near.push_back(vect3d[i]);
+			min_vect.push_back(norm( (point_temp - point_)));
+			line( pc,point_, point_ , Scalar( 5, 5, 0 ),  2, 8 );
+		}
+	}
+
+	if(min_vect.size() > 0)
+	{
+		std::vector<double>::iterator index_min = std::min_element(min_vect.begin(), min_vect.end());
+		int min_index = std::distance(std::begin(min_vect), index_min);
+		BottonCHosen.Pos3d_ = point_near[min_index];
+		ROS_INFO_STREAM("IL BOTTONE E': "<<BottonCHosen.Pos3d_);
+	}
+	
+	imshow("kf_near",pc);
+	waitKey(0);
+
 }
 
 void Camera::RobotMove(const geometry_msgs::Pose msg)
 {
 	ROS_INFO_STREAM("RICEVUTO Messaggio");
-	// geometry_msgs::Point position;
-	// geometry_msgs::Quaternion 
-	// KDL::Quaternion orientation(msg->orientation.x,msg->orientation.y,msg->orientation.z);
+	move_camera_end = true;
 	tf::poseMsgToKDL(msg, Move_robot);
-	// Move_robot.z = msg->position.z;
-	// Move_robot.y = msg->position.y;
-	// Move_robot.x = msg->position.x;
-	// move_z_robot = msg->position.z;
-
+	frame1_ = scene.clone();
 	sub_ptam_2 = true;
 }
 
@@ -155,13 +222,14 @@ void Camera::ImageConverter(const sensor_msgs::Image::ConstPtr& msg)
     cv::undistort(scene_temp, scene, Camera_Matrix, Cam_par_distortion);
 
 	arrived_cam = 1;
+
 }
 
 
 void Camera::ControllCamera()
 {
 	imshow("CAMERA_ROBOT",  scene);
-
+	scene.copyTo(scene_first);
  	/*set the callback function for any mouse event*/
 	setMouseCallback("CAMERA_ROBOT", CallBackFunc, NULL);
 		waitKey(0);
@@ -256,38 +324,34 @@ void Camera::ShapeDetect()
 
 void Camera::SOtreCamera(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr msg)
 {
-	// KDL::Frame frame_so3_ptam;
-	// ROS_INFO("LEGGO TOPIC ptam");
 	tf::poseMsgToKDL ((msg->pose).pose, frame_so3_ptam);
-	// ROS_INFO_STREAM("frame_so3_ptam: "<<frame_so3_ptam);
+	FillCamMatrixPose(frame_so3_ptam, scala);
+	frame_w_c = frame_so3_ptam.Inverse();
+}
+
+
+void Camera::FillCamMatrixPose(KDL::Frame frame, KDL::Vector scale)
+{
+
 	Camera2_S03.at<float>(0,0) = frame_so3_ptam.M.data[0];
 	Camera2_S03.at<float>(0,1) = frame_so3_ptam.M.data[1];
 	Camera2_S03.at<float>(0,2) = frame_so3_ptam.M.data[2];
 	
-	Camera2_S03.at<float>(0,3) = frame_so3_ptam.p.x();
+	Camera2_S03.at<float>(0,3) = frame_so3_ptam.p.x()*scale.x();
 	Camera2_S03.at<float>(1,0) = frame_so3_ptam.M.data[3];
 	Camera2_S03.at<float>(1,1) = frame_so3_ptam.M.data[4];
 	Camera2_S03.at<float>(1,2) = frame_so3_ptam.M.data[5];
 
-	Camera2_S03.at<float>(1,3) = frame_so3_ptam.p.y();
+	Camera2_S03.at<float>(1,3) = frame_so3_ptam.p.y()*scale.y();
 	Camera2_S03.at<float>(2,0) = frame_so3_ptam.M.data[6];
 	Camera2_S03.at<float>(2,1) = frame_so3_ptam.M.data[7];
 	Camera2_S03.at<float>(2,2) = frame_so3_ptam.M.data[8];
 
-	Camera2_S03.at<float>(2,3) = frame_so3_ptam.p.z();
+	Camera2_S03.at<float>(2,3) = frame_so3_ptam.p.z()*scale.z();
 
-	sub_ptam = true;
-
-
-	// if(SaveFirst == true)
-	// {
-	// 	So3_prev = std::abs(Camera2_S03.at<float>(2,3));
-	// 	// distance_z = media_z;
-	// 	SaveFirst = false;
-	// 	// scala = media_z/So3_prev;
-	// 	// ROS_INFO_STREAM("Per Ptam invece sono in : " << So3_prev*scala_prev);
-	// }
 }
+
+
 
 
 void Camera::DetectWithSift()
@@ -328,7 +392,7 @@ void Camera::DetectWithSift()
  	std::vector< DMatch > matches;
     matcher.match( BottonCHosen.descr_, descr_, matches );
 
-    double max_dist = 0; double min_dist = 100;
+    double max_dist = 0; double min_dist = 90;
 
 	/*-- Quick calculation of max and min distances between keypoints */
 	for( int i = 0; i < BottonCHosen.descr_.rows; i++ )
@@ -396,256 +460,63 @@ void Camera::DetectWithSift()
 }
 
 
-
-void Camera::MoveCallBack(const std_msgs::Bool::ConstPtr msg)
-{
-
-	move_camera_end = msg->data;
-	frame1_ = scene.clone();
-	if(frame1_.empty())
-	{
-		ROS_ERROR("empty mat frame");
-		// return 0;
-	}
-
-	// sub_ptam_2 = true;
-}
-
-
-
 void Camera::Triangulation()
 {
 	ROS_INFO("*******Triangulation*******");
-	// double distance_z;
 
-	if(scala_ok == false)
+	if(SaveFirst == false)
 	{
-		if(SaveFirst == true)
-		{
-			So3_prev_ptam = frame_so3_ptam;
-			// S03_prev_robot = Move_robot;
-			// distance_z = media_z;
-			SaveFirst = false;
-			// scala = media_z/So3_prev;
-			// ROS_INFO_STREAM("Per Ptam invece sono in : " << So3_prev*scala_prev);
-		}
-		else
-		{
-			double temp_distance_z_ptam;
-			temp_distance_z_ptam = So3_prev_ptam.p.z() - frame_so3_ptam.p.z();
-			scala = Move_robot.p.z()/temp_distance_z_ptam;
-			scala_ok = true;
-		}
+		So3_prev_ptam = frame_w_c;
+		SaveFirst = true;
 	}
 	else
 	{
-		KDL::Frame New_web_pose;
-		// for(unsigned int i=0; i<frame_so3_ptam.M.size();i++)
-		// {
-		// 	New_web_pose.M.data[i] = frame_so3_ptam.data[i]*scala;
-		// }
-		New_web_pose.M = frame_so3_ptam.M;
-		New_web_pose.p = KDL::Vector::Zero();
-		New_web_pose.p.data[0] = frame_so3_ptam.p.x()*scala;
-		New_web_pose.p.data[1] = frame_so3_ptam.p.y()*scala;
-		New_web_pose.p.data[2] = frame_so3_ptam.p.z()*scala;
-
-
-		ROS_INFO_STREAM("New_web_pose: " << New_web_pose);
+		if(frame_w_c.p.z() == 0)
+		{
+			ROS_INFO("ARRIVATO");
+		}
+		else
+		{
+			FindScale();
+			So3_prev_ptam = frame_w_c;		
+		}
 	}
 
-
-
-
-
-	// KDL::Frame Tpunto;
-
-	// KDL::Rotation rot_stereo = KDL::Rotation::Identity();
-	// KDL::Vector trasl_stereo(distanzaWebcam,0.0,0.0);
-	// KDL::Frame Tc1cs(rot_stereo,trasl_stereo );
-	// KDL::Rotation Mat_scala = KDL::Rotation::Identity();
-	// Mat_scala(0,0) = (1/scala);
-	// Mat_scala(1,1) = (1/scala);
-	// Mat_scala(2,2) = (1/scala);
-	
-	// KDL::Vector t(0,0,0);
-	// KDL::Frame Ptam_temp(Mat_scala,t);
-	// KDL::Frame Ptam_scalate = Ptam_temp*frame_so3_ptam;
-
-	// Tpunto = Ptam_scalate*Tc1cs;
-
-	// ROS_INFO_STREAM("Tpunto: " << Tpunto);
-
-	// if(SaveFirst == true)
-	// {
-	// 	So3_prev = std::abs(Camera2_S03.at<float>(2,3));
-	// 	distance_z = media_z;
-	// 	SaveFirst = false;
-	// 	ROS_INFO_STREAM("Ora sono in: " << distance_z);
-
-	// }
-	// else
-	// {
-		// if(So3_prev < std::abs(Camera2_S03.at<float>(2,3)))
-		// {
-		// 	ROS_INFO("PTAM da i numeri.. trova una soluzione");
-		// }
-		// else
-		// {
-			// scale = move_z_robot/std::abs(Camera2_S03.at<float>(2,3));
-
-			// scale = move_z_robot/std::abs(Camera2_S03.at<float>(2,3));
-		 	// So3_new = So3_new + scala_prev*So3_prev - std::abs(Camera2_S03.at<float>(2,3))*scale;
-		 	// distance_z =  media_z - So3_new;
-		 	 
-		 	// ROS_INFO_STREAM("Ora sono in: " << distance_z);
-		 	// ROS_INFO_STREAM("OPPURE SONO IN: " << scala_prev*So3_prev - std::abs(Camera2_S03.at<float>(2,3))*scale);
-		 	// scala_prev = scale;
-		 	// So3_prev = std::abs(Camera2_S03.at<float>(2,3)); 
-		// }
-	// }
-
+	ProjectPointAndFindPosBot3d(vect3d);
 	sub_ptam_2 = false;
-
-
 }
 
 
+void Camera::FindScale()
+{
+	if(Move_robot.p.z() != 0)
+	{
+		scala[2] = ScalaReturn(frame_w_c.p.z(), So3_prev_ptam.p.z(), Move_robot.p.z());
+	}
+	if(Move_robot.p.x() !=0 )
+	{
+		scala[0] = ScalaReturn(frame_w_c.p.x(), So3_prev_ptam.p.x(), Move_robot.p.x());
+		
+	}
+	if(Move_robot.p.y() !=0 )
+	{
+		scala[1] = ScalaReturn(frame_w_c.p.y(), So3_prev_ptam.p.y(), Move_robot.p.y());
+		
+	}
+
+	FillCamMatrixPose(frame_so3_ptam, scala);
+	ROS_INFO_STREAM("scala: " << scala);
+}
 
 
+double ScalaReturn(double ptam, double ptam_prev, double robot)
+{
+	double scala_temp = 0;
+	double temp_ = ptam_prev - ptam;
+	if(temp_ !=0 )
+	{
+		scala_temp = std::abs(robot/temp_);
+	}
 
-
-
-// void Camera::StereoCalibration()
-// {
-
-// 	ROS_INFO("StereoCalibration");
-// 	cv::Mat key_array_1;
-// 	cv::Mat key_array_2;
-
-//  	CreateAVector(KeypointIm2, KeyPointIm1Match , key_array_1, key_array_2);
- 
-//   	Size imgSize = BottonCHosen.figure_.size();
-
-// 	cv::Mat_<double> R = cv::Mat::eye(3, 3, CV_32FC1);
-// 	cv::Mat_<double> T(3,1);
-// 	T << distanzaWebcam,0.0,0.0;
-// 	cv::Mat R1,P1,P2,Q; 
-// 	cv::Mat R2 = cv::Mat(3,3,CV_32FC1,0.0f);
-	
-// 	cv::stereoRectify(Camera_Matrix, Cam_par_distortion, Camera_Matrix,Cam_par_distortion, imgSize,  R,  T,  R1,  R2,  P1,  P2,  Q);
-	
-// 	// ROS_INFO_STREAM("R1 DET: " << determinant(R1));
-// 	// ROS_INFO_STREAM("R2 DET: " << determinant(R2));
-// 	cv::Mat points4D;
-// 	cv::triangulatePoints(P1, P2, key_array_1, key_array_2, points4D);
-// 	// ROS_INFO_STREAM("points4D: " << points4D.size());
-// 	if(points4D.cols > 3 )
-// 	{
-// 		cv::transpose(points4D, triangulatedPoints3D);
-// 		cv::convertPointsFromHomogeneous(triangulatedPoints3D, triangulatedPoints3D);
-// 		// media_z = scale_factor * Media(triangulatedPoints3D, RobotArmLenght);
-// 		media_z = scale_factor * Media(triangulatedPoints3D, RobotArmLenght,2);
-// 		ROS_INFO_STREAM("MEDIA * scale_factor su z: "<< media_z);
-
-// 		// media_x =  Media(triangulatedPoints3D, 1.0, 0);
-// 		// media_y =  Media(triangulatedPoints3D, 1.0, 1);
-// 		FindXeY( Camera_Matrix, media_z, T);
-// 		// ROS_INFO_STREAM("MEDIA * scale_factor su z: "<< media_z);
-// 		// ROS_INFO_STREAM("MEDIA su y: "<< media_y);
-// 		// ROS_INFO_STREAM("MEDIA su x: "<< media_x);
-// 		FirstCalibration = 0;
-// 		SaveFirst = true;
-// 		// sub_ptam = true;
-// 	}
-	
-// }
-
-// void Camera::FindXeY(cv::Mat cameraMatrix, double media_z, cv::Mat tvec)
-// {
-// 	cv::Mat uvPoint = cv::Mat::ones(3,1,CV_64F); //u,v,1
-// 	uvPoint.at<double>(0,0) = BottonCHosen.Center_.x; //got this point using mouse callback
-// 	uvPoint.at<double>(1,0) = BottonCHosen.Center_.y;
-
-// 	double s;
-// 	Eigen::Matrix3d Reigen = Eigen::Matrix3d::Identity();
-// 	Eigen::Matrix3d CamEigen;
-
-// 	for( int i=0; i < cameraMatrix.rows; i++)
-// 	{
-// 		for( int j =0; j < cameraMatrix.cols; j++)
-// 		{
-// 			CamEigen(i,j) = cameraMatrix.at<float>(i,j);
-// 		}
-// 	}
-
-	
-// 	Eigen::Vector3d Point2D;
-// 	Eigen::Vector3d T;
-// 	Point2D[0] = uvPoint.at<double>(0,0);
-// 	Point2D[1] = uvPoint.at<double>(1,0);
-// 	Point2D[2] = uvPoint.at<double>(2,0);
-// 	T[0] =  tvec.at<double>(0,0);
-// 	T[1] =  tvec.at<double>(1,0);
-// 	T[2] =  tvec.at<double>(2,0);
-	
-	
-// 	Eigen::Vector3d prod_eigen;
-// 	prod_eigen = Reigen.inverse()*CamEigen.inverse()*Point2D;
-
-// 	Eigen::Vector3d temp2;
-// 	temp2 = Reigen.inverse()*T;
-// 	s = (media_z + temp2(2,0))/prod_eigen(2,0);
-// 	Eigen::Vector3d p;
-// 	p = Reigen.inverse()*(s*CamEigen.inverse()*Point2D - T);
-
-// 	ROS_INFO_STREAM("POINT 2d: " << p);
-// }
-
-// double Media(cv::Mat triangulatedPoints3D, double MaxLenght, int col)
-// {
-// 	float temp = 0;
-// 	float count = 0;
-
-// 	for(int i=0; i< triangulatedPoints3D.rows; i++)
-// 	{	
-// 		if( std::abs(triangulatedPoints3D.at<float>(i,col)) <= MaxLenght  )
-// 		{
-// 			temp = temp + std::abs(triangulatedPoints3D.at<float>(i,col)); 
-// 			count = count + 1;
-// 		}
-// 	}
-
-// 	double media = temp/count;
-	
-// 	return media;
-// }
-
-
-// void Camera::CreateAVector(std::vector<Point2f> keyp2, std::vector<Point2f> keyp_1 , cv::Mat &key_array_1, cv::Mat &key_array_2)
-// {	
-// 	std::vector<cv::Point2f> points;
-// 	std::vector<cv::Point2f> points2;
-// 	std::vector<Point2f> v_count;
-
-	
-// 	if(keyp2.size() >= keyp_1.size())
-// 	{
-// 		v_count.resize(keyp_1.size());
-// 	}
-// 	else
-// 	{
-// 		v_count.resize(keyp2.size());
-// 	}
-
-// 	for (unsigned int i=0; i< v_count.size(); i++)
-// 	{
-// 		points2.push_back(keyp2[i]);
-// 		points.push_back(keyp_1[i]);
-// 	}
-
-// 	cv::Mat key_array_1_temp(points);
-// 	key_array_1_temp.copyTo(key_array_1);
-// 	cv::Mat key_array_2_temp(points2);
-// 	key_array_2_temp.copyTo(key_array_2);
-// }
+	return scala_temp;
+}

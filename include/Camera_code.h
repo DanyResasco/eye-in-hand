@@ -12,6 +12,7 @@
 #include <kdl_parser/kdl_parser.hpp>
 #include <kdl/kdl.hpp>
 #include <kdl/frames_io.hpp>
+#include <ptam_com/KeyFrame_msg.h>
 
 #include <ros/ros.h>
 #include <image_transport/image_transport.h>
@@ -21,15 +22,18 @@
 #include <geometry_msgs/Pose.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <std_msgs/Bool.h>
+#include <sensor_msgs/PointCloud2.h>
 
 //sift
 #include <stdio.h>
 #include <iostream>
+#include <fstream>
 #include "opencv2/core/core.hpp"
 #include "opencv2/features2d/features2d.hpp"
 #include "opencv2/nonfree/features2d.hpp"
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/nonfree/nonfree.hpp"
+ #include <tf/transform_broadcaster.h>
 
 // #include "opencv2/imgcodecs.hpp"
 
@@ -39,7 +43,10 @@
 #include <tf_conversions/tf_kdl.h>
 #include <std_srvs/Empty.h>
 
-
+#include <pcl/io/pcd_io.h>
+#include <pcl_conversions/pcl_conversions.h>
+#include <std_msgs/Float32MultiArray.h>
+#include <visualization_msgs/MarkerArray.h>
 
 using namespace cv;
 
@@ -49,6 +56,11 @@ class Camera
 {
 	public:
 		ros::NodeHandle nh;
+		// std::vector<KDL::Frame> frame_vect, frame_vect2d;
+
+		std::vector<cv::Point3d> frame_vect;
+		std::vector<cv::Point2d> frame_vect2d;
+
 		// double video_or_photo;
     	image_transport::Publisher image_pub_;
     	ros::Subscriber ptam_sub;
@@ -58,6 +70,7 @@ class Camera
     	cv::Mat Im1;
     	cv::Mat Im2;
     	KDL::Frame Move_robot;
+    	cv::Mat Ptamkf3d;
 
 		cv::Mat scene;
 		int arrived_cam = 0;
@@ -73,6 +86,7 @@ class Camera
 			std::vector<KeyPoint> keyp_;
 			cv::Mat descr_;
 			cv::Mat figure_;
+			cv::Point3d Pos3d_;
 		} BottonCHosen;
 
 		cv::Mat Point_3d; 
@@ -99,7 +113,7 @@ class Camera
 		cv::Mat frame1_;
 		double RobotArmLenght;
 		double media_z, media_x,media_y ;
-		double scala;
+		KDL::Vector scala;
 		double distanzaWebcam;
 		KDL::Frame So3_prev_ptam;
 		KDL::Frame S03_prev_robot;
@@ -108,6 +122,22 @@ class Camera
 		// double scala;
 		cv::Mat Point3dTriangulate;
 		bool scala_ok;
+		ros::Subscriber ptam_kf3d;
+		cv::Mat scene_first;
+		std::vector<cv::Point2d> projectedPoints;
+		std::vector<cv::Point3d> vect3d;
+		float cam_fx, cam_d0, cam_d1, cam_d2, cam_d3,cam_d4, cam_fy, cam_cx, cam_cy;
+		std::vector<cv::Point2d> kf_point;
+		std::vector<cv::Point3d> kf_point3d;
+		ros::Subscriber dany_kf,dany_kf3d,ptam_kf2d;
+
+			std::vector<cv::Point3d> point_near;
+				std::vector<int> index_near;
+				bool sub_ptam1;
+				ros::Publisher marker_pub;
+
+		KDL::Frame frame_w_c;	//camere in word
+
 
 		Camera();
 		~Camera(){};
@@ -115,6 +145,8 @@ class Camera
 		void DetectWithSift();
 		void StereoCalibration();
 		void Triangulation();
+		void MatchPtamCv(std::vector<cv::Point2d> vect);
+		void Find3dPoint();
 
 	private:
 		
@@ -129,6 +161,19 @@ class Camera
 		void MoveCallBack(const std_msgs::Bool::ConstPtr msg);
 		void FindXeY(cv::Mat cameraMatrix, double media_z, cv::Mat tvec);
 		void RobotMove(const geometry_msgs::Pose msg);
+		void InfoKf3d(const sensor_msgs::PointCloud2::ConstPtr& msg);
+		// void InfoKf3d(const ptam_com::KeyFrame_msg::ConstPtr msg);
+		void InfoKf2d(const std_msgs::Float32MultiArray::ConstPtr &msg);
+		// void InfoKf3d(const std_msgs::Float32MultiArray::ConstPtr &msg);
+		// std::vector<cv::Point3d> ProjectPointWithPtamCamParam(std::vector<cv::Point3d> vect3d);
+		void POSE3d(const std_msgs::Float32MultiArray::ConstPtr msg);
+		void POSE2d(const std_msgs::Float32MultiArray::ConstPtr msg);
+		void ProjectPointAndFindPosBot3d(std::vector<cv::Point3d> vect3d);
+
+		void FillCamMatrixPose(KDL::Frame frame, KDL::Vector scale);
+		void FindScale();
+
+
 };
 
 
@@ -155,14 +200,11 @@ int Camera::first_Step = 1;
 double Media(cv::Mat triangulatedPoints3D, double MaxLenght, int col);
 
 
+void FromCvPointToEigen(cv::Point3d point_, Eigen::VectorXd &vect);
+void FromMatToEigen(cv::Mat Mat_, Eigen::MatrixXd &Eigen);
+void FromEigenVectorToCvPOint(Eigen::VectorXd Eigen, cv::Point3d &mat);
 
-
-
-
-
-
-
-
+double ScalaReturn(double ptam, double ptam_prev, double robot);
 
 
 
