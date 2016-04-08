@@ -70,7 +70,8 @@ class Camera
     	cv::Mat Im1;
     	cv::Mat Im2;
     	KDL::Frame Move_robot;
-    	cv::Mat Ptamkf3d;
+    	KDL::Rotation Move_robot_prev;
+    	// cv::Mat Ptamkf3d;
 
 		cv::Mat scene;
 		int arrived_cam = 0;
@@ -116,6 +117,7 @@ class Camera
 		KDL::Vector scala;
 		double distanzaWebcam;
 		KDL::Frame So3_prev_ptam;
+		// KDL::Vector So3_prev_ptam;
 		KDL::Frame S03_prev_robot;
 		bool SaveFirst;
 		bool sub_ptam_2;
@@ -125,7 +127,7 @@ class Camera
 		ros::Subscriber ptam_kf3d;
 		cv::Mat scene_first;
 		std::vector<cv::Point2d> projectedPoints;
-		std::vector<cv::Point3d> vect3d;
+		// std::vector<cv::Point3d> vect3d;
 		float cam_fx, cam_d0, cam_d1, cam_d2, cam_d3,cam_d4, cam_fy, cam_cx, cam_cy;
 		std::vector<cv::Point2d> kf_point;
 		std::vector<cv::Point3d> kf_point3d;
@@ -135,7 +137,7 @@ class Camera
 				std::vector<int> index_near;
 				bool sub_ptam1;
 				ros::Publisher marker_pub;
-
+		pcl::PointCloud<pcl::PointXYZ> Ptamkf3d;
 		KDL::Frame frame_w_c;	//camere in word
 
 
@@ -172,6 +174,8 @@ class Camera
 
 		void FillCamMatrixPose(KDL::Frame frame, KDL::Vector scale);
 		void FindScale();
+
+		std::vector<cv::Point3d> Find3dPos();
 
 
 };

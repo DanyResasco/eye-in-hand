@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 			{			    			
     			node.ControllCamera();
     		}
-    		// ROS_INFO_STREAM("ESCO DAL FIRST STEP");
+
 			if(node.move_camera_end == true)
 			{
 				node.DetectWithSift();
@@ -90,11 +90,8 @@ Camera::Camera(): it_(nh)
 	sub_ptam_2 = false;
 	SaveFirst = false;
 	
-	
 	KDL::Vector v(1,1,1);
 	scala = v;
-
-
 
 	sub = it_.subscribe("/camera/output_video", 1, &Camera::ImageConverter, this);
 	ptam_sub = nh.subscribe("/vslam/pose",1, &Camera::SOtreCamera, this);  //word in camera frame
@@ -109,61 +106,12 @@ void Camera::InfoKf3d(const sensor_msgs::PointCloud2::ConstPtr& msg)
 {
 	ROS_INFO_STREAM("qui InfoKf3d");
 	//Converto da pointcloud2 a pcl::XYZ
-	pcl::PointCloud<pcl::PointXYZ> Ptamkf3d;
+	// pcl::PointCloud<pcl::PointXYZ> Ptamkf3d;
 	pcl::PCLPointCloud2 pcl_pc;
     pcl_conversions::toPCL(*msg, pcl_pc);
-    pcl::fromPCLPointCloud2(pcl_pc, Ptamkf3d);  	
-  	vect3d.clear();
+    pcl::fromPCLPointCloud2(pcl_pc, Ptamkf3d);
+}  	
 
-    Eigen::MatrixXd	So3_ptam_eigen(4,4); 
-    FromMatToEigen( Camera2_S03,So3_ptam_eigen );
-
-    // std::ofstream myfile1,myfile2;
-    // myfile1.open("/home/daniela/code/src/eye_in_hand/filelog_camera.txt");
-    //  myfile2.open("/home/daniela/code/src/eye_in_hand/filelog_word.txt");
-
-  	for(unsigned int i=0; i < Ptamkf3d.size(); i++)
-  	{
-
-  		Eigen::VectorXd vect_eigen(4);
-  		cv::Point3d point_temp(Ptamkf3d[i].x,Ptamkf3d[i].y,Ptamkf3d[i].z);
-  		FromCvPointToEigen(point_temp, vect_eigen);
-  		Eigen::VectorXd POint_c1_eigen(4);
-  		POint_c1_eigen = So3_ptam_eigen*vect_eigen;	//C_c_w*p_w
-  		
-  		FromEigenVectorToCvPOint(POint_c1_eigen, point_temp);
-  		// ROS_INFO_STREAM("point_temp: " <<point_temp);
-    	vect3d.push_back(point_temp);
-    	// ROS_INFO_STREAM("point_tempvect3d[i]: " <<vect3d[i]);
-
-		// if (myfile1.is_open())
-		// {
-		//   	// myfile << "POint 3d x,y,z \n";
-  // 		  		// myfile <<Ptamkf3d[i].x <<"\t"<<Ptamkf3d[i].y<< "\t" << Ptamkf3d[i].z<<"\n";
-		// 	myfile1<<POint_c1_eigen[0] << "\t" << POint_c1_eigen[1] << "\t" << POint_c1_eigen[2]<<"\n";
-		    
-		//     // ROS_INFO("STO SALVANDO");
-		// }
-
-
-		// if (myfile2.is_open())
-		// {
-		//   	// myfile << "POint 3d x,y,z \n";
-  // 		  		myfile2 <<Ptamkf3d[i].x <<"\t"<<Ptamkf3d[i].y<< "\t" << Ptamkf3d[i].z<<"\n";
-		// 	// myfile1<<POint_c1_eigen[0] << "\t" << POint_c1_eigen[1] << "\t" << POint_c1_eigen[2]<<"\n";
-		    
-		//     // ROS_INFO("STO SALVANDO");
-		// }
-
-
-
-
-		// else
-		// 	ROS_INFO("bau");
-  	}
-
-    // ProjectPointAndFindPosBot3d(vect3d);
-}
 
 
 
@@ -199,9 +147,8 @@ void Camera::ProjectPointAndFindPosBot3d(std::vector<cv::Point3d> vect3d)
 		ROS_INFO_STREAM("IL BOTTONE E': "<<BottonCHosen.Pos3d_);
 	}
 	
-	imshow("kf_near",pc);
-	waitKey(0);
-
+	// imshow("kf_near",pc);
+	// waitKey(0);
 }
 
 void Camera::RobotMove(const geometry_msgs::Pose msg)
@@ -211,6 +158,7 @@ void Camera::RobotMove(const geometry_msgs::Pose msg)
 	tf::poseMsgToKDL(msg, Move_robot);
 	frame1_ = scene.clone();
 	sub_ptam_2 = true;
+	// Move_robot.M = frame_so3_ptam.M; 
 }
 
 void Camera::ImageConverter(const sensor_msgs::Image::ConstPtr& msg)
@@ -222,7 +170,6 @@ void Camera::ImageConverter(const sensor_msgs::Image::ConstPtr& msg)
     cv::undistort(scene_temp, scene, Camera_Matrix, Cam_par_distortion);
 
 	arrived_cam = 1;
-
 }
 
 
@@ -327,6 +274,7 @@ void Camera::SOtreCamera(const geometry_msgs::PoseWithCovarianceStamped::ConstPt
 	tf::poseMsgToKDL ((msg->pose).pose, frame_so3_ptam);
 	FillCamMatrixPose(frame_so3_ptam, scala);
 	frame_w_c = frame_so3_ptam.Inverse();
+
 }
 
 
@@ -380,11 +328,6 @@ void Camera::DetectWithSift()
 
 
 	detector.detect(frame, keyp_ );
-	// cv::Mat img_keypoints_1;
-	// drawKeypoints( frame, keyp_, img_keypoints_1, Scalar::all(-1), DrawMatchesFlags::DEFAULT );
-	// cv::imshow("key2", img_keypoints_1);
-	// 		cv::waitKey(0);
-
 	extractor.compute( frame, keyp_, descr_ );
  		
     /* -- Step 2: Matching descriptor vectors using FLANN matcher */
@@ -403,7 +346,6 @@ void Camera::DetectWithSift()
 	}
 
 	std::vector< DMatch > good_matches;
-	// std::vector<cv::Point2f> pointIm2;
 
 	for( int i = 0; i < BottonCHosen.descr_.rows; i++ )
 	{ 
@@ -422,7 +364,6 @@ void Camera::DetectWithSift()
 	  				DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
 
 	/*-- Localize the object */
-	// std::vector<Point2f> obj;
 	std::vector<Point> scene_point;
 	ROS_INFO_STREAM(" good_matches.size(): " << good_matches.size());
 	for(unsigned int i = 0; i < good_matches.size(); i++ )
@@ -432,21 +373,9 @@ void Camera::DetectWithSift()
 	    scene_point.push_back( keyp_[ good_matches[i].trainIdx ].pt );
 	}
 
-	//test roi
-	// cv::Point centerim2 = FindACenter(scene_point);
-	// ROS_INFO_STREAM("CREATO FindACenter");
-	// std::pair<int,int> value = FindMaxValue(frame, centerim2 );
-	// cv::Mat roi(scene, Rect(centerim2.x - 30,centerim2.y - 40,value.first, value.second));
-	// cv::Mat convert_BcMat_ = roi.clone(); 
-	
-
-	// convert_BcMat_.convertTo(Image_roi2, CV_8U) ;
 	// 	//-- Show detected matches
-	imshow( "good_matches", img_matches );
-	waitKey(0);
+	// imshow( "fnea);
 
-	// ROS_INFO_STREAM("scene_point.SIZE()"<< scene_point.size());
-	// ROS_INFO_STREAM("BottonCHosen.keyp_: " <<BottonCHosen.keyp_.size());
 	if(scene_point.size() >0)
 	{
 		setLabel(frame, "quip", scene_point);
@@ -466,8 +395,10 @@ void Camera::Triangulation()
 
 	if(SaveFirst == false)
 	{
-		So3_prev_ptam = frame_w_c;
 		SaveFirst = true;
+		Move_robot_prev = Move_robot.M;
+		// So3_prev_ptam = Move_robot_prev.Inverse()*frame_w_c.p;
+		So3_prev_ptam = frame_w_c;
 	}
 	else
 	{
@@ -478,31 +409,95 @@ void Camera::Triangulation()
 		else
 		{
 			FindScale();
-			So3_prev_ptam = frame_w_c;		
+			// So3_prev_ptam = Move_robot_prev.Inverse()*frame_w_c.p;	
+			So3_prev_ptam = frame_w_c;
 		}
 	}
-
+	std::vector<cv::Point3d> vect3d;
+	vect3d = Find3dPos();
 	ProjectPointAndFindPosBot3d(vect3d);
 	sub_ptam_2 = false;
 }
 
 
+std::vector<cv::Point3d> Camera::Find3dPos()
+{
+	// vect3d.clear();
+	std::vector<cv::Point3d> vect3d_return;
+    Eigen::MatrixXd	So3_ptam_eigen(4,4); 
+    FromMatToEigen( Camera2_S03,So3_ptam_eigen );
+
+    // std::ofstream myfile1,myfile2;
+    // myfile1.open("/home/daniela/code/src/eye_in_hand/filelog_camera.txt");
+    // myfile2.open("/home/daniela/code/src/eye_in_hand/filelog_word.txt");
+
+  	for(unsigned int i=0; i < Ptamkf3d.size(); i++)
+  	{
+  		Eigen::VectorXd vect_eigen(4);
+  		cv::Point3d point_temp(Ptamkf3d[i].x,Ptamkf3d[i].y,Ptamkf3d[i].z);
+  		FromCvPointToEigen(point_temp, vect_eigen);
+  		Eigen::VectorXd POint_c1_eigen(4);
+  		POint_c1_eigen = So3_ptam_eigen*vect_eigen;	//C_c_w*p_w
+  		
+  		FromEigenVectorToCvPOint(POint_c1_eigen, point_temp);
+  		// ROS_INFO_STREAM("point_temp: " <<point_temp);
+    	vect3d_return.push_back(point_temp);
+    	// ROS_INFO_STREAM("point_tempvect3d[i]: " <<vect3d[i]);
+
+		// if (myfile1.is_open())
+		// {
+		//   	// myfile << "POint 3d x,y,z \n";
+  // 		  		// myfile <<Ptamkf3d[i].x <<"\t"<<Ptamkf3d[i].y<< "\t" << Ptamkf3d[i].z<<"\n";
+		// 	myfile1<<POint_c1_eigen[0] << "\t" << POint_c1_eigen[1] << "\t" << POint_c1_eigen[2]<<"\n";
+		    
+		//     // ROS_INFO("STO SALVANDO");
+		// }
+
+
+		// if (myfile2.is_open())
+		// {
+		//   	// myfile << "POint 3d x,y,z \n";
+  // 		  		myfile2 <<Ptamkf3d[i].x <<"\t"<<Ptamkf3d[i].y<< "\t" << Ptamkf3d[i].z<<"\n";
+		// 	// myfile1<<POint_c1_eigen[0] << "\t" << POint_c1_eigen[1] << "\t" << POint_c1_eigen[2]<<"\n";
+		    
+		//     // ROS_INFO("STO SALVANDO");
+		// }
+
+		// else
+		// 	ROS_INFO("bau");
+  	}
+  	return vect3d_return;
+    // ProjectPointAndFindPosBot3d(vect3d);
+}
+
+
+
+
+
+
+
 void Camera::FindScale()
 {
+	// Move_robot_prev = Move_robot.M.Inverse() * Move_robot_prev.Inverse();
+	
+	// KDL::Vector temp_point_w_c;
+	// temp_point_w_c = Move_robot_prev.Inverse()*frame_w_c.p;
+
 	if(Move_robot.p.z() != 0)
 	{
 		scala[2] = ScalaReturn(frame_w_c.p.z(), So3_prev_ptam.p.z(), Move_robot.p.z());
+		scala[1] = scala[2];
+		scala[0] = scala[2];
 	}
-	if(Move_robot.p.x() !=0 )
-	{
-		scala[0] = ScalaReturn(frame_w_c.p.x(), So3_prev_ptam.p.x(), Move_robot.p.x());
+	// if(Move_robot.p.x() !=0 )
+	// {
+	// 	scala[0] = ScalaReturn(frame_w_c.p.x(), So3_prev_ptam.p.x(), Move_robot.p.x());
+	// }
+	// if(Move_robot.p.y() !=0 )
+	// {
+	// 	scala[1] = ScalaReturn(frame_w_c.p.y(), So3_prev_ptam.p.y(), Move_robot.p.y());
 		
-	}
-	if(Move_robot.p.y() !=0 )
-	{
-		scala[1] = ScalaReturn(frame_w_c.p.y(), So3_prev_ptam.p.y(), Move_robot.p.y());
-		
-	}
+	// }
 
 	FillCamMatrixPose(frame_so3_ptam, scala);
 	ROS_INFO_STREAM("scala: " << scala);
@@ -515,7 +510,8 @@ double ScalaReturn(double ptam, double ptam_prev, double robot)
 	double temp_ = ptam_prev - ptam;
 	if(temp_ !=0 )
 	{
-		scala_temp = std::abs(robot/temp_);
+		// scala_temp = std::abs(robot/temp_);
+		scala_temp = robot/temp_;
 	}
 
 	return scala_temp;
