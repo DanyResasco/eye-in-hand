@@ -2,9 +2,10 @@
 #include <Camera_code.h>
 #include <geometry_function.hpp>
 #include <converter_file.hpp>
+#include <plane_estimate.hpp>
 
-using namespace cv;
-RNG rng(12345);
+// using namespace cv;
+cv::RNG rng(12345);
 
 int main(int argc, char **argv)
 {
@@ -18,7 +19,7 @@ int main(int argc, char **argv)
 	
 	ROS_DEBUG( "Spin Rate %lf", spin_rate);
 
-	namedWindow("CAMERA_ROBOT");
+	cv::namedWindow("CAMERA_ROBOT");
 
 	ros::Rate rate(spin_rate); 
 		
@@ -88,8 +89,9 @@ Camera::Camera(): it_(nh)
  	//initialize the flag
 	move_camera_end = false;
 	sub_ptam_2 = false;
-	SaveFirst = false;
-	scala_first = false;
+	count_n_passi = 0;
+	// SaveFirst = false;
+	// scala_first = false;
 	
 	KDL::Vector v(1,1,1);
 	scala = v;
@@ -126,27 +128,32 @@ void Camera::ProjectPointAndFindPosBot3d(std::vector<cv::Point3d> vect3d)
 		point_.x =  cam_fx*vect3d[i].x/vect3d[i].z + cam_cx;
 		point_.y =  cam_fy*vect3d[i].y/vect3d[i].z + cam_cy;
 		// return_vect.push_back(point_);
-		line( pc,point_, point_ , Scalar( 220, 220, 0 ),  2, 8 );	
+		cv::line( pc,point_, point_ , cv::Scalar( 220, 220, 0 ),  2, 8 );	
 		if(norm( (point_temp - point_)) <= 100)
 		{
 			point_near.push_back(vect3d[i]);
 			min_vect.push_back(norm( (point_temp - point_)));
-			line( pc,point_, point_ , Scalar( 5, 5, 0 ),  2, 8 );
+			cv::line( pc,point_, point_ , cv::Scalar( 5, 5, 0 ),  2, 8 );
 		}
 	}
 
-	if(min_vect.size() > 0)
+	if(min_vect.size() >= 3 )	//servono almeno 3 punti per creare il piano
 	{
-		std::vector<double>::iterator index_min = std::min_element(min_vect.begin(), min_vect.end());
-		int min_index = std::distance(std::begin(min_vect), index_min);
-		BottonCHosen.Pos3d_ = point_near[min_index];
-		ROS_INFO_STREAM("IL BOTTONE E': "<<BottonCHosen.Pos3d_);
+		Eigen::Vector4f plane_param;
+		plane_param = EstimatePlane(point_near);
+
+		FindBottonPos3D(plane_param);
+
+		// std::vector<double>::iterator index_min = std::min_element(min_vect.begin(), min_vect.end());
+		// int min_index = std::distance(std::begin(min_vect), index_min);
+		// BottonCHosen.Pos3d_ = point_near[min_index];
+		// ROS_INFO_STREAM("IL BOTTONE E': "<<BottonCHosen.Pos3d_);
 	}
 	else
-		ROS_INFO_STREAM("non ho trovato punti vicini");
+		ROS_INFO_STREAM("non ho trovato punti vicini. non posso calcolare il piano");
 	
-	imshow("kf_near",pc);
-	waitKey(0);
+	cv::imshow("kf_near",pc);
+	cv::waitKey(0);
 }
 
 void Camera::RobotMove(const geometry_msgs::Pose msg)
@@ -173,11 +180,11 @@ void Camera::ImageConverter(const sensor_msgs::Image::ConstPtr& msg)
 
 void Camera::ControllCamera()
 {
-	imshow("CAMERA_ROBOT",  scene);
+	cv::imshow("CAMERA_ROBOT",  scene);
 	scene.copyTo(scene_first);
  	/*set the callback function for any mouse event*/
-	setMouseCallback("CAMERA_ROBOT", CallBackFunc, NULL);
-		waitKey(0);
+	cv::setMouseCallback("CAMERA_ROBOT", CallBackFunc, NULL);
+		cv::waitKey(0);
 
 	if(press_buttom == 1 )	/*wait the mouse event*/
 	{
@@ -187,7 +194,7 @@ void Camera::ControllCamera()
 
 void Camera::CallBackFunc(int event, int x, int y, int flags, void* userdata)
 {
-    if ( event == EVENT_LBUTTONDOWN )
+    if ( event == cv::EVENT_LBUTTONDOWN )
     {
        	std::cout << "Left mouse button is clicked. Save the position (" << x << ", " << y << ")" <<std::endl;
         pos_object.x = x;
@@ -200,7 +207,7 @@ void Camera::CallBackFunc(int event, int x, int y, int flags, void* userdata)
 void Camera::ShapeDetect()
 { 
 	
-	Mat src_gray;
+	cv::Mat src_gray;
 	cv::Mat dst ;
 
     /* Convert it to gray*/
@@ -235,7 +242,7 @@ void Camera::ShapeDetect()
 			BottonCHosen.Bot_C = CenterAndContours.second[info_geometry.first];
 
 			std::pair<int,int> value = FindMaxValue(dst, BottonCHosen.Center_ );
-			cv::Mat roi(scene, Rect(BottonCHosen.Center_.x - 30,BottonCHosen.Center_.y - 40,value.first, value.second));
+			cv::Mat roi(scene, cv::Rect(BottonCHosen.Center_.x - 30,BottonCHosen.Center_.y - 40,value.first, value.second));
 			cv::Mat convert_BcMat_ = roi.clone(); 
 
 			convert_BcMat_.convertTo(BottonCHosen.figure_, CV_8U) ;
@@ -320,7 +327,7 @@ void Camera::DetectWithSift()
        		magnification  = 3.0;    */ 
 	// SIFT feature detector and feature extractor
     // std::cout<<"BottonCHosen.descr_.rows: "<<BottonCHosen.descr_.rows<<std::endl;
-    std::vector<KeyPoint> keyp_;
+    std::vector<cv::KeyPoint> keyp_;
 	cv::Mat descr_;   		
 	cv::SiftFeatureDetector detector( 0.01, 3.0 );
 	cv::SiftDescriptorExtractor extractor( 2.0 );
@@ -332,8 +339,8 @@ void Camera::DetectWithSift()
 	extractor.compute( frame, keyp_, descr_ );
  		
     /* -- Step 2: Matching descriptor vectors using FLANN matcher */
- 	FlannBasedMatcher matcher;
- 	std::vector< DMatch > matches;
+ 	cv::FlannBasedMatcher matcher;
+ 	std::vector< cv::DMatch > matches;
     matcher.match( BottonCHosen.descr_, descr_, matches );
 
     double max_dist = 0; double min_dist = 90;
@@ -346,11 +353,11 @@ void Camera::DetectWithSift()
 	    if( dist > max_dist ) max_dist = dist;
 	}
 
-	std::vector< DMatch > good_matches;
+	std::vector< cv::DMatch > good_matches;
 
 	for( int i = 0; i < BottonCHosen.descr_.rows; i++ )
 	{ 
-	 	if( matches[i].distance <= max(2*min_dist, 0.02) )
+	 	if( matches[i].distance <= cv::max(2*min_dist, 0.02) )
 	    { 
 		   	good_matches.push_back( matches[i]);
 
@@ -359,13 +366,13 @@ void Camera::DetectWithSift()
     }
 
 	/*-- Draw only "good" matches */
-	Mat img_matches;
-	drawMatches(BottonCHosen.figure_, BottonCHosen.keyp_, frame, keyp_, good_matches, img_matches, 
-	  				Scalar::all(-1), Scalar::all(-1),std::vector<char>(), 
-	  				DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
+	cv::Mat img_matches;
+	cv::drawMatches(BottonCHosen.figure_, BottonCHosen.keyp_, frame, keyp_, good_matches, img_matches, 
+	  				cv::Scalar::all(-1), cv::Scalar::all(-1),std::vector<char>(), 
+	  				cv::DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
 
 	/*-- Localize the object */
-	std::vector<Point> scene_point;
+	std::vector<cv::Point> scene_point;
 	ROS_INFO_STREAM(" good_matches.size(): " << good_matches.size());
 	for(unsigned int i = 0; i < good_matches.size(); i++ )
 	{
@@ -383,9 +390,9 @@ void Camera::DetectWithSift()
 		cv::Rect r = cv::boundingRect(scene_point);
 		cv::Point pt(r.x + (r.width / 2), r.y + (r.height / 2));
 		Botton_2frame = pt;
-		line( frame,pt, pt , Scalar( 110, 220, 0 ),  2, 8 );
-		imshow("Object detection",frame);
-		waitKey(0);
+		cv::line( frame,pt, pt , cv::Scalar( 110, 220, 0 ),  2, 8 );
+		cv::imshow("Object detection",frame);
+		cv::waitKey(0);
 	}
 }
 
@@ -394,40 +401,42 @@ void Camera::Triangulation()
 {
 	ROS_INFO("*******Triangulation*******");
 
-	if(SaveFirst == false)
+	if(count_n_passi == 1)
 	{
-		SaveFirst = true;
-		// So3_prev_ptam = frame_so3_ptam;
-		// Move_robot_prev = Move_robot.M;
-		// So3_prev_ptam = frame_so3_ptam;
+		FindScale();
+		// SaveFirst = true;
+		// // So3_prev_ptam = frame_so3_ptam;
+		// // Move_robot_prev = Move_robot.M;
+		// // So3_prev_ptam = frame_so3_ptam;
 	}
-	else
-	{
-		// if(frame_w_c.p.z() == 0)
-		// {
-		// 	ROS_INFO("ARRIVATO");
-		// }
-		// else
-		// {
-		if(scala_first == true)
-		{
-			FindScale();
-			scala_first = false;
-		}
-			// So3_prev_ptam = frame_w_c;
-		// }
-	}
+	// else
+	// {
+	// 	// if(frame_w_c.p.z() == 0)
+	// 	// {
+	// 	// 	ROS_INFO("ARRIVATO");
+	// 	// }
+	// 	// else
+	// 	// {
+	// 	if(scala_first == true)
+	// 	{
+	// 		FindScale();
+	// 		scala_first = false;
+	// 	}
+	// 		// So3_prev_ptam = frame_w_c;
+	// 	// }
+	// }
 
 	
 	std::vector<cv::Point3d> vect3d;
-	vect3d = Find3dPos();
+	vect3d = ConvertPointFromWordToCam();
 	ProjectPointAndFindPosBot3d(vect3d);
 	sub_ptam_2 = false;
 	So3_prev_ptam = frame_so3_ptam;
+	count_n_passi +=1; 
 }
 
 
-std::vector<cv::Point3d> Camera::Find3dPos()
+std::vector<cv::Point3d> Camera::ConvertPointFromWordToCam()
 {
 	// vect3d.clear();
 	std::vector<cv::Point3d> vect3d_return;
@@ -445,14 +454,14 @@ std::vector<cv::Point3d> Camera::Find3dPos()
   		FromCvPointToEigen(point_temp, vect_eigen);
   		Eigen::VectorXd POint_c1_eigen(4);
 
-  		Eigen::MatrixXd ScalingMatrix(4,4);
-  		ScalingMatrix = Eigen::MatrixXd::Zero(4,4);
-  		ScalingMatrix(0,0) = scala[0];
-  		ScalingMatrix(1,1) = scala[1];
-  		ScalingMatrix(2,2) = scala[2];
-  		ScalingMatrix(3,3) = 1;
+  		Eigen::MatrixXd ScalinMatrix(4,4);
+  		ScalinMatrix = Eigen::MatrixXd::Zero(4,4);
+  		ScalinMatrix(0,0) = scala[0];
+  		ScalinMatrix(1,1) = scala[1];
+  		ScalinMatrix(2,2) = scala[2];
+  		ScalinMatrix(3,3) = 1;
 
-  		POint_c1_eigen = ScalingMatrix*So3_ptam_eigen*vect_eigen;	//C_c_w*p_w
+  		POint_c1_eigen = ScalinMatrix*So3_ptam_eigen*vect_eigen;	//C_c_w*p_w
   		
   		FromEigenVectorToCvPOint(POint_c1_eigen, point_temp);
   		// ROS_INFO_STREAM("point_temp: " <<point_temp);
@@ -500,18 +509,18 @@ void Camera::FindScale()
 	if(Move_robot.p.z() != 0)
 	{
 		scala[2] = ScalaReturn(Frame_c2_c1.p.z(), So3_prev_ptam.p.z(), Move_robot.p.z());
-		// scala[1] = scala[2];
-		// scala[0] = scala[2];
+		scala[1] = scala[2];
+		scala[0] = scala[2];
 	}
-	if(Move_robot.p.x() !=0 )
-	{
-		scala[0] = ScalaReturn(frame_w_c.p.x(), So3_prev_ptam.p.x(), Move_robot.p.x());
-	}
-	if(Move_robot.p.y() !=0 )
-	{
-		scala[1] = ScalaReturn(frame_w_c.p.y(), So3_prev_ptam.p.y(), Move_robot.p.y());
+	// if(Move_robot.p.x() !=0 )
+	// {
+	// 	scala[0] = ScalaReturn(frame_w_c.p.x(), So3_prev_ptam.p.x(), Move_robot.p.x());
+	// }
+	// if(Move_robot.p.y() !=0 )
+	// {
+	// 	scala[1] = ScalaReturn(frame_w_c.p.y(), So3_prev_ptam.p.y(), Move_robot.p.y());
 		
-	}
+	// }
 
 	// FillCamMatrixPose(frame_so3_ptam, scala);
 	ROS_INFO_STREAM("scala: " << scala);

@@ -48,7 +48,7 @@
 #include <std_msgs/Float32MultiArray.h>
 #include <visualization_msgs/MarkerArray.h>
 
-using namespace cv;
+// using namespace cv;
 
 
 
@@ -84,7 +84,7 @@ class Camera
 		{
 			std::vector<cv::Point> Bot_C; //contour
 			cv::Point Center_;
-			std::vector<KeyPoint> keyp_;
+			std::vector<cv::KeyPoint> keyp_;
 			cv::Mat descr_;
 			cv::Mat figure_;
 			cv::Point3d Pos3d_;
@@ -95,14 +95,14 @@ class Camera
 		double move_z_robot;
 
 		std::vector<cv::Point2f> KeypointIm2;
-		std::vector<Point2f> KeyPointIm1Match;
+		std::vector<cv::Point2f> KeyPointIm1Match;
 		cv::Mat triangulatedPoints3D;
 		KDL::Frame frame_so3_ptam;
 
 		image_transport::ImageTransport it_;
 	  	image_transport::Subscriber sub;
 	  	std::string camera_topic_;
-	  	static Point pos_object;
+	  	static cv::Point pos_object;
 		static int press_buttom;
 		static int first_Step ;
 		double Finish = 1;
@@ -140,6 +140,7 @@ class Camera
 		pcl::PointCloud<pcl::PointXYZ> Ptamkf3d;
 		KDL::Frame frame_w_c;	//camere in word
 		bool scala_first;
+		int count_n_passi;
 
 
 		Camera();
@@ -160,23 +161,25 @@ class Camera
 		std::pair<std::vector<cv::Point> ,std::vector<std::vector<cv::Point>> > FindContours(cv::Mat bw, cv::Mat camera);
 		void SOtreCamera(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr msg);
 		
-		void CreateAVector(std::vector<Point2f> keyp2, std::vector<Point2f> keyp_1 , cv::Mat &key_array_1, cv::Mat &key_array_2);
+		// void CreateAVector(std::vector<cv::Point2f> keyp2, std::vector<cv::Point2f> keyp_1 , cv::Mat &key_array_1, cv::Mat &key_array_2);
 		void MoveCallBack(const std_msgs::Bool::ConstPtr msg);
-		void FindXeY(cv::Mat cameraMatrix, double media_z, cv::Mat tvec);
+		// void FindXeY(cv::Mat cameraMatrix, double media_z, cv::Mat tvec);
 		void RobotMove(const geometry_msgs::Pose msg);
 		void InfoKf3d(const sensor_msgs::PointCloud2::ConstPtr& msg);
 		// void InfoKf3d(const ptam_com::KeyFrame_msg::ConstPtr msg);
-		void InfoKf2d(const std_msgs::Float32MultiArray::ConstPtr &msg);
+		// void InfoKf2d(const std_msgs::Float32MultiArray::ConstPtr &msg);
 		// void InfoKf3d(const std_msgs::Float32MultiArray::ConstPtr &msg);
 		// std::vector<cv::Point3d> ProjectPointWithPtamCamParam(std::vector<cv::Point3d> vect3d);
-		void POSE3d(const std_msgs::Float32MultiArray::ConstPtr msg);
-		void POSE2d(const std_msgs::Float32MultiArray::ConstPtr msg);
+		// void POSE3d(const std_msgs::Float32MultiArray::ConstPtr msg);
+		// void POSE2d(const std_msgs::Float32MultiArray::ConstPtr msg);
 		void ProjectPointAndFindPosBot3d(std::vector<cv::Point3d> vect3d);
 
 		void FillCamMatrixPose(KDL::Frame frame);
 		void FindScale();
 
-		std::vector<cv::Point3d> Find3dPos();
+		std::vector<cv::Point3d> ConvertPointFromWordToCam();
+		Eigen::Vector4f EstimatePlane(std::vector<cv::Point3d> Point_Near);
+		void FindBottonPos3D(Eigen::Vector4f plane_param);
 
 
 };
@@ -197,7 +200,7 @@ std::pair<int,int> FindMaxValue(cv::Mat &matrix, cv::Point &point );
 */
 
 
-Point Camera::pos_object;
+cv::Point Camera::pos_object;
 int Camera::press_buttom = 0;
 int Camera::first_Step = 1;
 
