@@ -89,17 +89,16 @@ Camera::Camera(): it_(nh)
 	move_camera_end = false;
 	sub_ptam_2 = false;
 	SaveFirst = false;
+	scala_first = false;
 	
 	KDL::Vector v(1,1,1);
 	scala = v;
 
 	sub = it_.subscribe("/camera/output_video", 1, &Camera::ImageConverter, this);
-	ptam_sub = nh.subscribe("/vslam/pose",1, &Camera::SOtreCamera, this);  //word in camera frame
+	ptam_sub = nh.subscribe("/vslam/pose",1, &Camera::SOtreCamera, this);  //word in camera framebu
 	movewebcamrobot = nh.subscribe("/moverobot",1, &Camera::RobotMove,this); // robot in cam frame
 	ptam_kf3d = nh.subscribe("/vslam/pc2",1,&Camera::InfoKf3d,this);	//point in word frame
 }
-
-
 
 
 void Camera::InfoKf3d(const sensor_msgs::PointCloud2::ConstPtr& msg)
@@ -111,9 +110,6 @@ void Camera::InfoKf3d(const sensor_msgs::PointCloud2::ConstPtr& msg)
     pcl_conversions::toPCL(*msg, pcl_pc);
     pcl::fromPCLPointCloud2(pcl_pc, Ptamkf3d);
 }  	
-
-
-
 
 void Camera::ProjectPointAndFindPosBot3d(std::vector<cv::Point3d> vect3d)
 {
@@ -131,7 +127,7 @@ void Camera::ProjectPointAndFindPosBot3d(std::vector<cv::Point3d> vect3d)
 		point_.y =  cam_fy*vect3d[i].y/vect3d[i].z + cam_cy;
 		// return_vect.push_back(point_);
 		line( pc,point_, point_ , Scalar( 220, 220, 0 ),  2, 8 );	
-		if(norm( (point_temp - point_)) <= 90)
+		if(norm( (point_temp - point_)) <= 100)
 		{
 			point_near.push_back(vect3d[i]);
 			min_vect.push_back(norm( (point_temp - point_)));
@@ -146,9 +142,11 @@ void Camera::ProjectPointAndFindPosBot3d(std::vector<cv::Point3d> vect3d)
 		BottonCHosen.Pos3d_ = point_near[min_index];
 		ROS_INFO_STREAM("IL BOTTONE E': "<<BottonCHosen.Pos3d_);
 	}
+	else
+		ROS_INFO_STREAM("non ho trovato punti vicini");
 	
-	// imshow("kf_near",pc);
-	// waitKey(0);
+	imshow("kf_near",pc);
+	waitKey(0);
 }
 
 void Camera::RobotMove(const geometry_msgs::Pose msg)
@@ -272,30 +270,33 @@ void Camera::ShapeDetect()
 void Camera::SOtreCamera(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr msg)
 {
 	tf::poseMsgToKDL ((msg->pose).pose, frame_so3_ptam);
-	FillCamMatrixPose(frame_so3_ptam, scala);
+	FillCamMatrixPose(frame_so3_ptam);
 	frame_w_c = frame_so3_ptam.Inverse();
-
 }
 
 
-void Camera::FillCamMatrixPose(KDL::Frame frame, KDL::Vector scale)
+// void Camera::FillCamMatrixPose(KDL::Frame frame, KDL::Vector scale)
+void Camera::FillCamMatrixPose(KDL::Frame frame)
 {
 
 	Camera2_S03.at<float>(0,0) = frame_so3_ptam.M.data[0];
 	Camera2_S03.at<float>(0,1) = frame_so3_ptam.M.data[1];
 	Camera2_S03.at<float>(0,2) = frame_so3_ptam.M.data[2];
 	
-	Camera2_S03.at<float>(0,3) = frame_so3_ptam.p.x()*scale.x();
+	// Camera2_S03.at<float>(0,3) = frame_so3_ptam.p.x()*scale.x();
+	Camera2_S03.at<float>(0,3) = frame_so3_ptam.p.x();
 	Camera2_S03.at<float>(1,0) = frame_so3_ptam.M.data[3];
 	Camera2_S03.at<float>(1,1) = frame_so3_ptam.M.data[4];
 	Camera2_S03.at<float>(1,2) = frame_so3_ptam.M.data[5];
 
-	Camera2_S03.at<float>(1,3) = frame_so3_ptam.p.y()*scale.y();
+	// Camera2_S03.at<float>(1,3) = frame_so3_ptam.p.y()*scale.y();
+	Camera2_S03.at<float>(1,3) = frame_so3_ptam.p.y();
 	Camera2_S03.at<float>(2,0) = frame_so3_ptam.M.data[6];
 	Camera2_S03.at<float>(2,1) = frame_so3_ptam.M.data[7];
 	Camera2_S03.at<float>(2,2) = frame_so3_ptam.M.data[8];
 
-	Camera2_S03.at<float>(2,3) = frame_so3_ptam.p.z()*scale.z();
+	// Camera2_S03.at<float>(2,3) = frame_so3_ptam.p.z()*scale.z();
+	Camera2_S03.at<float>(2,3) = frame_so3_ptam.p.z();
 
 }
 
@@ -396,27 +397,33 @@ void Camera::Triangulation()
 	if(SaveFirst == false)
 	{
 		SaveFirst = true;
-		Move_robot_prev = Move_robot.M;
-		// So3_prev_ptam = Move_robot_prev.Inverse()*frame_w_c.p;
-		So3_prev_ptam = frame_w_c;
+		// So3_prev_ptam = frame_so3_ptam;
+		// Move_robot_prev = Move_robot.M;
+		// So3_prev_ptam = frame_so3_ptam;
 	}
 	else
 	{
-		if(frame_w_c.p.z() == 0)
-		{
-			ROS_INFO("ARRIVATO");
-		}
-		else
+		// if(frame_w_c.p.z() == 0)
+		// {
+		// 	ROS_INFO("ARRIVATO");
+		// }
+		// else
+		// {
+		if(scala_first == true)
 		{
 			FindScale();
-			// So3_prev_ptam = Move_robot_prev.Inverse()*frame_w_c.p;	
-			So3_prev_ptam = frame_w_c;
+			scala_first = false;
 		}
+			// So3_prev_ptam = frame_w_c;
+		// }
 	}
+
+	
 	std::vector<cv::Point3d> vect3d;
 	vect3d = Find3dPos();
 	ProjectPointAndFindPosBot3d(vect3d);
 	sub_ptam_2 = false;
+	So3_prev_ptam = frame_so3_ptam;
 }
 
 
@@ -425,7 +432,7 @@ std::vector<cv::Point3d> Camera::Find3dPos()
 	// vect3d.clear();
 	std::vector<cv::Point3d> vect3d_return;
     Eigen::MatrixXd	So3_ptam_eigen(4,4); 
-    FromMatToEigen( Camera2_S03,So3_ptam_eigen );
+    FromMatToEigen( Camera2_S03, So3_ptam_eigen );
 
     // std::ofstream myfile1,myfile2;
     // myfile1.open("/home/daniela/code/src/eye_in_hand/filelog_camera.txt");
@@ -437,7 +444,15 @@ std::vector<cv::Point3d> Camera::Find3dPos()
   		cv::Point3d point_temp(Ptamkf3d[i].x,Ptamkf3d[i].y,Ptamkf3d[i].z);
   		FromCvPointToEigen(point_temp, vect_eigen);
   		Eigen::VectorXd POint_c1_eigen(4);
-  		POint_c1_eigen = So3_ptam_eigen*vect_eigen;	//C_c_w*p_w
+
+  		Eigen::MatrixXd ScalingMatrix(4,4);
+  		ScalingMatrix = Eigen::MatrixXd::Zero(4,4);
+  		ScalingMatrix(0,0) = scala[0];
+  		ScalingMatrix(1,1) = scala[1];
+  		ScalingMatrix(2,2) = scala[2];
+  		ScalingMatrix(3,3) = 1;
+
+  		POint_c1_eigen = ScalingMatrix*So3_ptam_eigen*vect_eigen;	//C_c_w*p_w
   		
   		FromEigenVectorToCvPOint(POint_c1_eigen, point_temp);
   		// ROS_INFO_STREAM("point_temp: " <<point_temp);
@@ -448,7 +463,7 @@ std::vector<cv::Point3d> Camera::Find3dPos()
 		// {
 		//   	// myfile << "POint 3d x,y,z \n";
   // 		  		// myfile <<Ptamkf3d[i].x <<"\t"<<Ptamkf3d[i].y<< "\t" << Ptamkf3d[i].z<<"\n";
-		// 	myfile1<<POint_c1_eigen[0] << "\t" << POint_c1_eigen[1] << "\t" << POint_c1_eigen[2]<<"\n";
+		 	// myfile1<<POint_c1_eigen[0] << "\t" << POint_c1_eigen[1] << "\t" << POint_c1_eigen[2]<<"\n";
 		    
 		//     // ROS_INFO("STO SALVANDO");
 		// }
@@ -466,6 +481,7 @@ std::vector<cv::Point3d> Camera::Find3dPos()
 		// else
 		// 	ROS_INFO("bau");
   	}
+  	// myfile1.close();
   	return vect3d_return;
     // ProjectPointAndFindPosBot3d(vect3d);
 }
@@ -478,28 +494,26 @@ std::vector<cv::Point3d> Camera::Find3dPos()
 
 void Camera::FindScale()
 {
-	// Move_robot_prev = Move_robot.M.Inverse() * Move_robot_prev.Inverse();
-	
-	// KDL::Vector temp_point_w_c;
-	// temp_point_w_c = Move_robot_prev.Inverse()*frame_w_c.p;
+	KDL::Frame Frame_c2_c1;
+	Frame_c2_c1 = So3_prev_ptam*frame_w_c;
 
 	if(Move_robot.p.z() != 0)
 	{
-		scala[2] = ScalaReturn(frame_w_c.p.z(), So3_prev_ptam.p.z(), Move_robot.p.z());
-		scala[1] = scala[2];
-		scala[0] = scala[2];
+		scala[2] = ScalaReturn(Frame_c2_c1.p.z(), So3_prev_ptam.p.z(), Move_robot.p.z());
+		// scala[1] = scala[2];
+		// scala[0] = scala[2];
 	}
-	// if(Move_robot.p.x() !=0 )
-	// {
-	// 	scala[0] = ScalaReturn(frame_w_c.p.x(), So3_prev_ptam.p.x(), Move_robot.p.x());
-	// }
-	// if(Move_robot.p.y() !=0 )
-	// {
-	// 	scala[1] = ScalaReturn(frame_w_c.p.y(), So3_prev_ptam.p.y(), Move_robot.p.y());
+	if(Move_robot.p.x() !=0 )
+	{
+		scala[0] = ScalaReturn(frame_w_c.p.x(), So3_prev_ptam.p.x(), Move_robot.p.x());
+	}
+	if(Move_robot.p.y() !=0 )
+	{
+		scala[1] = ScalaReturn(frame_w_c.p.y(), So3_prev_ptam.p.y(), Move_robot.p.y());
 		
-	// }
+	}
 
-	FillCamMatrixPose(frame_so3_ptam, scala);
+	// FillCamMatrixPose(frame_so3_ptam, scala);
 	ROS_INFO_STREAM("scala: " << scala);
 }
 
@@ -507,11 +521,11 @@ void Camera::FindScale()
 double ScalaReturn(double ptam, double ptam_prev, double robot)
 {
 	double scala_temp = 0;
-	double temp_ = ptam_prev - ptam;
-	if(temp_ !=0 )
+	// double temp_ = ptam_prev - ptam;
+	if(ptam !=0 )
 	{
 		// scala_temp = std::abs(robot/temp_);
-		scala_temp = robot/temp_;
+		scala_temp = robot/ptam;
 	}
 
 	return scala_temp;

@@ -139,6 +139,7 @@ class Camera
 				ros::Publisher marker_pub;
 		pcl::PointCloud<pcl::PointXYZ> Ptamkf3d;
 		KDL::Frame frame_w_c;	//camere in word
+		bool scala_first;
 
 
 		Camera();
@@ -172,7 +173,7 @@ class Camera
 		void POSE2d(const std_msgs::Float32MultiArray::ConstPtr msg);
 		void ProjectPointAndFindPosBot3d(std::vector<cv::Point3d> vect3d);
 
-		void FillCamMatrixPose(KDL::Frame frame, KDL::Vector scale);
+		void FillCamMatrixPose(KDL::Frame frame);
 		void FindScale();
 
 		std::vector<cv::Point3d> Find3dPos();
