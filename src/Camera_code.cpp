@@ -90,11 +90,8 @@ Camera::Camera(): it_(nh)
 	move_camera_end = false;
 	sub_ptam_2 = false;
 	count_n_passi = 0;
-	// SaveFirst = false;
-	// scala_first = false;
 	
-	KDL::Vector v(1,1,1);
-	scala = v;
+	scala = 1;
 
 	sub = it_.subscribe("/camera/output_video", 1, &Camera::ImageConverter, this);
 	ptam_sub = nh.subscribe("/vslam/pose",1, &Camera::SOtreCamera, this);  //word in camera framebu
@@ -116,11 +113,12 @@ void Camera::InfoKf3d(const sensor_msgs::PointCloud2::ConstPtr& msg)
 void Camera::ProjectPointAndFindPosBot3d(std::vector<cv::Point3d> vect3d)
 {
 	std::vector<cv::Point3d> point_near;
+	// std::vector<int> index_near;
 	std::vector<double> min_vect;
 	cv::Mat pc;
 	frame1_.copyTo(pc);
 
-	cv::Point2d point_temp(BottonCHosen.Center_.x, BottonCHosen.Center_.y);
+	cv::Point2d point_temp(BottonCHosen.Botton_2frame.x, BottonCHosen.Botton_2frame.y);
 
 	for(unsigned int i=0; i < vect3d.size(); i++)
 	{
@@ -181,7 +179,7 @@ void Camera::ImageConverter(const sensor_msgs::Image::ConstPtr& msg)
 void Camera::ControllCamera()
 {
 	cv::imshow("CAMERA_ROBOT",  scene);
-	scene.copyTo(scene_first);
+	
  	/*set the callback function for any mouse event*/
 	cv::setMouseCallback("CAMERA_ROBOT", CallBackFunc, NULL);
 		cv::waitKey(0);
@@ -212,8 +210,7 @@ void Camera::ShapeDetect()
 
     /* Convert it to gray*/
   	cvtColor( scene, dst, CV_GRAY2RGB );
-  	//Im1 = dst.clone();
-
+  
   	
   	/* Convert to binary image using Canny*/
 	cv::Mat bw;
@@ -238,6 +235,7 @@ void Camera::ShapeDetect()
 
 			BottonCHosen.Center_.x = floor(CenterAndContours.first[info_geometry.first].x);
 			BottonCHosen.Center_.y = floor(CenterAndContours.first[info_geometry.first].y);
+			BottonCHosen.Botton_2frame = BottonCHosen.Center_;
 			setLabel(dst, "BOTP", CenterAndContours.second[info_geometry.first]);
 			BottonCHosen.Bot_C = CenterAndContours.second[info_geometry.first];
 
@@ -313,27 +311,16 @@ void Camera::FillCamMatrixPose(KDL::Frame frame)
 void Camera::DetectWithSift()
 {
 	ROS_INFO_STREAM("DENTRO DetectWithSift");
-	// Im2 = frame.clone();
 	cv::Mat frame;
 	cv::Mat frame_temp;
 	frame_temp = frame1_.clone();
-
-	 	// cvtColor( frame1_, frame, CV_GRAY2RGB );
 	frame_temp.convertTo(frame, CV_8U) ;
   	
   	//Detect sift
-		 /* threshold      = 0.04;
-       		edge_threshold = 10.0;
-       		magnification  = 3.0;    */ 
-	// SIFT feature detector and feature extractor
-    // std::cout<<"BottonCHosen.descr_.rows: "<<BottonCHosen.descr_.rows<<std::endl;
-    std::vector<cv::KeyPoint> keyp_;
+	std::vector<cv::KeyPoint> keyp_;
 	cv::Mat descr_;   		
 	cv::SiftFeatureDetector detector( 0.01, 3.0 );
 	cv::SiftDescriptorExtractor extractor( 2.0 );
-	// cv::SiftFeatureDetector detector;
-	// cv::SiftDescriptorExtractor extractor;
-
 
 	detector.detect(frame, keyp_ );
 	extractor.compute( frame, keyp_, descr_ );
@@ -382,14 +369,12 @@ void Camera::DetectWithSift()
 	}
 
 	// 	//-- Show detected matches
-	// imshow( "fnea);
-
 	if(scene_point.size() >0)
 	{
 		setLabel(frame, "quip", scene_point);
 		cv::Rect r = cv::boundingRect(scene_point);
 		cv::Point pt(r.x + (r.width / 2), r.y + (r.height / 2));
-		Botton_2frame = pt;
+		// BottonCHosen.Botton_2frame = pt;
 		cv::line( frame,pt, pt , cv::Scalar( 110, 220, 0 ),  2, 8 );
 		cv::imshow("Object detection",frame);
 		cv::waitKey(0);
@@ -403,30 +388,11 @@ void Camera::Triangulation()
 
 	if(count_n_passi == 1)
 	{
-		FindScale();
-		// SaveFirst = true;
-		// // So3_prev_ptam = frame_so3_ptam;
-		// // Move_robot_prev = Move_robot.M;
-		// // So3_prev_ptam = frame_so3_ptam;
+		KDL::Frame Frame_c2_c1;
+		Frame_c2_c1 = So3_prev_ptam*frame_w_c;
+		scala = ScalaReturn(Frame_c2_c1.p.z(), So3_prev_ptam.p.z(), Move_robot.p.z());
 	}
-	// else
-	// {
-	// 	// if(frame_w_c.p.z() == 0)
-	// 	// {
-	// 	// 	ROS_INFO("ARRIVATO");
-	// 	// }
-	// 	// else
-	// 	// {
-	// 	if(scala_first == true)
-	// 	{
-	// 		FindScale();
-	// 		scala_first = false;
-	// 	}
-	// 		// So3_prev_ptam = frame_w_c;
-	// 	// }
-	// }
-
-	
+		
 	std::vector<cv::Point3d> vect3d;
 	vect3d = ConvertPointFromWordToCam();
 	ProjectPointAndFindPosBot3d(vect3d);
@@ -455,11 +421,11 @@ std::vector<cv::Point3d> Camera::ConvertPointFromWordToCam()
   		Eigen::VectorXd POint_c1_eigen(4);
 
   		Eigen::MatrixXd ScalinMatrix(4,4);
-  		ScalinMatrix = Eigen::MatrixXd::Zero(4,4);
-  		ScalinMatrix(0,0) = scala[0];
-  		ScalinMatrix(1,1) = scala[1];
-  		ScalinMatrix(2,2) = scala[2];
-  		ScalinMatrix(3,3) = 1;
+  		ScalinMatrix = Eigen::MatrixXd::Identity(4,4)*scala;
+  		// ScalinMatrix(0,0) = scala;
+  		// ScalinMatrix(1,1) = scala;
+  		// ScalinMatrix(2,2) = scala;
+  		// ScalinMatrix(3,3) = 1;
 
   		POint_c1_eigen = ScalinMatrix*So3_ptam_eigen*vect_eigen;	//C_c_w*p_w
   		
@@ -501,41 +467,28 @@ std::vector<cv::Point3d> Camera::ConvertPointFromWordToCam()
 
 
 
-void Camera::FindScale()
-{
-	KDL::Frame Frame_c2_c1;
-	Frame_c2_c1 = So3_prev_ptam*frame_w_c;
-
-	if(Move_robot.p.z() != 0)
-	{
-		scala[2] = ScalaReturn(Frame_c2_c1.p.z(), So3_prev_ptam.p.z(), Move_robot.p.z());
-		scala[1] = scala[2];
-		scala[0] = scala[2];
-	}
-	// if(Move_robot.p.x() !=0 )
-	// {
-	// 	scala[0] = ScalaReturn(frame_w_c.p.x(), So3_prev_ptam.p.x(), Move_robot.p.x());
-	// }
-	// if(Move_robot.p.y() !=0 )
-	// {
-	// 	scala[1] = ScalaReturn(frame_w_c.p.y(), So3_prev_ptam.p.y(), Move_robot.p.y());
-		
-	// }
-
-	// FillCamMatrixPose(frame_so3_ptam, scala);
-	ROS_INFO_STREAM("scala: " << scala);
-}
+// double FindScale(KDL::Frame Frame_c2_c1)
+// {
+// 	double scala_;
+	
+// 	if(Move_robot.p.z() != 0)
+// 	{
+// 		scala_ = ScalaReturn(Frame_c2_c1.p.z(), So3_prev_ptam.p.z(), Move_robot.p.z());
+// 	}
+	
+// 	ROS_INFO_STREAM("scala: " << scala_);
+// 	return scala_;
+// }
 
 
 double ScalaReturn(double ptam, double ptam_prev, double robot)
 {
 	double scala_temp = 0;
-	// double temp_ = ptam_prev - ptam;
+	
 	if(ptam !=0 )
 	{
-		// scala_temp = std::abs(robot/temp_);
 		scala_temp = robot/ptam;
 	}
-
+	ROS_INFO_STREAM("scala: " << scala_temp);
 	return scala_temp;
 }

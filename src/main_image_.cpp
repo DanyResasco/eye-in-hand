@@ -15,13 +15,13 @@ int main(int argc, char** argv)
 
   /*Open the webcam*/
   cv::VideoCapture cap(1);
+  
   // Check if video device can be opened with the given index
   if(!cap.isOpened()) return 1;
   
   cv::Mat frame;
   sensor_msgs::ImagePtr msg;
 
-  // ros::Rate loop_rate(5);
   while (nh.ok()) 
   {
     cap >> frame;
@@ -35,15 +35,13 @@ int main(int argc, char** argv)
       /*send msgs to ptam*/
       msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", src_gray).toImageMsg();
       pub.publish(msg);
-   
-      // cv::waitKey(1);
     }
+
     else
     {
       ROS_ERROR("No camera Found");
     }
 
     ros::spinOnce();
-    // loop_rate.sleep();
   }
 }
