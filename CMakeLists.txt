@@ -3,14 +3,6 @@ project(eye_in_hand)
 
 find_package( OpenCV 2.4 REQUIRED)
 
-# find_package( OpenCV 3.0.0 REQUIRED )
-# if( OpenCV_FOUND )
-# list( APPEND ThirdParty_LIBS ${OpenCV_LIBS} )
-#     include_directories( opencv_contrib ${OpenCV_INCLUDE_DIRS} )
-# endif( OpenCV_FOUND )
-
-# set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} /home/daniela/OpenCV3/opencv_contrib) 
-
 
 
 # include_directories(cmake_modules ${Boost_INCLUDE_DIR})
@@ -129,10 +121,18 @@ add_executable(prova_dany src/main_image_.cpp)
 add_dependencies(prova_dany prova_dany_gencpp ${PROJECT_NAME})
 target_link_libraries(prova_dany ${catkin_LIBRARIES} ${OpenCV_LIBS} opencv_nonfree)
 
-add_executable(ptam_test_dany src/Camera_code.cpp)
+# add_executable(ptam_test_dany src/Camera_code.cpp)
+# # add_executable(prova_dany src/image_converter.cpp)
+# add_dependencies(ptam_test_dany ptam_test_dany_gencpp ${PROJECT_NAME})
+# target_link_libraries(ptam_test_dany ${catkin_LIBRARIES} ${OpenCV_LIBS} opencv_nonfree  ${PCL_LIBRARIES})
+
+
+add_executable(ptam_test_dany src/prova_ptam_res.cpp)
 # add_executable(prova_dany src/image_converter.cpp)
 add_dependencies(ptam_test_dany ptam_test_dany_gencpp ${PROJECT_NAME})
 target_link_libraries(ptam_test_dany ${catkin_LIBRARIES} ${OpenCV_LIBS} opencv_nonfree  ${PCL_LIBRARIES})
+
+
 
 
 # add_executable(ptam_test_dany src/test_vslam_pose_ptam.cpp)

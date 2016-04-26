@@ -37,8 +37,7 @@ int main(int argc, char **argv)
 			if(node.move_camera_end == true)
 			{
 				node.DetectWithSift();
-
-				if(node.stop_flag == false)
+				if(node.sub_ptam_2 == true)
 				{
 					node.Triangulation();
 				}
@@ -90,9 +89,8 @@ Camera::Camera(): it_(nh)
 
  	//initialize the flag
 	move_camera_end = false;
-	// sub_ptam_2 = false;
-	// count_n_passi = 0;
-	stop_flag = true;
+	sub_ptam_2 = false;
+	count_n_passi = 0;
 	
 	scala = 1;
 	myfile1.open("/home/daniela/code/src/eye_in_hand/pos_log.txt");
@@ -103,26 +101,19 @@ Camera::Camera(): it_(nh)
 	ptam_sub = nh.subscribe("/vslam/pose",1, &Camera::SOtreCamera, this);  //word in camera framebu
 	movewebcamrobot = nh.subscribe("/moverobot",1, &Camera::RobotMove,this); // robot in cam frame
 	ptam_kf3d = nh.subscribe("/vslam/pc2",1,&Camera::InfoKf3d,this);	//point in word frame
-	stop_sub = nh.subscribe("/stop",1,&Camera::StopCallback,this);	//to stop the pc2 callback
 }
 
-void Camera::StopCallback(const std_msgs::Bool::ConstPtr& msg)
-{
-	stop_flag = msg->data;
-}
+
 
 
 
 void Camera::InfoKf3d(const sensor_msgs::PointCloud2::ConstPtr& msg)
 {
-	if(stop_flag == false)
-	{
-		ROS_INFO_STREAM("qui InfoKf3d");
-		//Converto da pointcloud2 a pcl::XYZ
-		pcl::PCLPointCloud2 pcl_pc;
-	    pcl_conversions::toPCL(*msg, pcl_pc);
-	    pcl::fromPCLPointCloud2(pcl_pc, Ptamkf3d);
-	}
+	ROS_INFO_STREAM("qui InfoKf3d");
+	//Converto da pointcloud2 a pcl::XYZ
+	pcl::PCLPointCloud2 pcl_pc;
+    pcl_conversions::toPCL(*msg, pcl_pc);
+    pcl::fromPCLPointCloud2(pcl_pc, Ptamkf3d);
 }  	
 
 void Camera::ProjectPointAndFindPosBot3d(std::vector<cv::Point3d> vect3d)
@@ -176,7 +167,7 @@ void Camera::RobotMove(const geometry_msgs::Pose msg)
 	tf::poseMsgToKDL(msg, Move_robot);
 	Robot.push_back(Move_robot.p.z());
 	frame1_ = scene.clone();
-	// sub_ptam_2 = true;
+	sub_ptam_2 = true;
 	 
 }
 
@@ -198,7 +189,7 @@ void Camera::ControllCamera()
 	
  	/*set the callback function for any mouse event*/
 	cv::setMouseCallback("CAMERA_ROBOT", CallBackFunc, NULL);
-	cv::waitKey(0);
+		cv::waitKey(0);
 
 	if(press_buttom == 1 )	/*wait the mouse event*/
 	{
@@ -410,25 +401,35 @@ void Camera::Triangulation()
 {
 	ROS_INFO("*******Triangulation*******");
 
-	KDL::Frame Frame_c2_c1;
-	// Calcolo trasformazione tra c2 a c1
-	Frame_c2_c1 = So3_prev_ptam*frame_w_c;	
-	Ptam.push_back(So3_prev_ptam.p.z() - Frame_c2_c1.p.z());
-	scala = Scale(Ptam,Robot);
-
-    myfile << scala << "\n" ;
-
-    //metodo semplificato per il calcolo della scala
 	// if(count_n_passi == 1)
 	// {
-	// 	double scala_mio = ScalaReturn(Frame_c2_c1.p.z(), So3_prev_ptam.p.z(), Move_robot.p.z());
-	// 	ROS_INFO_STREAM("scala_mio: " << scala_mio);
-	// }
+		KDL::Frame Frame_c2_c1;
+		Frame_c2_c1 = So3_prev_ptam*frame_w_c;
+		Ptam.push_back(Frame_c2_c1.p.z());
+		// scala = Scale_factor(Ptam,Robot);
+		scala = Scale(Ptam,Robot);
+
+		// std::ofstream myfile;
+    //  myfile.open("/home/daniela/code/src/eye_in_hand/scala_log.txt");
+    // if(myfile.is_open())
+     myfile << scala << "\n" ;
+    // else
+    //     ROS_INFO_STREAM("non ti ho aperto il file");
+    
+    // myfile.close();
+
+
+
+	if(count_n_passi == 1)
+	{
+		double scala_mio = ScalaReturn(Frame_c2_c1.p.z(), So3_prev_ptam.p.z(), Move_robot.p.z());
+		ROS_INFO_STREAM("scala_mio: " << scala_mio);
+	}
 		
 	std::vector<cv::Point3d> vect3d;
 	vect3d = ConvertPointFromWordToCam();
 	ProjectPointAndFindPosBot3d(vect3d);
-	// sub_ptam_2 = false;
+	sub_ptam_2 = false;
 	So3_prev_ptam = frame_so3_ptam;
 	count_n_passi +=1; 
 }
@@ -436,13 +437,14 @@ void Camera::Triangulation()
 
 std::vector<cv::Point3d> Camera::ConvertPointFromWordToCam()
 {
+	// vect3d.clear();
 	std::vector<cv::Point3d> vect3d_return;
     Eigen::MatrixXd	So3_ptam_eigen(4,4); 
     FromMatToEigen( Camera2_S03, So3_ptam_eigen );
 
     std::ofstream myfile2, myfile3;
     myfile2.open("/home/daniela/code/src/eye_in_hand/filelog_camera.txt");
-    myfile3.open("/home/daniela/code/src/eye_in_hand/filelog_word.txt");
+    // myfile3.open("/home/daniela/code/src/eye_in_hand/filelog_word.txt");
 
   	for(unsigned int i=0; i < Ptamkf3d.size(); i++)
   	{
@@ -454,20 +456,51 @@ std::vector<cv::Point3d> Camera::ConvertPointFromWordToCam()
   		Eigen::MatrixXd ScalinMatrix(4,4);
   		ScalinMatrix = Eigen::MatrixXd::Identity(4,4)*scala;
   		
+  		// ROS_INFO_STREAM("ScalinMatrix: "<<ScalinMatrix);
+
   		POint_c1_eigen = ScalinMatrix*So3_ptam_eigen*vect_eigen;	//C_c_w*p_w
   		
   		FromEigenVectorToCvPOint(POint_c1_eigen, point_temp);
-  		
+  		// ROS_INFO_STREAM("point_temp: " <<point_temp);
     	vect3d_return.push_back(point_temp);
+    	// ROS_INFO_STREAM("point_tempvect3d[i]: " <<vect3d[i]);
 
-	 	myfile2<<POint_c1_eigen[0] << "\t" << POint_c1_eigen[1] << "\t" << POint_c1_eigen[2]<<"\n";
-		myfile3 <<Ptamkf3d[i].x <<"\t"<<Ptamkf3d[i].y<< "\t" << Ptamkf3d[i].z<<"\n";
+		// if (myfile1.is_open())
+		// {
+		//   	// myfile << "POint 3d x,y,z \n";
+  // 		  		// myfile <<Ptamkf3d[i].x <<"\t"<<Ptamkf3d[i].y<< "\t" << Ptamkf3d[i].z<<"\n";
+		 	myfile2<<POint_c1_eigen[0] << "\t" << POint_c1_eigen[1] << "\t" << POint_c1_eigen[2]<<"\n";
+		    
+		//     // ROS_INFO("STO SALVANDO");
+		// }
+
+
+		// if (myfile2.is_open())
+		// {
+		//   	// myfile << "POint 3d x,y,z \n";
+  		  		// myfile3 <<Ptamkf3d[i].x <<"\t"<<Ptamkf3d[i].y<< "\t" << Ptamkf3d[i].z<<"\n";
+		// myfile1<<POint_c1_eigen[0] << "\t" << POint_c1_eigen[1] << "\t" << POint_c1_eigen[2]<<"\n";
+		    
+		//     // ROS_INFO("STO SALVANDO");
+		// }
+
+		// else
+		// 	ROS_INFO("bau");
   	}
-
   	myfile2.close();
-  	myfile3.close();
-
+  	// myfile3.close();
   	return vect3d_return;
 }
 
 
+double ScalaReturn(double ptam, double ptam_prev, double robot)
+{
+	double scala_temp = 0;
+	
+	if(ptam !=0 )
+	{
+		scala_temp = robot/ptam;
+	}
+	// ROS_INFO_STREAM("scala: " << scala_temp);
+	return scala_temp;
+}

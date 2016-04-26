@@ -12,12 +12,11 @@ std::pair<std::vector<cv::Point> ,std::vector<std::vector<cv::Point> >> Camera::
 	// We'll put the labels in this destination image
 	cv::Mat dst = camera.clone();
 
-	//std::cout<<"trovati i contorni"<<std::endl;
 	for (unsigned int i = 0; i < contours.size(); i++)
 	{
 	    // Approximate contour with accuracy proportional
 	    // to the contour perimeter
-	   cv::approxPolyDP(cv::Mat(contours[i]), approx, cv::arcLength(cv::Mat(contours[i]), true)*0.02, true);
+	   cv::approxPolyDP(cv::Mat(contours[i]), approx, cv::arcLength(cv::Mat(contours[i]), true)*0.025, true);
 
 		// Skip small or non-convex objects 
 		if (std::fabs(cv::contourArea(contours[i])) < 100 || !cv::isContourConvex(approx))
@@ -87,8 +86,6 @@ std::pair<std::vector<cv::Point> ,std::vector<std::vector<cv::Point> >> Camera::
 std::pair<int,int> FindMaxValue(cv::Mat &matrix, cv::Point &point )
 {
 	std::pair<int,int> dist;
-	// std::cout<<"point x: " <<point.x<<'\t'<<"point y: "<<point.y<<std::endl;
-	// std::cout<<"matrix x: " <<matrix.cols<<'\t'<<"matrix y: "<<matrix.rows<<std::endl;
 	cv::Point point2(point.x-30, point.y -40);
 	cv::Rect rect(point, matrix.size());
 	
@@ -106,7 +103,6 @@ std::pair<int,int> FindMaxValue(cv::Mat &matrix, cv::Point &point )
 	else
 		dist.second = matrix.rows - point2.y;
 
-	// std::cout<<"dist first: "<<dist.first<<'\t'<<"dist second: "<<dist.second<<std::endl;
 	return dist;
 }
 
@@ -121,13 +117,10 @@ std::pair<int,bool> Camera::FindAMinDistanceButton(std::vector<cv::Point> &baric
 	for(unsigned int i=0; i<= baricentro.size();i++)
 	{
 		local_dist = norm((point_ - baricentro[i]));
-		// std::cout<<"distance 14: "<<local_dist<<std::endl;
-
 		distance.push_back(local_dist);	
 	}
 
 	int min_d = distance[0];
-	// check_bot.first = 1;
 	int count = 0;
 
 	for(unsigned int i=0; i < distance.size(); i++)
@@ -138,7 +131,6 @@ std::pair<int,bool> Camera::FindAMinDistanceButton(std::vector<cv::Point> &baric
 	   		check_bot.first = i;
 	   		check_bot.second = true;
 	   		count ++;
-	   		//std::cout<<"index: "<<index_shape <<std::endl;
 	   	}	
 	}
 
@@ -151,11 +143,8 @@ std::pair<int,bool> Camera::FindAMinDistanceButton(std::vector<cv::Point> &baric
 		check_bot.first = 1;
 
 	}	
-	// std::cout<<"check_bot.first: "<<check_bot.first<<std::endl;
-
-	return check_bot;
 	
-
+	return check_bot;
 }
 
 cv::Point FindACenter(std::vector<cv::Point> &geometry)

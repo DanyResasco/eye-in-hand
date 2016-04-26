@@ -33,7 +33,6 @@ Eigen::Vector4f EstimatePlane(std::vector<cv::Point3d> Point_Near)
 
 void Camera::FindBottonPos3D(Eigen::Vector4f plane_param)
 {
-
 	//the plane parameters as: a, b, c, d
 	float a = plane_param[0];
 	float b = plane_param[1];
@@ -49,6 +48,8 @@ void Camera::FindBottonPos3D(Eigen::Vector4f plane_param)
 	BottonCHosen.Pos3d_.x = (( (point_temp[0]-cam_cx) * BottonCHosen.Pos3d_.z)/cam_fx);
 	BottonCHosen.Pos3d_.y = (( (point_temp[1]-cam_cy) * BottonCHosen.Pos3d_.z)/cam_fy);
 
-
+	
+    myfile1 << BottonCHosen.Pos3d_.z << "\n" ;
+    // myfile1.close();
 	ROS_INFO_STREAM("IL BOTTONE E': "<<BottonCHosen.Pos3d_);
 }
