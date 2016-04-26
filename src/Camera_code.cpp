@@ -38,10 +38,10 @@ int main(int argc, char **argv)
 			{
 				node.DetectWithSift();
 
-				if(node.stop_flag == false)
-				{
+				// if(node.stop_flag == false)
+				// {
 					node.Triangulation();
-				}
+				// }
 			}
     	}
             
@@ -87,6 +87,7 @@ Camera::Camera(): it_(nh)
  	Cam_par_distortion.at<float>(0,3) = cam_d3; 
  	Cam_par_distortion.at<float>(0,3) = cam_d4; 
 
+ 	InfoKf3d_ = false;
 
  	//initialize the flag
 	move_camera_end = false;
@@ -103,78 +104,47 @@ Camera::Camera(): it_(nh)
 	ptam_sub = nh.subscribe("/vslam/pose",1, &Camera::SOtreCamera, this);  //word in camera framebu
 	movewebcamrobot = nh.subscribe("/moverobot",1, &Camera::RobotMove,this); // robot in cam frame
 	ptam_kf3d = nh.subscribe("/vslam/pc2",1,&Camera::InfoKf3d,this);	//point in word frame
-	stop_sub = nh.subscribe("/stop",1,&Camera::StopCallback,this);	//to stop the pc2 callback
+	scala_sub = nh.subscribe("/scala_",1,&Camera::ScaleCallback,this);	//to stop the pc2 callback
 }
 
-void Camera::StopCallback(const std_msgs::Bool::ConstPtr& msg)
+// void Camera::StopCallback(const std_msgs::Bool::ConstPtr& msg)
+// {
+// 	stop_flag = msg->data;
+// }
+
+void Camera::ScaleCallback(const std_msgs::Float32::ConstPtr msg)
 {
-	stop_flag = msg->data;
-}
+	scala = msg->data;
+	// stop_flag = false;
+	// ROS_INFO_STREAM("ARRIVATO MSG SCALA");
+	// ROS_INFO_STREAM("SCALA: " << scala);
+	move_camera_end = true;
+	frame1_ = scene.clone();
 
+}
 
 
 void Camera::InfoKf3d(const sensor_msgs::PointCloud2::ConstPtr& msg)
 {
-	if(stop_flag == false)
-	{
+	// if(stop_flag == false)
+	// {
 		ROS_INFO_STREAM("qui InfoKf3d");
 		//Converto da pointcloud2 a pcl::XYZ
 		pcl::PCLPointCloud2 pcl_pc;
 	    pcl_conversions::toPCL(*msg, pcl_pc);
 	    pcl::fromPCLPointCloud2(pcl_pc, Ptamkf3d);
-	}
+	    InfoKf3d_ = true;
+	// }
 }  	
 
-void Camera::ProjectPointAndFindPosBot3d(std::vector<cv::Point3d> vect3d)
-{
-	std::vector<cv::Point3d> point_near;
-	// std::vector<int> index_near;
-	std::vector<double> min_vect;
-	cv::Mat pc;
-	frame1_.copyTo(pc);
 
-	cv::Point2d point_temp(BottonCHosen.Botton_2frame.x, BottonCHosen.Botton_2frame.y);
-
-	for(unsigned int i=0; i < vect3d.size(); i++)
-	{
-		cv::Point2d point_;
-		point_.x =  cam_fx*vect3d[i].x/vect3d[i].z + cam_cx;
-		point_.y =  cam_fy*vect3d[i].y/vect3d[i].z + cam_cy;
-		// return_vect.push_back(point_);
-		cv::line( pc,point_, point_ , cv::Scalar( 220, 220, 0 ),  2, 8 );	
-		if(norm( (point_temp - point_)) <= 100)
-		{
-			point_near.push_back(vect3d[i]);
-			min_vect.push_back(norm( (point_temp - point_)));
-			cv::line( pc,point_, point_ , cv::Scalar( 5, 5, 0 ),  2, 8 );
-		}
-	}
-
-	if(min_vect.size() >= 3 )	//servono almeno 3 punti per creare il piano
-	{
-		Eigen::Vector4f plane_param;
-		plane_param = EstimatePlane(point_near);
-
-		FindBottonPos3D(plane_param);
-
-		// std::vector<double>::iterator index_min = std::min_element(min_vect.begin(), min_vect.end());
-		// int min_index = std::distance(std::begin(min_vect), index_min);
-		// BottonCHosen.Pos3d_ = point_near[min_index];
-		// ROS_INFO_STREAM("IL BOTTONE E': "<<BottonCHosen.Pos3d_);
-	}
-	else
-		ROS_INFO_STREAM("non ho trovato punti vicini. non posso calcolare il piano");
-	
-	// cv::imshow("kf_near",pc);
-	// cv::waitKey(0);
-}
 
 void Camera::RobotMove(const geometry_msgs::Pose msg)
 {
 	ROS_INFO_STREAM("RICEVUTO Messaggio");
-	move_camera_end = true;
+	// move_camera_end = true;
 	tf::poseMsgToKDL(msg, Move_robot);
-	Robot.push_back(Move_robot.p.z());
+	// Robot.push_back(Move_robot.p.z());
 	frame1_ = scene.clone();
 	// sub_ptam_2 = true;
 	 
@@ -295,11 +265,11 @@ void Camera::SOtreCamera(const geometry_msgs::PoseWithCovarianceStamped::ConstPt
 	
 	tf::poseMsgToKDL ((msg->pose).pose, frame_so3_ptam);
 	FillCamMatrixPose(frame_so3_ptam);
-	frame_w_c = frame_so3_ptam.Inverse();
-	if(myfile4.is_open())
-	myfile4 << frame_so3_ptam.p.z() << '\n';
-	else
-		ROS_INFO_STREAM("no myfile4");
+	// frame_w_c = frame_so3_ptam.Inverse();
+	// if(myfile4.is_open())
+	// myfile4 << frame_so3_ptam.p.z() << '\n';
+	// else
+	// 	ROS_INFO_STREAM("no myfile4");
 	
 }
 
@@ -342,6 +312,7 @@ void Camera::DetectWithSift()
 	cv::SiftFeatureDetector detector( 0.01, 3.0 );
 	cv::SiftDescriptorExtractor extractor( 2.0 );
 
+	// ROS_INFO_STREAM("FATTO SIFT IM2");
 	detector.detect(frame, keyp_ );
 	extractor.compute( frame, keyp_, descr_ );
  		
@@ -349,6 +320,7 @@ void Camera::DetectWithSift()
  	cv::FlannBasedMatcher matcher;
  	std::vector< cv::DMatch > matches;
     matcher.match( BottonCHosen.descr_, descr_, matches );
+    // ROS_INFO_STREAM("matcher");
 
     double max_dist = 0; double min_dist = 90;
 
@@ -410,27 +382,32 @@ void Camera::Triangulation()
 {
 	ROS_INFO("*******Triangulation*******");
 
-	KDL::Frame Frame_c2_c1;
-	// Calcolo trasformazione tra c2 a c1
-	Frame_c2_c1 = So3_prev_ptam*frame_w_c;	
-	Ptam.push_back(So3_prev_ptam.p.z() - Frame_c2_c1.p.z());
-	scala = Scale(Ptam,Robot);
+	// KDL::Frame Frame_c2_c1;
+	// // Calcolo trasformazione tra c2 a c1
+	// Frame_c2_c1 = So3_prev_ptam*frame_w_c;	
+	// Ptam.push_back(So3_prev_ptam.p.z() - Frame_c2_c1.p.z());
+	// scala = Scale(Ptam,Robot);
 
-    myfile << scala << "\n" ;
+ //    myfile << scala << "\n" ;
 
-    //metodo semplificato per il calcolo della scala
+ //    //metodo semplificato per il calcolo della scala
 	// if(count_n_passi == 1)
 	// {
 	// 	double scala_mio = ScalaReturn(Frame_c2_c1.p.z(), So3_prev_ptam.p.z(), Move_robot.p.z());
 	// 	ROS_INFO_STREAM("scala_mio: " << scala_mio);
 	// }
-		
-	std::vector<cv::Point3d> vect3d;
-	vect3d = ConvertPointFromWordToCam();
-	ProjectPointAndFindPosBot3d(vect3d);
-	// sub_ptam_2 = false;
-	So3_prev_ptam = frame_so3_ptam;
-	count_n_passi +=1; 
+	if(InfoKf3d_ == true)
+	{	
+		std::vector<cv::Point3d> vect3d;
+		vect3d = ConvertPointFromWordToCam();
+		ProjectPointAndFindPosBot3d(vect3d);
+	}
+	else
+		ROS_INFO_STREAM("ti stai dimenticando di inviare ptam visualizer");
+		// // sub_ptam_2 = false;
+		// So3_prev_ptam = frame_so3_ptam;
+
+		// count_n_passi +=1; 
 }
 
 
@@ -471,3 +448,46 @@ std::vector<cv::Point3d> Camera::ConvertPointFromWordToCam()
 }
 
 
+void Camera::ProjectPointAndFindPosBot3d(std::vector<cv::Point3d> vect3d)
+{
+	std::vector<cv::Point3d> point_near;
+	// std::vector<int> index_near;
+	std::vector<double> min_vect;
+	cv::Mat pc;
+	frame1_.copyTo(pc);
+
+	cv::Point2d point_temp(BottonCHosen.Botton_2frame.x, BottonCHosen.Botton_2frame.y);
+
+	for(unsigned int i=0; i < vect3d.size(); i++)
+	{
+		cv::Point2d point_;
+		point_.x =  cam_fx*vect3d[i].x/vect3d[i].z + cam_cx;
+		point_.y =  cam_fy*vect3d[i].y/vect3d[i].z + cam_cy;
+		// return_vect.push_back(point_);
+		cv::line( pc,point_, point_ , cv::Scalar( 220, 220, 0 ),  2, 8 );	
+		if(norm( (point_temp - point_)) <= 100)
+		{
+			point_near.push_back(vect3d[i]);
+			min_vect.push_back(norm( (point_temp - point_)));
+			cv::line( pc,point_, point_ , cv::Scalar( 5, 5, 0 ),  2, 8 );
+		}
+	}
+
+	if(min_vect.size() >= 3 )	//servono almeno 3 punti per creare il piano
+	{
+		Eigen::Vector4f plane_param;
+		plane_param = EstimatePlane(point_near);
+
+		FindBottonPos3D(plane_param);
+
+		// std::vector<double>::iterator index_min = std::min_element(min_vect.begin(), min_vect.end());
+		// int min_index = std::distance(std::begin(min_vect), index_min);
+		// BottonCHosen.Pos3d_ = point_near[min_index];
+		// ROS_INFO_STREAM("IL BOTTONE E': "<<BottonCHosen.Pos3d_);
+	}
+	else
+		ROS_INFO_STREAM("non ho trovato punti vicini. non posso calcolare il piano");
+	
+	// cv::imshow("kf_near",pc);
+	// cv::waitKey(0);
+}

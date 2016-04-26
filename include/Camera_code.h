@@ -38,6 +38,7 @@
 #include <pcl/io/pcd_io.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <std_msgs/Float32MultiArray.h>
+#include <std_msgs/Float32.h>
 #include <visualization_msgs/MarkerArray.h>
 
 // using namespace cv;
@@ -56,7 +57,7 @@ class Camera
     	KDL::Frame Move_robot;  
 		cv::Mat scene;
 		int arrived_cam = 0;		
-		ros::Subscriber movewebcamrobot, stop_sub;
+		ros::Subscriber movewebcamrobot, scala_sub;
 		ros::Subscriber ptam_kf3d;
 		image_transport::ImageTransport it_;
 	  	image_transport::Subscriber sub;
@@ -102,6 +103,7 @@ class Camera
 		std::vector<double> Ptam;
 		std::ofstream myfile1,myfile,myfile4;
     	bool stop_flag;
+    	bool InfoKf3d_;
 
 
 
@@ -200,7 +202,8 @@ class Camera
 			Project the 2d botton position into 3d plane
 		*/
 		void FindBottonPos3D(Eigen::Vector4f plane_param);
-		void StopCallback(const std_msgs::Bool::ConstPtr& msg);
+		// void StopCallback(const std_msgs::Bool::ConstPtr& msg);
+		void ScaleCallback(const std_msgs::Float32::ConstPtr msg);
 };
 
 

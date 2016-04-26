@@ -6,6 +6,7 @@
 	<node name="Camera_" pkg="eye_in_hand" type="prova_dany" output="screen" >
   </node>
       <include file="$(find eye_in_hand)/launch/image_maind.launch"/>
+       <include file="$(find eye_in_hand)/launch/ptam_scala.launch"/>
 
     <node name="ptam" pkg="ptam" type="ptam" clear_params="true" output="screen">
       <remap from="image" to="$(optenv IMAGE /camera/output_video)" />
