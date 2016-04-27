@@ -1,9 +1,6 @@
 #include <ros/ros.h>
 #include <keyboard/Key.h>
 #include <std_msgs/Bool.h>
-// #include <controller_manager_msgs/SwitchController.h>
-// #include <std_srvs/Empty.h>
-
 
 uint key_pressed;
 
@@ -34,13 +31,11 @@ int main(int argc, char **argv)
   ros::Rate rate(spin_rate);
 
   while (node.ok())
-    {
-      // ROS_INFO_STREAM("DENTRO WHILE");
+  {
       ros::spinOnce();
 
       switch (key_pressed) 
       {
-
           case keyboard::Key::KEY_r: // Mosso il robot
             bool_msg.data = true;
             pub_reset.publish(bool_msg);
@@ -61,7 +56,7 @@ int main(int argc, char **argv)
       key_pressed = keyboard::Key::KEY_UNKNOWN;
       ros::spinOnce();
       rate.sleep();
-    }
+  }
 
   return 0;
 }

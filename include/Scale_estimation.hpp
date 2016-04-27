@@ -49,11 +49,6 @@ double Scale(std::vector<double> X, std::vector<double> Y)
     else
         temp_sign =  (sxy>0 ? 1 : -1);
 
-    // ROS_INFO_STREAM("temp_sign: "<< temp_sign);
-
-    // double S = (sxx-syy+temp_sign*std::sqrt(std::pow((sxx-syy),2)+4*sxy*sxy))/(2*(1/sigmax)*sigmay*sxy);
-    // ROS_INFO_STREAM("S: "<< S);
-
     double scale =1/( (sxx-syy+temp_sign*std::sqrt(std::pow((sxx-syy),2)+4*sxy*sxy))/(2*(1/sigmax)*sigmay*sxy));
     // ROS_INFO_STREAM("scala: "<< scale);
 
