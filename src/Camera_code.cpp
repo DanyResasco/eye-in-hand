@@ -119,6 +119,7 @@ void Camera::ScaleCallback(const std_msgs::Float32::ConstPtr msg)
 	// ROS_INFO_STREAM("ARRIVATO MSG SCALA");
 	// ROS_INFO_STREAM("SCALA: " << scala);
 	move_camera_end = true;
+	stop_flag = true;
 	frame1_ = scene.clone();
 
 }

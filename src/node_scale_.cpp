@@ -39,7 +39,7 @@ PtamScale::PtamScale()
 	scala = 1;
 	// myfile1.open("/home/daniela/code/src/eye_in_hand/pos_log.txt");
 	// myfile.open("/home/daniela/code/src/eye_in_hand/scale_log.txt");
-	myfile4.open("/home/daniela/code/src/eye_in_hand/ptam_pose9.txt");
+	myfile4.open("/home/daniela/code/src/eye_in_hand/ptam_pose11.txt");
 
 	// sub = it_.subscribe("/PtamScale/output_video", 1, &PtamScale::ImageConverter, this);
 	ptam_sub = nh.subscribe("/vslam/pose",1, &PtamScale::SOtreCamera, this);  //word in camera framebu
@@ -51,13 +51,14 @@ PtamScale::PtamScale()
 
 void PtamScale::StopCallback(const std_msgs::Bool::ConstPtr& msg)
 {
+	ROS_INFO_STREAM("arrivato msg stopandgo");
 	stop_flag = msg->data;
 	
 }
 
 void PtamScale::RobotMove(const geometry_msgs::Pose msg)
 {
-	ROS_INFO_STREAM("RICEVUTO Messaggio");
+	// ROS_INFO_STREAM("RICEVUTO Messaggio");
 	tf::poseMsgToKDL(msg, Move_robot);
 	// Robot.push_back(Move_robot.p.z());
 	So3_prev_ptam = frame_so3_ptam;
@@ -97,7 +98,8 @@ void PtamScale::SOtreCamera(const geometry_msgs::PoseWithCovarianceStamped::Cons
 			
 			if( Vect_scala.size() > 300 )
 			{	
-				if((*Vect_scala.end() - Vect_scala[Vect_scala.size() -1]) <= 0.001  )
+				
+				if((Vect_scala.back() - Vect_scala[Vect_scala.size() - 2]) <= 0.001  )
 				{
 					std_msgs::Float32 scala_;
 					scala_.data = Vect_scala.back();
