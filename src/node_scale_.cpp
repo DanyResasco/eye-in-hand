@@ -39,12 +39,12 @@ PtamScale::PtamScale()
 	scala = 1;
 	// myfile1.open("/home/daniela/code/src/eye_in_hand/pos_log.txt");
 	// myfile.open("/home/daniela/code/src/eye_in_hand/scale_log.txt");
-	myfile4.open("/home/daniela/code/src/eye_in_hand/ptam_pose7.txt");
+	myfile4.open("/home/daniela/code/src/eye_in_hand/ptam_pose9.txt");
 
 	// sub = it_.subscribe("/PtamScale/output_video", 1, &PtamScale::ImageConverter, this);
 	ptam_sub = nh.subscribe("/vslam/pose",1, &PtamScale::SOtreCamera, this);  //word in camera framebu
 	movewebcamrobot = nh.subscribe("/moverobot",1, &PtamScale::RobotMove,this); // robot in cam frame
-	stop_sub = nh.subscribe("/stop",1,&PtamScale::StopCallback,this);	//to stop the pc2 callback
+	stop_sub = nh.subscribe("/stopandgo",1,&PtamScale::StopCallback,this);	//to stop the pc2 callback
 	// ptam_kf3d = nh.subscribe("/vslam/pc2",1,&PtamScale::InfoKf3d,this);	//point in word frame
 	pub_scala = nh.advertise<std_msgs::Float32>("/scala_", 1);
 }
@@ -95,7 +95,7 @@ void PtamScale::SOtreCamera(const geometry_msgs::PoseWithCovarianceStamped::Cons
 			Vect_scala.push_back(scala);
 			// So3_prev_ptam = frame_w_c;
 			
-			if( Vect_scala.size() > 250 )
+			if( Vect_scala.size() > 300 )
 			{	
 				if((*Vect_scala.end() - Vect_scala[Vect_scala.size() -1]) <= 0.001  )
 				{

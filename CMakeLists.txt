@@ -127,12 +127,14 @@ add_dependencies(ptam_test_dany ptam_test_dany_gencpp ${PROJECT_NAME})
 target_link_libraries(ptam_test_dany ${catkin_LIBRARIES} ${OpenCV_LIBS} opencv_nonfree  ${PCL_LIBRARIES})
 
 
-add_executable(ptam_ src/prova_ptam_res.cpp)
+add_executable(ptam_node src/node_scale_.cpp)
 # # add_executable(prova_dany src/image_converter.cpp)
-add_dependencies(ptam_ ptam_gencpp ${PROJECT_NAME})
-target_link_libraries(ptam_ ${catkin_LIBRARIES} ${OpenCV_LIBS} opencv_nonfree  ${PCL_LIBRARIES})
+add_dependencies(ptam_node ptam_node_gencpp ${PROJECT_NAME})
+target_link_libraries(ptam_node ${catkin_LIBRARIES} ${OpenCV_LIBS} opencv_nonfree  ${PCL_LIBRARIES})
 
-
+add_executable(keycommands src/keycommands.cpp)
+add_dependencies(keycommands keycommands_gencpp ${PROJECT_NAME})
+target_link_libraries(keycommands ${catkin_LIBRARIES})
 
 
 # add_executable(ptam_test_dany src/test_vslam_pose_ptam.cpp)

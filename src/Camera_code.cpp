@@ -3,7 +3,7 @@
 #include <geometry_function.hpp>
 #include <converter_file.hpp>
 #include <plane_estimate.hpp>
-#include <Scale_estimation.hpp>
+// #include <Scale_estimation.hpp>
 
 // using namespace cv;
 cv::RNG rng(12345);
@@ -38,10 +38,10 @@ int main(int argc, char **argv)
 			{
 				node.DetectWithSift();
 
-				// if(node.stop_flag == false)
-				// {
+				if(node.stop_flag == true)
+				{
 					node.Triangulation();
-				// }
+				}
 			}
     	}
             
@@ -93,7 +93,7 @@ Camera::Camera(): it_(nh)
 	move_camera_end = false;
 	// sub_ptam_2 = false;
 	// count_n_passi = 0;
-	stop_flag = true;
+	stop_flag = false;
 	
 	scala = 1;
 	myfile1.open("/home/daniela/code/src/eye_in_hand/pos_log.txt");
@@ -102,7 +102,7 @@ Camera::Camera(): it_(nh)
 
 	sub = it_.subscribe("/camera/output_video", 1, &Camera::ImageConverter, this);
 	ptam_sub = nh.subscribe("/vslam/pose",1, &Camera::SOtreCamera, this);  //word in camera framebu
-	movewebcamrobot = nh.subscribe("/moverobot",1, &Camera::RobotMove,this); // robot in cam frame
+	movewebcamrobot = nh.subscribe("/robot",1, &Camera::RobotMove,this); // robot in cam frame
 	ptam_kf3d = nh.subscribe("/vslam/pc2",1,&Camera::InfoKf3d,this);	//point in word frame
 	scala_sub = nh.subscribe("/scala_",1,&Camera::ScaleCallback,this);	//to stop the pc2 callback
 }
@@ -139,11 +139,12 @@ void Camera::InfoKf3d(const sensor_msgs::PointCloud2::ConstPtr& msg)
 
 
 
-void Camera::RobotMove(const geometry_msgs::Pose msg)
+void Camera::RobotMove(const std_msgs::Bool::ConstPtr& msg)
 {
 	ROS_INFO_STREAM("RICEVUTO Messaggio");
-	// move_camera_end = true;
-	tf::poseMsgToKDL(msg, Move_robot);
+	 stop_flag = msg->data;
+	 // move_camera_end = msg->data;
+	// tf::poseMsgToKDL(msg, Move_robot);
 	// Robot.push_back(Move_robot.p.z());
 	frame1_ = scene.clone();
 	// sub_ptam_2 = true;
@@ -406,7 +407,7 @@ void Camera::Triangulation()
 		ROS_INFO_STREAM("ti stai dimenticando di inviare ptam visualizer");
 		// // sub_ptam_2 = false;
 		// So3_prev_ptam = frame_so3_ptam;
-
+	stop_flag = false;
 		// count_n_passi +=1; 
 }
 

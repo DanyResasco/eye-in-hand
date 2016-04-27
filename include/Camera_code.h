@@ -168,7 +168,7 @@ class Camera
 
 			This pose is relative to frame early
 		*/	
-		void RobotMove(const geometry_msgs::Pose msg);
+		void RobotMove(const std_msgs::Bool::ConstPtr& msg);
 
 		/*!
 			\brief Callback that convert PointCloud2 to poincloudXYX
@@ -265,17 +265,17 @@ void FromEigenVectorToCvPOint(Eigen::VectorXd Eigen, cv::Point3d &mat);
 	\param [in] previusly position
 	\param [in] robot movements
 	\return scale factor
-*/
-double ScalaReturn(double ptam, double ptam_prev, double robot);
+// */
+// double ScalaReturn(double ptam, double ptam_prev, double robot);
 
 
 
 
 
-double Scale(std::vector<double> X, std::vector<double> Y) ;
+// double Scale(std::vector<double> X, std::vector<double> Y) ;
 
-double standard_deviation(std::vector<double> data);
-double Scale_factor(std::vector<double> X, std::vector<double> Y) ;
+// double standard_deviation(std::vector<double> data);
+// double Scale_factor(std::vector<double> X, std::vector<double> Y) ;
 
 
 

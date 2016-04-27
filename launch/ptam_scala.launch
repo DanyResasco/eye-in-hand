@@ -4,7 +4,7 @@
 	<arg name="spin_rate" default="50" />
 	<arg name="video_or_photo" default="0" />
 
-    <node name="dany_ptam" pkg="eye_in_hand" type="ptam_" output="screen" >
+    <node name="dany_ptam" pkg="eye_in_hand" type="ptam_node" output="screen" >
 		<!-- <rosparam command="load" file="$(find eye_in_hand)/Config/code_param.yaml" /> -->
 
 		<param name="spin_rate" value="$(arg spin_rate)" />

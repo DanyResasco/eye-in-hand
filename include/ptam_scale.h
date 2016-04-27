@@ -83,6 +83,6 @@ private:
 
 double Scale(std::vector<double> X, std::vector<double> Y) ;
 double standard_deviation(std::vector<double> data);
-
+double ScalaReturn(double ptam, double ptam_prev, double robot);
 
 #endif

@@ -20,5 +20,15 @@ ATTENZIONE: per la calibrazione di Ptam occorre utilizzare la chessboard fornita
 
 /*PROCEDURA*/
 Quando la camera è attiva invia due messaggi Ros, uno invia lo streaming dal nodo di PTAM l'altro invia una immagine statica al nodo di opencv. Una volta che l'immagine è arrivata ( nel topic /camera/output_video) è possibile effettuare la fase di riconoscimento del bottone premuto.
-Per inizializzare Ptam occorre premere la barra spazziatric, traslare la camera e ripremere la barra. Dopo questa fase di iniziallizazione Ptam inizia ad inviare la posa del frame word rispetto la camera. Per la stima della scala si è scelto di utilizzare lo stimatore a massima verosimiglianza. Per questo tipo di stimatore occorrono più di cento campioni. Per far queto si sono creati due messaggi:
-1) topic : /moverobot. In questo topic si invia un geometry_msgs/Pose con la posizione reale del
+Per inizializzare Ptam occorre premere la barra spazziatrice, traslare la camera e ripremere la barra. Bisonga assicurarsi che la griglia creata sia stabile. Se balla occorre ripetere la procedura premendo reset nell'interfaccia Ptam.
+Dopo questa fase di iniziallizazione Ptam inizia ad inviare la posa del frame word rispetto la camera. Per la stima della scala si è creato un nodo ros. Bisogna inviare: 
+
+1) topic : /moverobot. In questo topic si invia un geometry_msgs/Pose con la traslazione effettuata.
+	i.e se ci si è spostato di 2 cm su z bisogna inviare rostopic pub -1 /moverobot geometry_msgs/Pose '{position: {x: 0.0, y: 0.0, z: 0.02}, orientation: {w: 1}}'
+2) topic: /stop. Questo messaggio serve per fermare momentaneamente il calcolo della stima della scala. 
+	rostopic pub -1 /stop std_msgs/Bool 'true'
+	Per farla ripartire
+	rostopic pub -1 /stop std_msgs/Bool 'false'
+
+Quando l'algoritmo raggiunge la convergenza invia un messaggio ros al nodo della camera per calcolare la posa 3d del bottone.
+Ogni volta che la camera si muove bisogna inviare sul topic /moverobot la posa
