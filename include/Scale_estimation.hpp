@@ -1,12 +1,7 @@
 double Scale(std::vector<double> X, std::vector<double> Y) 
 {
-    double sigmax = standard_deviation(X); //% 0.0834 ; %mean(std(X));
-    double sigmay = 0.01;
-    // standard_deviation(Y);// %0.0648 ; %mean(std(Y));
-
-    // ROS_INFO_STREAM("sigmax: "<< sigmax);
-    // ROS_INFO_STREAM("sigmay: "<< sigmay);
-
+    double sigmay = standard_deviation(Y); //% 0.0834 ; %mean(std(X));
+    double sigmax = 0.01;
 
     int N = X.size();
 
@@ -17,30 +12,17 @@ double Scale(std::vector<double> X, std::vector<double> Y)
     for(int i = 0; i< N; i++ )
     sumxx = sumxx + (X[i]*X[i]);
 
-    // ROS_INFO_STREAM("sumxx: "<< sumxx);
-
     double  sxx = std::pow(sigmay,2)*sumxx;
-
-    // ROS_INFO_STREAM("sxx: "<< sxx);
-
 
     for(int i=0; i<N; i++)    
         sumyy = sumyy + (Y[i]*Y[i]);
 
-    // ROS_INFO_STREAM("sumyy: "<< sumyy);
-
-    double syy = std::pow(sigmay,2)*sumxx;
-
-    // ROS_INFO_STREAM("syy: "<< syy);
+    double syy = std::pow(sigmax,2)*sumyy;
 
     for (int i = 0; i< N; i++)
         sumxy = sumxy +(X[i]*Y[i]);
 
-    // ROS_INFO_STREAM("sumxy: "<< sumxy);
-
     double sxy = sigmay*sigmax*sumxy;
-
-    // ROS_INFO_STREAM("sxy: "<< sxy);
 
     double temp_sign;
     
@@ -49,9 +31,8 @@ double Scale(std::vector<double> X, std::vector<double> Y)
     else
         temp_sign =  (sxy>0 ? 1 : -1);
 
-    double scale =1/( (sxx-syy+temp_sign*std::sqrt(std::pow((sxx-syy),2)+4*sxy*sxy))/(2*(1/sigmax)*sigmay*sxy));
-    // ROS_INFO_STREAM("scala: "<< scale);
-
+    double scale = (sxx-syy+temp_sign*std::sqrt(std::pow((sxx-syy),2)+4*sxy*sxy))/(2*(1/sigmax)*sigmay*sxy);
+    
     return scale;
 }
 
@@ -95,6 +76,6 @@ double ScalaReturn(double ptam, double ptam_prev, double robot)
     {
         scala_temp = robot/ptam;
     }
-    // ROS_INFO_STREAM("scala: " << scala_temp);
+
     return scala_temp;
 }

@@ -30,14 +30,14 @@ int main(int argc, char **argv)
 
 PtamScale::PtamScale()
 {
-	myfile4.open("/home/daniela/code/src/eye_in_hand/ptam_pose12.txt");
+	myfile4.open("/home/daniela/code/src/eye_in_hand/ptam_pose16.txt");
 	ptam_sub = nh.subscribe("/vslam/pose",1, &PtamScale::SOtreCamera, this);  //word in camera framebu
 	movewebcamrobot = nh.subscribe("/moverobot",1, &PtamScale::RobotMove,this); // robot in cam frame
 	stop_sub = nh.subscribe("/stopandgo",1,&PtamScale::StopCallback,this);	//to stop the pc2 callback
 	pub_scala = nh.advertise<std_msgs::Float32>("/scala_", 1);
 	So3_prev_ptam = KDL::Frame::Identity();
 	// KDL::Vector v(0,0,0);
-	// Move_robot.p = v.z();
+	// Move_robot.p = v;
 	// stop_flag = false;
 }
 
@@ -75,13 +75,13 @@ void PtamScale::SOtreCamera(const geometry_msgs::PoseWithCovarianceStamped::Cons
 
 		Robot.push_back(Move_robot.p.z());
 		Ptam.push_back(Frame_c2_c1.p.z());
-		double scala = Scale(Ptam, Robot);
+		double scala = Scale(Robot,Ptam);
 		ROS_INFO_STREAM("scala: " << scala);
 		Vect_scala.push_back(scala);
 		
-		if( Vect_scala.size() >= 300 )
+		if( Vect_scala.size() >= 1000 )
 		{	
-			if( (Vect_scala.back() - Vect_scala[Vect_scala.size() - 2]) <= 0.001 )
+			if( (Vect_scala.back() - Vect_scala[Vect_scala.size() - 2]) <= 0.0001)
 			{
 				std_msgs::Float32 scala_;
 				scala_.data = Vect_scala.back();

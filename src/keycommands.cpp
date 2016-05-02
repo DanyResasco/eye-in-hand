@@ -22,7 +22,7 @@ int main(int argc, char **argv)
 
   key_pressed = keyboard::Key::KEY_UNKNOWN;
 
-  ros::Subscriber sub_keyboard = node.subscribe("keyboard/keydown", 10, getKeyCallback);
+  ros::Subscriber sub_keyboard = node.subscribe("/keyboard/keydown", 10, getKeyCallback);
 
   std_msgs::Bool bool_msg;
   ros::Publisher pub_reset = node.advertise<std_msgs::Bool>("/robot", 10);
@@ -42,12 +42,12 @@ int main(int argc, char **argv)
             ROS_INFO_STREAM("Mosso il robot");
             break;
           case keyboard::Key::KEY_g: //Start 
-            bool_msg.data = true;
-             pub_reset.publish(bool_msg);
+            bool_msg.data = false;
+             pub_start_robots.publish(bool_msg);
              ROS_INFO_STREAM("Starting ");
             break;
           case keyboard::Key::KEY_s: //Stop Robots
-            bool_msg.data = false;
+            bool_msg.data = true ;
             pub_start_robots.publish(bool_msg);
             ROS_INFO_STREAM("Stopping Robots");
             break;

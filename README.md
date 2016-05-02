@@ -38,5 +38,14 @@ Riassumendo, occorre:
 1) inizializzare Ptam
 2) inviare la traslazione sul topic /moverobot
 3) inviare messaggio di start sul topic /stopandgo --> rostopic pub -1 /stop std_msgs/Bool 'false'
-4) inviare rosrun ptam ptam_visualizer
-5) inviare ad ogni roto/traslazione il messaggio di movimento sul topic /stopandgo --> rostopic pub -1 /robot std_msgs/Bool true
+4) inviare messaggio di stop sul topic /stopandgo --> rostopic pub -1 /stop std_msgs/Bool 'true' appena ha stimato la scala
+5) inviare rosrun ptam ptam_visualizer
+6) inviare ad ogni roto/traslazione il messaggio di movimento sul topic /stopandgo --> rostopic pub -1 /robot std_msgs/Bool true
+
+Metodo veloce:
+1) inizializzare Ptam
+2) inviare la traslazione sul topic /moverobot
+3) inviare messaggio di start premendo g sulla tastiera
+4) inviare messaggio di stop premendo s sulla tastiera
+5) inviare rosrun ptam ptam_visualizer
+6) premere ad ogni roto/traslazione il tasto r

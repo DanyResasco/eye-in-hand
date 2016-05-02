@@ -274,9 +274,6 @@ void Camera::FillCamMatrixPose(KDL::Frame frame)
 	Camera2_S03.at<float>(2,3) = frame_so3_ptam.p.z();
 }
 
-
-
-
 void Camera::DetectWithSift()
 {
 	ROS_INFO_STREAM("DENTRO DetectWithSift");
@@ -391,9 +388,9 @@ std::vector<cv::Point3d> Camera::ConvertPointFromWordToCam()
 
   		Eigen::MatrixXd ScalinMatrix(4,4);
   		ScalinMatrix = Eigen::MatrixXd::Identity(4,4)*scala;
-  		
+  		  		
   		POint_c1_eigen = ScalinMatrix*So3_ptam_eigen*vect_eigen;	//C_c_w*p_w
-  		
+  		 // POint_c1_eigen = So3_ptam_eigen*ScalinMatrix*vect_eigen;	//C_c_w*p_w
   		FromEigenVectorToCvPOint(POint_c1_eigen, point_temp);
   		
     	vect3d_return.push_back(point_temp);
@@ -423,7 +420,7 @@ void Camera::ProjectPointAndFindPosBot3d(std::vector<cv::Point3d> vect3d)
 		cv::Point2d point_;
 		point_.x =  cam_fx*vect3d[i].x/vect3d[i].z + cam_cx;
 		point_.y =  cam_fy*vect3d[i].y/vect3d[i].z + cam_cy;
-		// return_vect.push_back(point_);
+		
 		cv::line( pc,point_, point_ , cv::Scalar( 220, 220, 0 ),  2, 8 );	
 		if(norm( (point_temp - point_)) <= 100)
 		{
