@@ -7,6 +7,7 @@ Il codice sviluppato aspetta che l'utente, tramite l'interfaccia, prema un pulsa
 Attenzione: In questo codice si utilizza Opencv 2.4 e ROS indigo.
 Questo algoritmo non funziona con Opencv 3. Nei forum di Opencv c'è scritto che i metodi di cv_bridge non sono ancora supportati in opencv3.
 L'utilizzo di pcl 1.7.2 è facoltativo, se non si dispone di tale versione basta cambiare il package dentro al Cmakelist find_package(PCL 1.7.2 REQUIRED) e cambiarlo con la versione installata.
+Si è scelto di usare delle scorciatoie per inviare i comandi usando la testiera. Installare il pacchetto ros keycommand.
 
 /*Calibrazione*/
 Bisogna effettuare due calibrazioni. 
@@ -37,8 +38,8 @@ Ogni volta che la camera si muove bisogna inviare sul topic /robot il valore tru
 Riassumendo, occorre:
 1) inizializzare Ptam
 2) inviare la traslazione sul topic /moverobot
-3) inviare messaggio di start sul topic /stopandgo --> rostopic pub -1 /stop std_msgs/Bool 'false'
-4) inviare messaggio di stop sul topic /stopandgo --> rostopic pub -1 /stop std_msgs/Bool 'true' appena ha stimato la scala
+3) inviare messaggio di start sul topic /stopandgo --> rostopic pub -1 /stopandgo std_msgs/Bool 'false'
+4) inviare messaggio di stop sul topic /stopandgo --> rostopic pub -1 /stopandgo std_msgs/Bool 'true' appena ha stimato la scala
 5) inviare rosrun ptam ptam_visualizer
 6) inviare ad ogni roto/traslazione il messaggio di movimento sul topic /stopandgo --> rostopic pub -1 /robot std_msgs/Bool true
 
@@ -48,4 +49,6 @@ Metodo veloce:
 3) inviare messaggio di start premendo g sulla tastiera
 4) inviare messaggio di stop premendo s sulla tastiera
 5) inviare rosrun ptam ptam_visualizer
-6) premere ad ogni roto/traslazione il tasto r
+6) premere ad ogni roto/traslazione il tasto r sulla tastiera
+
+Per questo metodo assicurarsi di avere la finestra nera di ros keycommand accesa e selezionata

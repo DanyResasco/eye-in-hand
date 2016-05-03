@@ -44,7 +44,7 @@ public:
 	std::ofstream myfile4;
     bool stop_flag;
 	KDL::Frame Move_robot;
-	ros::Publisher pub_scala;
+	ros::Publisher pub_scala, pub_scala_naif;
 	std::vector<double> Robot;
 	std::vector<double> Ptam;
 	std::vector<double> Vect_scala;

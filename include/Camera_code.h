@@ -61,7 +61,8 @@ class Camera
 		ros::Subscriber ptam_kf3d;
 		image_transport::ImageTransport it_;
 	  	image_transport::Subscriber sub;
-	  	ros::Subscriber ptam_sub;
+	  	ros::Subscriber ptam_sub,scala_sub_naif;
+	  	double scala_mio;
 	
 		struct Obj 
 		{
@@ -193,7 +194,7 @@ class Camera
 
 			Scaling each point with the scale factor.
 		*/
-		std::vector<cv::Point3d> ConvertPointFromWordToCam();
+		std::vector<cv::Point3d> ConvertPointFromWordToCam(double scala);
 		
 		/*!
 			\brief Find the 3d botton pose
@@ -204,6 +205,7 @@ class Camera
 		void FindBottonPos3D(Eigen::Vector4f plane_param);
 		// void StopCallback(const std_msgs::Bool::ConstPtr& msg);
 		void ScaleCallback(const std_msgs::Float32::ConstPtr msg);
+		void ScaleNaifCallback(const std_msgs::Float32::ConstPtr msg);
 };
 
 

@@ -30,15 +30,13 @@ int main(int argc, char **argv)
 
 PtamScale::PtamScale()
 {
-	myfile4.open("/home/daniela/code/src/eye_in_hand/ptam_pose16.txt");
+	myfile4.open("/home/daniela/code/src/eye_in_hand/ptam_pose28.txt");
 	ptam_sub = nh.subscribe("/vslam/pose",1, &PtamScale::SOtreCamera, this);  //word in camera framebu
 	movewebcamrobot = nh.subscribe("/moverobot",1, &PtamScale::RobotMove,this); // robot in cam frame
 	stop_sub = nh.subscribe("/stopandgo",1,&PtamScale::StopCallback,this);	//to stop the pc2 callback
 	pub_scala = nh.advertise<std_msgs::Float32>("/scala_", 1);
+	pub_scala_naif = nh.advertise<std_msgs::Float32>("/scala_naif_method", 1);
 	So3_prev_ptam = KDL::Frame::Identity();
-	// KDL::Vector v(0,0,0);
-	// Move_robot.p = v;
-	// stop_flag = false;
 }
 
 void PtamScale::StopCallback(const std_msgs::Bool::ConstPtr& msg)
@@ -63,6 +61,7 @@ void PtamScale::SOtreCamera(const geometry_msgs::PoseWithCovarianceStamped::Cons
 	{ 
 		KDL::Frame Frame_c2_c1;
 		Frame_c2_c1 = So3_prev_ptam*frame_w_c;
+		// ROS_INFO_STREAM("***Frame_c2_c1:*** " << Frame_c2_c1);
 
 		if(myfile4.is_open())
 		{
@@ -89,6 +88,9 @@ void PtamScale::SOtreCamera(const geometry_msgs::PoseWithCovarianceStamped::Cons
 				stop_flag = true;
 				double scala_mio = ScalaReturn(Frame_c2_c1.p.z(), So3_prev_ptam.p.z(), Move_robot.p.z());
 				ROS_INFO_STREAM("scala_mio: " << scala_mio);
+				std_msgs::Float32 scala_mio_msg;
+				scala_mio_msg.data = scala_mio;
+				pub_scala_naif.publish(scala_mio_msg);
 			}
 		}
 	}

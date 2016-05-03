@@ -96,15 +96,16 @@ Camera::Camera(): it_(nh)
 	stop_flag = false;
 	
 	scala = 1;
-	myfile1.open("/home/daniela/code/src/eye_in_hand/pos_log.txt");
-	myfile.open("/home/daniela/code/src/eye_in_hand/scale_log.txt");
-	myfile4.open("/home/daniela/code/src/eye_in_hand/ptam_pose1.txt");
+	myfile1.open("/home/daniela/code/src/eye_in_hand/pos_log28.txt");
+	myfile.open("/home/daniela/code/src/eye_in_hand/scale_log28.txt");
+	myfile4.open("/home/daniela/code/src/eye_in_hand/ptam_pose28.txt");
 
 	sub = it_.subscribe("/camera/output_video", 1, &Camera::ImageConverter, this);
 	ptam_sub = nh.subscribe("/vslam/pose",1, &Camera::SOtreCamera, this);  //word in camera framebu
 	movewebcamrobot = nh.subscribe("/robot",1, &Camera::RobotMove,this); // robot in cam frame
 	ptam_kf3d = nh.subscribe("/vslam/pc2",1,&Camera::InfoKf3d,this);	//point in word frame
 	scala_sub = nh.subscribe("/scala_",1,&Camera::ScaleCallback,this);	//to stop the pc2 callback
+	scala_sub_naif = nh.subscribe("/scala_naif_method", 1, &Camera::ScaleNaifCallback,this);
 }
 
 void Camera::ScaleCallback(const std_msgs::Float32::ConstPtr msg)
@@ -114,6 +115,13 @@ void Camera::ScaleCallback(const std_msgs::Float32::ConstPtr msg)
 	stop_flag = true;
 	frame1_ = scene.clone();
 }
+
+void Camera::ScaleNaifCallback(const std_msgs::Float32::ConstPtr msg)
+{
+
+	scala_mio = msg->data;
+}
+
 
 
 void Camera::InfoKf3d(const sensor_msgs::PointCloud2::ConstPtr& msg)
@@ -211,6 +219,7 @@ void Camera::ShapeDetect()
 
 			std::pair<int,int> value = FindMaxValue(dst, BottonCHosen.Center_ );
 			cv::Mat roi(scene, cv::Rect(BottonCHosen.Center_.x - 30,BottonCHosen.Center_.y - 40,value.first, value.second));
+
 			cv::Mat convert_BcMat_ = roi.clone(); 
 
 			convert_BcMat_.convertTo(BottonCHosen.figure_, CV_8U) ;
@@ -218,7 +227,7 @@ void Camera::ShapeDetect()
 		    /* SIFT feature detector and feature extractor */
 		    cv::SiftFeatureDetector detector( 0.01, 3.0 );
 		    cv::SiftDescriptorExtractor extractor( 2.0 );
-
+		  
 		    detector.detect(BottonCHosen.figure_, BottonCHosen.keyp_ );
 		    extractor.compute( BottonCHosen.figure_, BottonCHosen.keyp_, BottonCHosen.descr_ );
 
@@ -247,7 +256,6 @@ void Camera::ShapeDetect()
 
 void Camera::SOtreCamera(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr msg)
 {
-	
 	tf::poseMsgToKDL ((msg->pose).pose, frame_so3_ptam);
 	FillCamMatrixPose(frame_so3_ptam);
 }
@@ -296,7 +304,7 @@ void Camera::DetectWithSift()
  	std::vector< cv::DMatch > matches;
     matcher.match( BottonCHosen.descr_, descr_, matches );
    
-    double max_dist = 0; double min_dist = 90;
+    double max_dist = 0; double min_dist = 50;
 
 	/*-- Quick calculation of max and min distances between keypoints */
 	for( int i = 0; i < BottonCHosen.descr_.rows; i++ )
@@ -331,12 +339,16 @@ void Camera::DetectWithSift()
 	/*-- Localize the object */
 	std::vector<cv::Point> scene_point;
 	ROS_INFO_STREAM(" good_matches.size(): " << good_matches.size());
+
+
 	for(unsigned int i = 0; i < good_matches.size(); i++ )
 	{
 	    //-- Get the keypoints from the good matches
 	    KeyPointIm1Match.push_back( BottonCHosen.keyp_[ good_matches[i].queryIdx ].pt );
 	    scene_point.push_back( keyp_[ good_matches[i].trainIdx ].pt );
 	}
+
+
 
 	// 	//-- Show detected matches
 	if(scene_point.size() >0)
@@ -349,6 +361,30 @@ void Camera::DetectWithSift()
 		cv::imshow("Object detection",frame);
 		cv::waitKey(0);
 	}
+
+
+
+
+	// for(unsigned int i = 0; i < good_matches.size(); i++ )
+	// {
+	//     //-- Get the keypoints from the good matches
+	//     KeyPointIm1Match.push_back( BottonCHosen.keyp_[ good_matches[i].queryIdx ].pt );
+	//     scene_point.push_back( keyp_[ good_matches[i].trainIdx ].pt );
+	// }
+
+
+
+	// // 	//-- Show detected matches
+	// if(scene_point.size() >0)
+	// {
+	// 	setLabel(frame, "quip", scene_point);
+	// 	cv::Rect r = cv::boundingRect(scene_point);
+	// 	cv::Point pt(r.x + (r.width / 2), r.y + (r.height / 2));
+	// 	cv::line( frame,pt, pt ,  cv::Scalar( 5, 5, 0 ),  2, 8 );
+	// 	BottonCHosen.Botton_2frame = pt;
+	// 	cv::imshow("Object detection",frame);
+	// 	cv::waitKey(0);
+	// }
 }
 
 
@@ -359,8 +395,12 @@ void Camera::Triangulation()
 	if(InfoKf3d_ == true)
 	{	
 		std::vector<cv::Point3d> vect3d;
-		vect3d = ConvertPointFromWordToCam();
+		vect3d = ConvertPointFromWordToCam(scala);
 		ProjectPointAndFindPosBot3d(vect3d);
+		ROS_INFO_STREAM("***NAIF METHOD***");
+		std::vector<cv::Point3d> vect3d_mio;
+		vect3d_mio = ConvertPointFromWordToCam(scala_mio);
+		ProjectPointAndFindPosBot3d(vect3d_mio);
 	}
 	else
 		ROS_INFO_STREAM("***Ti stai dimenticando di inviare ptam visualizer ***");
@@ -369,7 +409,7 @@ void Camera::Triangulation()
 }
 
 
-std::vector<cv::Point3d> Camera::ConvertPointFromWordToCam()
+std::vector<cv::Point3d> Camera::ConvertPointFromWordToCam(double scala)
 {
 	std::vector<cv::Point3d> vect3d_return;
     Eigen::MatrixXd	So3_ptam_eigen(4,4); 
@@ -390,7 +430,6 @@ std::vector<cv::Point3d> Camera::ConvertPointFromWordToCam()
   		ScalinMatrix = Eigen::MatrixXd::Identity(4,4)*scala;
   		  		
   		POint_c1_eigen = ScalinMatrix*So3_ptam_eigen*vect_eigen;	//C_c_w*p_w
-  		 // POint_c1_eigen = So3_ptam_eigen*ScalinMatrix*vect_eigen;	//C_c_w*p_w
   		FromEigenVectorToCvPOint(POint_c1_eigen, point_temp);
   		
     	vect3d_return.push_back(point_temp);

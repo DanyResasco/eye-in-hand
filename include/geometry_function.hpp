@@ -89,16 +89,17 @@ std::pair<int,int> FindMaxValue(cv::Mat &matrix, cv::Point &point )
 	cv::Point point2(point.x-30, point.y -40);
 	cv::Rect rect(point, matrix.size());
 	
-	if((point2.x)+100 < matrix.cols )
+
+	if((point2.x)+60 < matrix.cols )
 	{
-		dist.first = 100;
+		dist.first = 60;
 	}
 	else
 		dist.first = matrix.cols - point2.x;
 
-	if((point2.y)+100 < matrix.rows )
+	if((point2.y)+60 < matrix.rows )
 	{
-		dist.second = 100;
+		dist.second = 60;
 	}
 	else
 		dist.second = matrix.rows - point2.y;
