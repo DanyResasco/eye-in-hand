@@ -86,19 +86,17 @@ Camera::Camera(): it_(nh)
  	Cam_par_distortion.at<float>(0,2) = cam_d2;
  	Cam_par_distortion.at<float>(0,3) = cam_d3; 
  	Cam_par_distortion.at<float>(0,3) = cam_d4; 
-
- 	InfoKf3d_ = false;
+	
 
  	//initialize the flag
 	move_camera_end = false;
-	// sub_ptam_2 = false;
-	// count_n_passi = 0;
+	InfoKf3d_ = false;
 	stop_flag = false;
 	
 	scala = 1;
-	myfile1.open("/home/daniela/code/src/eye_in_hand/pos_log28.txt");
-	myfile.open("/home/daniela/code/src/eye_in_hand/scale_log28.txt");
-	myfile4.open("/home/daniela/code/src/eye_in_hand/ptam_pose28.txt");
+	myfile1.open("/home/daniela/code/src/eye_in_hand/pos_log30.txt");
+	myfile.open("/home/daniela/code/src/eye_in_hand/scale_log30.txt");
+	myfile4.open("/home/daniela/code/src/eye_in_hand/ptam_pose30.txt");
 
 	sub = it_.subscribe("/camera/output_video", 1, &Camera::ImageConverter, this);
 	ptam_sub = nh.subscribe("/vslam/pose",1, &Camera::SOtreCamera, this);  //word in camera framebu
@@ -118,7 +116,6 @@ void Camera::ScaleCallback(const std_msgs::Float32::ConstPtr msg)
 
 void Camera::ScaleNaifCallback(const std_msgs::Float32::ConstPtr msg)
 {
-
 	scala_mio = msg->data;
 }
 
@@ -126,7 +123,7 @@ void Camera::ScaleNaifCallback(const std_msgs::Float32::ConstPtr msg)
 
 void Camera::InfoKf3d(const sensor_msgs::PointCloud2::ConstPtr& msg)
 {
-	ROS_INFO_STREAM("qui InfoKf3d");
+	// ROS_INFO_STREAM("qui InfoKf3d");
 	//Converto da pointcloud2 a pcl::XYZ
 	pcl::PCLPointCloud2 pcl_pc;
     pcl_conversions::toPCL(*msg, pcl_pc);
@@ -138,9 +135,10 @@ void Camera::InfoKf3d(const sensor_msgs::PointCloud2::ConstPtr& msg)
 
 void Camera::RobotMove(const std_msgs::Bool::ConstPtr& msg)
 {
-	ROS_INFO_STREAM("RICEVUTO Messaggio");
+	// ROS_INFO_STREAM("RICEVUTO Messaggio");
 	stop_flag = msg->data;
-	frame1_ = scene.clone(); 
+	frame1_ = scene.clone();
+	move_camera_end = true; 
 }
 
 void Camera::ImageConverter(const sensor_msgs::Image::ConstPtr& msg)
@@ -231,7 +229,14 @@ void Camera::ShapeDetect()
 		    detector.detect(BottonCHosen.figure_, BottonCHosen.keyp_ );
 		    extractor.compute( BottonCHosen.figure_, BottonCHosen.keyp_, BottonCHosen.descr_ );
 
-			cv::imshow("dst", dst);
+		    //  cv::Mat output1;
+   			// cv::drawKeypoints(BottonCHosen.figure_, BottonCHosen.keyp_, output1);
+
+
+   // 			cv::imshow("dst", output1);
+			// cv::waitKey(0);
+
+		   	cv::imshow("dst", dst);
 			cv::waitKey(0);
 
 			// cv::imshow("dst", roi);
@@ -260,8 +265,6 @@ void Camera::SOtreCamera(const geometry_msgs::PoseWithCovarianceStamped::ConstPt
 	FillCamMatrixPose(frame_so3_ptam);
 }
 
-
-
 void Camera::FillCamMatrixPose(KDL::Frame frame)
 {
 
@@ -284,7 +287,7 @@ void Camera::FillCamMatrixPose(KDL::Frame frame)
 
 void Camera::DetectWithSift()
 {
-	ROS_INFO_STREAM("DENTRO DetectWithSift");
+	// ROS_INFO_STREAM("DENTRO DetectWithSift");
 	cv::Mat frame;
 	cv::Mat frame_temp;
 	frame_temp = frame1_.clone();
@@ -298,7 +301,12 @@ void Camera::DetectWithSift()
 
 	detector.detect(frame, keyp_ );
 	extractor.compute( frame, keyp_, descr_ );
- 		
+ 	
+	  // cv::Mat output1;
+   // 			cv::drawKeypoints(frame, keyp_, output1);
+   // 			cv::imshow("Keypoint", output1);
+			// cv::waitKey(0);
+
     /* -- Step 2: Matching descriptor vectors using FLANN matcher */
  	cv::FlannBasedMatcher matcher;
  	std::vector< cv::DMatch > matches;
@@ -338,7 +346,7 @@ void Camera::DetectWithSift()
 
 	/*-- Localize the object */
 	std::vector<cv::Point> scene_point;
-	ROS_INFO_STREAM(" good_matches.size(): " << good_matches.size());
+	// ROS_INFO_STREAM(" good_matches.size(): " << good_matches.size());
 
 
 	for(unsigned int i = 0; i < good_matches.size(); i++ )
@@ -362,29 +370,6 @@ void Camera::DetectWithSift()
 		cv::waitKey(0);
 	}
 
-
-
-
-	// for(unsigned int i = 0; i < good_matches.size(); i++ )
-	// {
-	//     //-- Get the keypoints from the good matches
-	//     KeyPointIm1Match.push_back( BottonCHosen.keyp_[ good_matches[i].queryIdx ].pt );
-	//     scene_point.push_back( keyp_[ good_matches[i].trainIdx ].pt );
-	// }
-
-
-
-	// // 	//-- Show detected matches
-	// if(scene_point.size() >0)
-	// {
-	// 	setLabel(frame, "quip", scene_point);
-	// 	cv::Rect r = cv::boundingRect(scene_point);
-	// 	cv::Point pt(r.x + (r.width / 2), r.y + (r.height / 2));
-	// 	cv::line( frame,pt, pt ,  cv::Scalar( 5, 5, 0 ),  2, 8 );
-	// 	BottonCHosen.Botton_2frame = pt;
-	// 	cv::imshow("Object detection",frame);
-	// 	cv::waitKey(0);
-	// }
 }
 
 
@@ -406,6 +391,7 @@ void Camera::Triangulation()
 		ROS_INFO_STREAM("***Ti stai dimenticando di inviare ptam visualizer ***");
 		
 	stop_flag = false;
+	move_camera_end = false;
 }
 
 

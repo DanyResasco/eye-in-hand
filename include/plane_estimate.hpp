@@ -39,7 +39,7 @@ void Camera::FindBottonPos3D(Eigen::Vector4f plane_param)
 	float c = plane_param[2];
 	float d = plane_param[3];
 
-	Eigen::Vector2d point_temp(BottonCHosen.Center_.x, BottonCHosen.Center_.y);
+	Eigen::Vector2d point_temp(BottonCHosen.Botton_2frame.x, BottonCHosen.Botton_2frame.y);
 		
 	float first_temp = (a*(point_temp[0]-cam_cx))/cam_fx;
 	float second_temp = (b*(point_temp[1]-cam_cy))/cam_fy;

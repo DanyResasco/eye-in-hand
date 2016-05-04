@@ -70,7 +70,6 @@ std::pair<std::vector<cv::Point> ,std::vector<std::vector<cv::Point> >> Camera::
 
 	        if (std::abs(1 - ((double)r.width / r.height)) <= 0.2 && std::abs(1 - (area / (CV_PI * std::pow(radius, 2)))) <= 0.2)
 	        {
-
 	            setLabel(dst, "CIR", contours[i]);
 	            CenterAndContours.first.push_back(FindACenter(contours[i]));
 
