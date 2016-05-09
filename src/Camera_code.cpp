@@ -94,9 +94,9 @@ Camera::Camera(): it_(nh)
 	stop_flag = false;
 	
 	scala = 1;
-	myfile1.open("/home/daniela/code/src/eye_in_hand/pos_log30.txt");
-	myfile.open("/home/daniela/code/src/eye_in_hand/scale_log30.txt");
-	myfile4.open("/home/daniela/code/src/eye_in_hand/ptam_pose30.txt");
+	myfile1.open("/home/daniela/code/src/eye_in_hand/pos_log31.txt");
+	myfile.open("/home/daniela/code/src/eye_in_hand/scale_log31.txt");
+	myfile4.open("/home/daniela/code/src/eye_in_hand/ptam_pose31.txt");
 
 	sub = it_.subscribe("/camera/output_video", 1, &Camera::ImageConverter, this);
 	ptam_sub = nh.subscribe("/vslam/pose",1, &Camera::SOtreCamera, this);  //word in camera framebu
@@ -402,8 +402,8 @@ std::vector<cv::Point3d> Camera::ConvertPointFromWordToCam(double scala)
     FromMatToEigen( Camera2_S03, So3_ptam_eigen );
 
     std::ofstream myfile2, myfile3;
-    myfile2.open("/home/daniela/code/src/eye_in_hand/filelog_camera.txt");
-    myfile3.open("/home/daniela/code/src/eye_in_hand/filelog_word.txt");
+    myfile2.open("/home/daniela/code/src/eye_in_hand/filelog_camera31.txt");
+    myfile3.open("/home/daniela/code/src/eye_in_hand/filelog_word31.txt");
 
   	for(unsigned int i=0; i < Ptamkf3d.size(); i++)
   	{

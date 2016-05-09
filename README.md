@@ -27,9 +27,9 @@ Dopo questa fase di iniziallizazione Ptam inizia ad inviare la posa del frame wo
 1) topic : /moverobot. In questo topic si invia un geometry_msgs/Pose con la traslazione effettuata.
 	i.e se ci si è spostato di 2 cm su z bisogna inviare rostopic pub -1 /moverobot geometry_msgs/Pose '{position: {x: 0.0, y: 0.0, z: 0.02}, orientation: {w: 1}}'
 2) topic: /stopandgo. Questo messaggio serve per fermare momentaneamente il calcolo della stima della scala. 
-	rostopic pub -1 /stop std_msgs/Bool 'true'
+	rostopic pub -1 /stopandgo std_msgs/Bool 'true'
 	Per farla ripartire
-	rostopic pub -1 /stop std_msgs/Bool 'false'
+	rostopic pub -1 /stopandgo std_msgs/Bool 'false'
 
 Quando l'algoritmo raggiunge la convergenza invia un messaggio ros al nodo della camera per calcolare la posa 3d del bottone.
 Ogni volta che la camera si muove bisogna inviare sul topic /robot il valore true
