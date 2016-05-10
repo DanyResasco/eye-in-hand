@@ -1,0 +1,483 @@
+\hypertarget{classCamera}{\section{Camera Class Reference}
+\label{classCamera}\index{Camera@{Camera}}
+}
+
+
+{\ttfamily \#include $<$Camera\-\_\-code.\-h$>$}
+
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{structCamera_1_1Obj}{Obj}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classCamera_a01f94c3543f56ede7af49dc778f19331}{Camera} ()
+\begin{DoxyCompactList}\small\item\em \-: constructor \end{DoxyCompactList}\item 
+\hyperlink{classCamera_ad1897942d0ccf91052386388a497349f}{$\sim$\-Camera} ()
+\begin{DoxyCompactList}\small\item\em \-: destructor \end{DoxyCompactList}\item 
+void \hyperlink{classCamera_a554d1f24580bd3dd28ba88f59accda9b}{Controll\-Camera} ()
+\begin{DoxyCompactList}\small\item\em \-: Function that handle the first iteration. \end{DoxyCompactList}\item 
+void \hyperlink{classCamera_a66a1a215b01f54735cbebe155286c375}{Detect\-With\-Sift} ()
+\begin{DoxyCompactList}\small\item\em \-: Function that calculates the keypoint for the second image, and match it with the first image \end{DoxyCompactList}\item 
+void \hyperlink{classCamera_a34aa1d42610e1300bbaba06783a7c4bc}{Triangulation} ()
+\begin{DoxyCompactList}\small\item\em \-: Function that triangulate the point \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+ros\-::\-Node\-Handle \hyperlink{classCamera_a8e5072bfde6efd4cb45a7231cca8ed52}{nh}
+\item 
+cv\-::\-Mat \hyperlink{classCamera_afd3dfe7ee73602d4b47192008d49ec5d}{Camera\-\_\-\-Matrix}
+\item 
+cv\-::\-Mat \hyperlink{classCamera_ae7a364a692c470227f2bc191b21f901f}{Cam\-\_\-par\-\_\-distortion}
+\item 
+cv\-::\-Mat \hyperlink{classCamera_ac663c1988261ce865b4504a200276b3c}{Camera2\-\_\-\-S03}
+\item 
+K\-D\-L\-::\-Frame \hyperlink{classCamera_aabba2a74f24c615abb26ee433fb09b43}{Move\-\_\-robot}
+\item 
+cv\-::\-Mat \hyperlink{classCamera_a1472be6a92f776d41cc12ebb6529fc74}{scene}
+\item 
+int \hyperlink{classCamera_adab75acb909d6bfb2caebccb8b79e6e5}{arrived\-\_\-cam} = 0
+\item 
+ros\-::\-Subscriber \hyperlink{classCamera_a81ec320a1f88feb728a21c6f7f57ebd8}{movewebcamrobot}
+\item 
+ros\-::\-Subscriber \hyperlink{classCamera_a8c9fec85e18c979baa250cc8582a6f30}{ptam\-\_\-kf3d}
+\item 
+image\-\_\-transport\-::\-Image\-Transport \hyperlink{classCamera_aa96bda66d1fd41b525da47f086ea5a89}{it\-\_\-}
+\item 
+image\-\_\-transport\-::\-Subscriber \hyperlink{classCamera_aa4d0866cc975c1f0383e3e46bc7a2f6c}{sub}
+\item 
+ros\-::\-Subscriber \hyperlink{classCamera_a353766709ed7bdd512b720bdbea0d971}{ptam\-\_\-sub}
+\item 
+struct \hyperlink{structCamera_1_1Obj}{Camera\-::\-Obj} \hyperlink{classCamera_a55fdd9bd264fca1c865c497fcdb4e74f}{Botton\-C\-Hosen}
+\item 
+std\-::vector$<$ cv\-::\-Point2f $>$ \hyperlink{classCamera_ab4604f1bddb77d7c8a1000e2f7e460b3}{Keypoint\-Im2}
+\item 
+std\-::vector$<$ cv\-::\-Point2f $>$ \hyperlink{classCamera_afb480f1314f4746356faf0c37907c20e}{Key\-Point\-Im1\-Match}
+\item 
+K\-D\-L\-::\-Frame \hyperlink{classCamera_a3d3770ba9ff2a24ee1bc8f51ebc24586}{frame\-\_\-so3\-\_\-ptam}
+\item 
+std\-::string \hyperlink{classCamera_a26a17808f034cbf22c913542695a957e}{camera\-\_\-topic\-\_\-}
+\item 
+bool \hyperlink{classCamera_a5e294d376163c3c4be7bd7154c03220e}{move\-\_\-camera\-\_\-end}
+\item 
+int \hyperlink{classCamera_aef0310393843e3bb2692dab6155b69a9}{First\-Calibration}
+\item 
+cv\-::\-Mat \hyperlink{classCamera_abffda8a107264c8b9a751d2271309347}{frame1\-\_\-}
+\item 
+double \hyperlink{classCamera_a724680ff9b6d9941710e45006d7c3654}{scala}
+\item 
+K\-D\-L\-::\-Frame \hyperlink{classCamera_afeaeb3e97cc648f250da792c08efd97d}{So3\-\_\-prev\-\_\-ptam}
+\item 
+bool \hyperlink{classCamera_ab64f4cee999ddfe78d5da5378bcf7e55}{Save\-First}
+\item 
+bool \hyperlink{classCamera_a95c8cb7d543f8a1c4ba50c1c82ce6f82}{sub\-\_\-ptam\-\_\-2}
+\item 
+float \hyperlink{classCamera_a85fb4fdca2ce631f887be13d0f258387}{cam\-\_\-fx}
+\item 
+float \hyperlink{classCamera_a083cada78af8082bbbc6007771cd50b3}{cam\-\_\-d0}
+\item 
+float \hyperlink{classCamera_a510b6f07637b601621eb9a087087250a}{cam\-\_\-d1}
+\item 
+float \hyperlink{classCamera_a3c56197691507f2117c8c51843270145}{cam\-\_\-d2}
+\item 
+float \hyperlink{classCamera_aa3dac72dbb0af237246670a99c6b0d35}{cam\-\_\-d3}
+\item 
+float \hyperlink{classCamera_a848d4b20dd5eb94643102155c0c1bc77}{cam\-\_\-d4}
+\item 
+float \hyperlink{classCamera_a2ce9b1e50b825fecb0926ab8597981f5}{cam\-\_\-fy}
+\item 
+float \hyperlink{classCamera_a11d3e628c9fdc64a5c20661296976177}{cam\-\_\-cx}
+\item 
+float \hyperlink{classCamera_aa90c06105f326518304bb8b3f4790339}{cam\-\_\-cy}
+\item 
+pcl\-::\-Point\-Cloud$<$ pcl\-::\-Point\-X\-Y\-Z $>$ \hyperlink{classCamera_aef0d78eacbae15e72cb30d59083f3e03}{Ptamkf3d}
+\item 
+K\-D\-L\-::\-Frame \hyperlink{classCamera_a752d2cd26036e89172ac9eee430f083c}{frame\-\_\-w\-\_\-c}
+\item 
+int \hyperlink{classCamera_a6ff6974cfb1d7aa649cdcb9d97f6be8a}{count\-\_\-n\-\_\-passi}
+\begin{DoxyCompactList}\small\item\em camere in word \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static cv\-::\-Point \hyperlink{classCamera_a3c133f08d9bc8154927d9105984f2ce9}{pos\-\_\-object}
+\item 
+static int \hyperlink{classCamera_a17309254cbc79d0b0e8eb569d70131f6}{press\-\_\-buttom} = 0
+\item 
+static int \hyperlink{classCamera_a5cb30974eb6e3f4e9297dd1dad35c1de}{first\-\_\-\-Step} = 1
+\end{DoxyCompactItemize}
+\subsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{classCamera_aed48b91bf98f8a6fea81b2ef102bad57}{Shape\-Detect} ()
+\begin{DoxyCompactList}\small\item\em \-: Function that find the botton desired \end{DoxyCompactList}\item 
+std\-::pair$<$ int, bool $>$ \hyperlink{classCamera_a88882aaa8db8a61e4bcf70fb65cefb9c}{Find\-A\-Min\-Distance\-Button} (std\-::vector$<$ cv\-::\-Point $>$ \&baricentro, cv\-::\-Point \&point\-\_\-)
+\item 
+void \hyperlink{classCamera_a3f5bb2733fcbed0155a3897699ef6f83}{Image\-Converter} (const sensor\-\_\-msgs\-::\-Image\-::\-Const\-Ptr \&msg)
+\begin{DoxyCompactList}\small\item\em \-: Callback that convert sensor image with cv mat \end{DoxyCompactList}\item 
+std\-::pair$<$ std\-::vector\\*
+$<$ cv\-::\-Point $>$,std\-::vector\\*
+$<$ std\-::vector$<$ cv\-::\-Point $>$ $>$ $>$ \hyperlink{classCamera_a85929d090858f78e928e79dd7ba84191}{Find\-Contours} (cv\-::\-Mat bw, cv\-::\-Mat camera)
+\begin{DoxyCompactList}\small\item\em \-: Approximate contour with accuracy proportional to the contour perimeter \end{DoxyCompactList}\item 
+void \hyperlink{classCamera_ae11c79efd19a4ef9f101723822c0db1b}{S\-Otre\-Camera} (const geometry\-\_\-msgs\-::\-Pose\-With\-Covariance\-Stamped\-::\-Const\-Ptr msg)
+\begin{DoxyCompactList}\small\item\em \-: Pose word into camera \end{DoxyCompactList}\item 
+void \hyperlink{classCamera_ace564958da0785b8cce36753ba18e6e5}{Robot\-Move} (const geometry\-\_\-msgs\-::\-Pose msg)
+\begin{DoxyCompactList}\small\item\em \-: Callback that save the real movement of robot \end{DoxyCompactList}\item 
+void \hyperlink{classCamera_a5230d27120df98fdc14532e2ac6aacb0}{Info\-Kf3d} (const sensor\-\_\-msgs\-::\-Point\-Cloud2\-::\-Const\-Ptr \&msg)
+\begin{DoxyCompactList}\small\item\em \-: Callback that convert Point\-Cloud2 to poincloud\-X\-Y\-X \end{DoxyCompactList}\item 
+void \hyperlink{classCamera_ae525d3deac4c9b70b8ea8eecec745a3b}{Project\-Point\-And\-Find\-Pos\-Bot3d} (std\-::vector$<$ cv\-::\-Point3d $>$ vect3d)
+\begin{DoxyCompactList}\small\item\em \-: Reproject the points 3d to 2d and find the 3d botton pose \end{DoxyCompactList}\item 
+void \hyperlink{classCamera_ae5bb06fd55207b065e33bde4039153cc}{Fill\-Cam\-Matrix\-Pose} (K\-D\-L\-::\-Frame frame)
+\item 
+std\-::vector$<$ cv\-::\-Point3d $>$ \hyperlink{classCamera_ac9384b90060c9c89ff27479921fab6ee}{Convert\-Point\-From\-Word\-To\-Cam} ()
+\begin{DoxyCompactList}\small\item\em \-: Convert each point in camera frame \end{DoxyCompactList}\item 
+void \hyperlink{classCamera_a37ef35f0b078fbe103281500864e522a}{Find\-Botton\-Pos3\-D} (Eigen\-::\-Vector4f plane\-\_\-param)
+\begin{DoxyCompactList}\small\item\em \-: Find the 3d botton pose \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Static Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static void \hyperlink{classCamera_aec7ddfff22b1a200c7fc2ea36eb6512d}{Call\-Back\-Func} (int event, int x, int y, int flags, void $\ast$userdata)
+\begin{DoxyCompactList}\small\item\em \-: Function that save the 2d position of press botton \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+test 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classCamera_a01f94c3543f56ede7af49dc778f19331}{\index{Camera@{Camera}!Camera@{Camera}}
+\index{Camera@{Camera}!Camera@{Camera}}
+\subsubsection[{Camera}]{\setlength{\rightskip}{0pt plus 5cm}Camera\-::\-Camera (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classCamera_a01f94c3543f56ede7af49dc778f19331}
+
+
+\-: constructor 
+
+\hypertarget{classCamera_ad1897942d0ccf91052386388a497349f}{\index{Camera@{Camera}!$\sim$\-Camera@{$\sim$\-Camera}}
+\index{$\sim$\-Camera@{$\sim$\-Camera}!Camera@{Camera}}
+\subsubsection[{$\sim$\-Camera}]{\setlength{\rightskip}{0pt plus 5cm}Camera\-::$\sim$\-Camera (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classCamera_ad1897942d0ccf91052386388a497349f}
+
+
+\-: destructor 
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classCamera_aec7ddfff22b1a200c7fc2ea36eb6512d}{\index{Camera@{Camera}!Call\-Back\-Func@{Call\-Back\-Func}}
+\index{Call\-Back\-Func@{Call\-Back\-Func}!Camera@{Camera}}
+\subsubsection[{Call\-Back\-Func}]{\setlength{\rightskip}{0pt plus 5cm}void Camera\-::\-Call\-Back\-Func (
+\begin{DoxyParamCaption}
+\item[{int}]{event, }
+\item[{int}]{x, }
+\item[{int}]{y, }
+\item[{int}]{flags, }
+\item[{void $\ast$}]{userdata}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}, {\ttfamily [private]}}}\label{classCamera_aec7ddfff22b1a200c7fc2ea36eb6512d}
+
+
+\-: Function that save the 2d position of press botton 
+
+\hypertarget{classCamera_a554d1f24580bd3dd28ba88f59accda9b}{\index{Camera@{Camera}!Controll\-Camera@{Controll\-Camera}}
+\index{Controll\-Camera@{Controll\-Camera}!Camera@{Camera}}
+\subsubsection[{Controll\-Camera}]{\setlength{\rightskip}{0pt plus 5cm}void Camera\-::\-Controll\-Camera (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classCamera_a554d1f24580bd3dd28ba88f59accda9b}
+
+
+\-: Function that handle the first iteration. 
+
+\hypertarget{classCamera_ac9384b90060c9c89ff27479921fab6ee}{\index{Camera@{Camera}!Convert\-Point\-From\-Word\-To\-Cam@{Convert\-Point\-From\-Word\-To\-Cam}}
+\index{Convert\-Point\-From\-Word\-To\-Cam@{Convert\-Point\-From\-Word\-To\-Cam}!Camera@{Camera}}
+\subsubsection[{Convert\-Point\-From\-Word\-To\-Cam}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<$ cv\-::\-Point3d $>$ Camera\-::\-Convert\-Point\-From\-Word\-To\-Cam (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classCamera_ac9384b90060c9c89ff27479921fab6ee}
+
+
+\-: Convert each point in camera frame 
+
+\begin{DoxyReturn}{Returns}
+\-: 3d point in camera frame
+\end{DoxyReturn}
+Scaling each point with the scale factor. \hypertarget{classCamera_a66a1a215b01f54735cbebe155286c375}{\index{Camera@{Camera}!Detect\-With\-Sift@{Detect\-With\-Sift}}
+\index{Detect\-With\-Sift@{Detect\-With\-Sift}!Camera@{Camera}}
+\subsubsection[{Detect\-With\-Sift}]{\setlength{\rightskip}{0pt plus 5cm}void Camera\-::\-Detect\-With\-Sift (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classCamera_a66a1a215b01f54735cbebe155286c375}
+
+
+\-: Function that calculates the keypoint for the second image, and match it with the first image 
+
+\hypertarget{classCamera_ae5bb06fd55207b065e33bde4039153cc}{\index{Camera@{Camera}!Fill\-Cam\-Matrix\-Pose@{Fill\-Cam\-Matrix\-Pose}}
+\index{Fill\-Cam\-Matrix\-Pose@{Fill\-Cam\-Matrix\-Pose}!Camera@{Camera}}
+\subsubsection[{Fill\-Cam\-Matrix\-Pose}]{\setlength{\rightskip}{0pt plus 5cm}void Camera\-::\-Fill\-Cam\-Matrix\-Pose (
+\begin{DoxyParamCaption}
+\item[{K\-D\-L\-::\-Frame}]{frame}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classCamera_ae5bb06fd55207b065e33bde4039153cc}
+\hypertarget{classCamera_a88882aaa8db8a61e4bcf70fb65cefb9c}{\index{Camera@{Camera}!Find\-A\-Min\-Distance\-Button@{Find\-A\-Min\-Distance\-Button}}
+\index{Find\-A\-Min\-Distance\-Button@{Find\-A\-Min\-Distance\-Button}!Camera@{Camera}}
+\subsubsection[{Find\-A\-Min\-Distance\-Button}]{\setlength{\rightskip}{0pt plus 5cm}std\-::pair$<$ int, bool $>$ Camera\-::\-Find\-A\-Min\-Distance\-Button (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ cv\-::\-Point $>$ \&}]{baricentro, }
+\item[{cv\-::\-Point \&}]{point\-\_\-}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classCamera_a88882aaa8db8a61e4bcf70fb65cefb9c}
+\hypertarget{classCamera_a37ef35f0b078fbe103281500864e522a}{\index{Camera@{Camera}!Find\-Botton\-Pos3\-D@{Find\-Botton\-Pos3\-D}}
+\index{Find\-Botton\-Pos3\-D@{Find\-Botton\-Pos3\-D}!Camera@{Camera}}
+\subsubsection[{Find\-Botton\-Pos3\-D}]{\setlength{\rightskip}{0pt plus 5cm}void Camera\-::\-Find\-Botton\-Pos3\-D (
+\begin{DoxyParamCaption}
+\item[{Eigen\-::\-Vector4f}]{plane\-\_\-param}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classCamera_a37ef35f0b078fbe103281500864e522a}
+
+
+\-: Find the 3d botton pose 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em } & plane param\\
+\hline
+\end{DoxyParams}
+Project the 2d botton position into 3d plane \hypertarget{classCamera_a85929d090858f78e928e79dd7ba84191}{\index{Camera@{Camera}!Find\-Contours@{Find\-Contours}}
+\index{Find\-Contours@{Find\-Contours}!Camera@{Camera}}
+\subsubsection[{Find\-Contours}]{\setlength{\rightskip}{0pt plus 5cm}std\-::pair$<$ std\-::vector$<$ cv\-::\-Point $>$,std\-::vector$<$ std\-::vector$<$ cv\-::\-Point $>$ $>$ $>$ Camera\-::\-Find\-Contours (
+\begin{DoxyParamCaption}
+\item[{cv\-::\-Mat}]{bw, }
+\item[{cv\-::\-Mat}]{camera}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classCamera_a85929d090858f78e928e79dd7ba84191}
+
+
+\-: Approximate contour with accuracy proportional to the contour perimeter 
+
+\begin{DoxyReturn}{Returns}
+\-: Center of each shape and his contours 
+\end{DoxyReturn}
+\hypertarget{classCamera_a3f5bb2733fcbed0155a3897699ef6f83}{\index{Camera@{Camera}!Image\-Converter@{Image\-Converter}}
+\index{Image\-Converter@{Image\-Converter}!Camera@{Camera}}
+\subsubsection[{Image\-Converter}]{\setlength{\rightskip}{0pt plus 5cm}void Camera\-::\-Image\-Converter (
+\begin{DoxyParamCaption}
+\item[{const sensor\-\_\-msgs\-::\-Image\-::\-Const\-Ptr \&}]{msg}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classCamera_a3f5bb2733fcbed0155a3897699ef6f83}
+
+
+\-: Callback that convert sensor image with cv mat 
+
+\hypertarget{classCamera_a5230d27120df98fdc14532e2ac6aacb0}{\index{Camera@{Camera}!Info\-Kf3d@{Info\-Kf3d}}
+\index{Info\-Kf3d@{Info\-Kf3d}!Camera@{Camera}}
+\subsubsection[{Info\-Kf3d}]{\setlength{\rightskip}{0pt plus 5cm}void Camera\-::\-Info\-Kf3d (
+\begin{DoxyParamCaption}
+\item[{const sensor\-\_\-msgs\-::\-Point\-Cloud2\-::\-Const\-Ptr \&}]{msg}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classCamera_a5230d27120df98fdc14532e2ac6aacb0}
+
+
+\-: Callback that convert Point\-Cloud2 to poincloud\-X\-Y\-X 
+
+This pose is relative to word frame. \hypertarget{classCamera_ae525d3deac4c9b70b8ea8eecec745a3b}{\index{Camera@{Camera}!Project\-Point\-And\-Find\-Pos\-Bot3d@{Project\-Point\-And\-Find\-Pos\-Bot3d}}
+\index{Project\-Point\-And\-Find\-Pos\-Bot3d@{Project\-Point\-And\-Find\-Pos\-Bot3d}!Camera@{Camera}}
+\subsubsection[{Project\-Point\-And\-Find\-Pos\-Bot3d}]{\setlength{\rightskip}{0pt plus 5cm}void Camera\-::\-Project\-Point\-And\-Find\-Pos\-Bot3d (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ cv\-::\-Point3d $>$}]{vect3d}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classCamera_ae525d3deac4c9b70b8ea8eecec745a3b}
+
+
+\-: Reproject the points 3d to 2d and find the 3d botton pose 
+
+
+\begin{DoxyParams}{Parameters}
+{\em } & pose of each feature\\
+\hline
+\end{DoxyParams}
+To find the 3d botton pose, we fit a plane with lms method and project the 2d botton position into this plane \hypertarget{classCamera_ace564958da0785b8cce36753ba18e6e5}{\index{Camera@{Camera}!Robot\-Move@{Robot\-Move}}
+\index{Robot\-Move@{Robot\-Move}!Camera@{Camera}}
+\subsubsection[{Robot\-Move}]{\setlength{\rightskip}{0pt plus 5cm}void Camera\-::\-Robot\-Move (
+\begin{DoxyParamCaption}
+\item[{const geometry\-\_\-msgs\-::\-Pose}]{msg}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classCamera_ace564958da0785b8cce36753ba18e6e5}
+
+
+\-: Callback that save the real movement of robot 
+
+This pose is relative to frame early \hypertarget{classCamera_aed48b91bf98f8a6fea81b2ef102bad57}{\index{Camera@{Camera}!Shape\-Detect@{Shape\-Detect}}
+\index{Shape\-Detect@{Shape\-Detect}!Camera@{Camera}}
+\subsubsection[{Shape\-Detect}]{\setlength{\rightskip}{0pt plus 5cm}void Camera\-::\-Shape\-Detect (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classCamera_aed48b91bf98f8a6fea81b2ef102bad57}
+
+
+\-: Function that find the botton desired 
+
+\hypertarget{classCamera_ae11c79efd19a4ef9f101723822c0db1b}{\index{Camera@{Camera}!S\-Otre\-Camera@{S\-Otre\-Camera}}
+\index{S\-Otre\-Camera@{S\-Otre\-Camera}!Camera@{Camera}}
+\subsubsection[{S\-Otre\-Camera}]{\setlength{\rightskip}{0pt plus 5cm}void Camera\-::\-S\-Otre\-Camera (
+\begin{DoxyParamCaption}
+\item[{const geometry\-\_\-msgs\-::\-Pose\-With\-Covariance\-Stamped\-::\-Const\-Ptr}]{msg}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [private]}}}\label{classCamera_ae11c79efd19a4ef9f101723822c0db1b}
+
+
+\-: Pose word into camera 
+
+\hypertarget{classCamera_a34aa1d42610e1300bbaba06783a7c4bc}{\index{Camera@{Camera}!Triangulation@{Triangulation}}
+\index{Triangulation@{Triangulation}!Camera@{Camera}}
+\subsubsection[{Triangulation}]{\setlength{\rightskip}{0pt plus 5cm}void Camera\-::\-Triangulation (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classCamera_a34aa1d42610e1300bbaba06783a7c4bc}
+
+
+\-: Function that triangulate the point 
+
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classCamera_adab75acb909d6bfb2caebccb8b79e6e5}{\index{Camera@{Camera}!arrived\-\_\-cam@{arrived\-\_\-cam}}
+\index{arrived\-\_\-cam@{arrived\-\_\-cam}!Camera@{Camera}}
+\subsubsection[{arrived\-\_\-cam}]{\setlength{\rightskip}{0pt plus 5cm}int Camera\-::arrived\-\_\-cam = 0}}\label{classCamera_adab75acb909d6bfb2caebccb8b79e6e5}
+\hypertarget{classCamera_a55fdd9bd264fca1c865c497fcdb4e74f}{\index{Camera@{Camera}!Botton\-C\-Hosen@{Botton\-C\-Hosen}}
+\index{Botton\-C\-Hosen@{Botton\-C\-Hosen}!Camera@{Camera}}
+\subsubsection[{Botton\-C\-Hosen}]{\setlength{\rightskip}{0pt plus 5cm}struct {\bf Camera\-::\-Obj}  Camera\-::\-Botton\-C\-Hosen}}\label{classCamera_a55fdd9bd264fca1c865c497fcdb4e74f}
+\hypertarget{classCamera_a11d3e628c9fdc64a5c20661296976177}{\index{Camera@{Camera}!cam\-\_\-cx@{cam\-\_\-cx}}
+\index{cam\-\_\-cx@{cam\-\_\-cx}!Camera@{Camera}}
+\subsubsection[{cam\-\_\-cx}]{\setlength{\rightskip}{0pt plus 5cm}float Camera\-::cam\-\_\-cx}}\label{classCamera_a11d3e628c9fdc64a5c20661296976177}
+\hypertarget{classCamera_aa90c06105f326518304bb8b3f4790339}{\index{Camera@{Camera}!cam\-\_\-cy@{cam\-\_\-cy}}
+\index{cam\-\_\-cy@{cam\-\_\-cy}!Camera@{Camera}}
+\subsubsection[{cam\-\_\-cy}]{\setlength{\rightskip}{0pt plus 5cm}float Camera\-::cam\-\_\-cy}}\label{classCamera_aa90c06105f326518304bb8b3f4790339}
+\hypertarget{classCamera_a083cada78af8082bbbc6007771cd50b3}{\index{Camera@{Camera}!cam\-\_\-d0@{cam\-\_\-d0}}
+\index{cam\-\_\-d0@{cam\-\_\-d0}!Camera@{Camera}}
+\subsubsection[{cam\-\_\-d0}]{\setlength{\rightskip}{0pt plus 5cm}float Camera\-::cam\-\_\-d0}}\label{classCamera_a083cada78af8082bbbc6007771cd50b3}
+\hypertarget{classCamera_a510b6f07637b601621eb9a087087250a}{\index{Camera@{Camera}!cam\-\_\-d1@{cam\-\_\-d1}}
+\index{cam\-\_\-d1@{cam\-\_\-d1}!Camera@{Camera}}
+\subsubsection[{cam\-\_\-d1}]{\setlength{\rightskip}{0pt plus 5cm}float Camera\-::cam\-\_\-d1}}\label{classCamera_a510b6f07637b601621eb9a087087250a}
+\hypertarget{classCamera_a3c56197691507f2117c8c51843270145}{\index{Camera@{Camera}!cam\-\_\-d2@{cam\-\_\-d2}}
+\index{cam\-\_\-d2@{cam\-\_\-d2}!Camera@{Camera}}
+\subsubsection[{cam\-\_\-d2}]{\setlength{\rightskip}{0pt plus 5cm}float Camera\-::cam\-\_\-d2}}\label{classCamera_a3c56197691507f2117c8c51843270145}
+\hypertarget{classCamera_aa3dac72dbb0af237246670a99c6b0d35}{\index{Camera@{Camera}!cam\-\_\-d3@{cam\-\_\-d3}}
+\index{cam\-\_\-d3@{cam\-\_\-d3}!Camera@{Camera}}
+\subsubsection[{cam\-\_\-d3}]{\setlength{\rightskip}{0pt plus 5cm}float Camera\-::cam\-\_\-d3}}\label{classCamera_aa3dac72dbb0af237246670a99c6b0d35}
+\hypertarget{classCamera_a848d4b20dd5eb94643102155c0c1bc77}{\index{Camera@{Camera}!cam\-\_\-d4@{cam\-\_\-d4}}
+\index{cam\-\_\-d4@{cam\-\_\-d4}!Camera@{Camera}}
+\subsubsection[{cam\-\_\-d4}]{\setlength{\rightskip}{0pt plus 5cm}float Camera\-::cam\-\_\-d4}}\label{classCamera_a848d4b20dd5eb94643102155c0c1bc77}
+\hypertarget{classCamera_a85fb4fdca2ce631f887be13d0f258387}{\index{Camera@{Camera}!cam\-\_\-fx@{cam\-\_\-fx}}
+\index{cam\-\_\-fx@{cam\-\_\-fx}!Camera@{Camera}}
+\subsubsection[{cam\-\_\-fx}]{\setlength{\rightskip}{0pt plus 5cm}float Camera\-::cam\-\_\-fx}}\label{classCamera_a85fb4fdca2ce631f887be13d0f258387}
+\hypertarget{classCamera_a2ce9b1e50b825fecb0926ab8597981f5}{\index{Camera@{Camera}!cam\-\_\-fy@{cam\-\_\-fy}}
+\index{cam\-\_\-fy@{cam\-\_\-fy}!Camera@{Camera}}
+\subsubsection[{cam\-\_\-fy}]{\setlength{\rightskip}{0pt plus 5cm}float Camera\-::cam\-\_\-fy}}\label{classCamera_a2ce9b1e50b825fecb0926ab8597981f5}
+\hypertarget{classCamera_ae7a364a692c470227f2bc191b21f901f}{\index{Camera@{Camera}!Cam\-\_\-par\-\_\-distortion@{Cam\-\_\-par\-\_\-distortion}}
+\index{Cam\-\_\-par\-\_\-distortion@{Cam\-\_\-par\-\_\-distortion}!Camera@{Camera}}
+\subsubsection[{Cam\-\_\-par\-\_\-distortion}]{\setlength{\rightskip}{0pt plus 5cm}cv\-::\-Mat Camera\-::\-Cam\-\_\-par\-\_\-distortion}}\label{classCamera_ae7a364a692c470227f2bc191b21f901f}
+\hypertarget{classCamera_ac663c1988261ce865b4504a200276b3c}{\index{Camera@{Camera}!Camera2\-\_\-\-S03@{Camera2\-\_\-\-S03}}
+\index{Camera2\-\_\-\-S03@{Camera2\-\_\-\-S03}!Camera@{Camera}}
+\subsubsection[{Camera2\-\_\-\-S03}]{\setlength{\rightskip}{0pt plus 5cm}cv\-::\-Mat Camera\-::\-Camera2\-\_\-\-S03}}\label{classCamera_ac663c1988261ce865b4504a200276b3c}
+\hypertarget{classCamera_afd3dfe7ee73602d4b47192008d49ec5d}{\index{Camera@{Camera}!Camera\-\_\-\-Matrix@{Camera\-\_\-\-Matrix}}
+\index{Camera\-\_\-\-Matrix@{Camera\-\_\-\-Matrix}!Camera@{Camera}}
+\subsubsection[{Camera\-\_\-\-Matrix}]{\setlength{\rightskip}{0pt plus 5cm}cv\-::\-Mat Camera\-::\-Camera\-\_\-\-Matrix}}\label{classCamera_afd3dfe7ee73602d4b47192008d49ec5d}
+\hypertarget{classCamera_a26a17808f034cbf22c913542695a957e}{\index{Camera@{Camera}!camera\-\_\-topic\-\_\-@{camera\-\_\-topic\-\_\-}}
+\index{camera\-\_\-topic\-\_\-@{camera\-\_\-topic\-\_\-}!Camera@{Camera}}
+\subsubsection[{camera\-\_\-topic\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}std\-::string Camera\-::camera\-\_\-topic\-\_\-}}\label{classCamera_a26a17808f034cbf22c913542695a957e}
+\hypertarget{classCamera_a6ff6974cfb1d7aa649cdcb9d97f6be8a}{\index{Camera@{Camera}!count\-\_\-n\-\_\-passi@{count\-\_\-n\-\_\-passi}}
+\index{count\-\_\-n\-\_\-passi@{count\-\_\-n\-\_\-passi}!Camera@{Camera}}
+\subsubsection[{count\-\_\-n\-\_\-passi}]{\setlength{\rightskip}{0pt plus 5cm}int Camera\-::count\-\_\-n\-\_\-passi}}\label{classCamera_a6ff6974cfb1d7aa649cdcb9d97f6be8a}
+
+
+camere in word 
+
+\hypertarget{classCamera_a5cb30974eb6e3f4e9297dd1dad35c1de}{\index{Camera@{Camera}!first\-\_\-\-Step@{first\-\_\-\-Step}}
+\index{first\-\_\-\-Step@{first\-\_\-\-Step}!Camera@{Camera}}
+\subsubsection[{first\-\_\-\-Step}]{\setlength{\rightskip}{0pt plus 5cm}int Camera\-::first\-\_\-\-Step = 1\hspace{0.3cm}{\ttfamily [static]}}}\label{classCamera_a5cb30974eb6e3f4e9297dd1dad35c1de}
+\hypertarget{classCamera_aef0310393843e3bb2692dab6155b69a9}{\index{Camera@{Camera}!First\-Calibration@{First\-Calibration}}
+\index{First\-Calibration@{First\-Calibration}!Camera@{Camera}}
+\subsubsection[{First\-Calibration}]{\setlength{\rightskip}{0pt plus 5cm}int Camera\-::\-First\-Calibration}}\label{classCamera_aef0310393843e3bb2692dab6155b69a9}
+\hypertarget{classCamera_abffda8a107264c8b9a751d2271309347}{\index{Camera@{Camera}!frame1\-\_\-@{frame1\-\_\-}}
+\index{frame1\-\_\-@{frame1\-\_\-}!Camera@{Camera}}
+\subsubsection[{frame1\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}cv\-::\-Mat Camera\-::frame1\-\_\-}}\label{classCamera_abffda8a107264c8b9a751d2271309347}
+\hypertarget{classCamera_a3d3770ba9ff2a24ee1bc8f51ebc24586}{\index{Camera@{Camera}!frame\-\_\-so3\-\_\-ptam@{frame\-\_\-so3\-\_\-ptam}}
+\index{frame\-\_\-so3\-\_\-ptam@{frame\-\_\-so3\-\_\-ptam}!Camera@{Camera}}
+\subsubsection[{frame\-\_\-so3\-\_\-ptam}]{\setlength{\rightskip}{0pt plus 5cm}K\-D\-L\-::\-Frame Camera\-::frame\-\_\-so3\-\_\-ptam}}\label{classCamera_a3d3770ba9ff2a24ee1bc8f51ebc24586}
+\hypertarget{classCamera_a752d2cd26036e89172ac9eee430f083c}{\index{Camera@{Camera}!frame\-\_\-w\-\_\-c@{frame\-\_\-w\-\_\-c}}
+\index{frame\-\_\-w\-\_\-c@{frame\-\_\-w\-\_\-c}!Camera@{Camera}}
+\subsubsection[{frame\-\_\-w\-\_\-c}]{\setlength{\rightskip}{0pt plus 5cm}K\-D\-L\-::\-Frame Camera\-::frame\-\_\-w\-\_\-c}}\label{classCamera_a752d2cd26036e89172ac9eee430f083c}
+\hypertarget{classCamera_aa96bda66d1fd41b525da47f086ea5a89}{\index{Camera@{Camera}!it\-\_\-@{it\-\_\-}}
+\index{it\-\_\-@{it\-\_\-}!Camera@{Camera}}
+\subsubsection[{it\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}image\-\_\-transport\-::\-Image\-Transport Camera\-::it\-\_\-}}\label{classCamera_aa96bda66d1fd41b525da47f086ea5a89}
+\hypertarget{classCamera_afb480f1314f4746356faf0c37907c20e}{\index{Camera@{Camera}!Key\-Point\-Im1\-Match@{Key\-Point\-Im1\-Match}}
+\index{Key\-Point\-Im1\-Match@{Key\-Point\-Im1\-Match}!Camera@{Camera}}
+\subsubsection[{Key\-Point\-Im1\-Match}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<$cv\-::\-Point2f$>$ Camera\-::\-Key\-Point\-Im1\-Match}}\label{classCamera_afb480f1314f4746356faf0c37907c20e}
+\hypertarget{classCamera_ab4604f1bddb77d7c8a1000e2f7e460b3}{\index{Camera@{Camera}!Keypoint\-Im2@{Keypoint\-Im2}}
+\index{Keypoint\-Im2@{Keypoint\-Im2}!Camera@{Camera}}
+\subsubsection[{Keypoint\-Im2}]{\setlength{\rightskip}{0pt plus 5cm}std\-::vector$<$cv\-::\-Point2f$>$ Camera\-::\-Keypoint\-Im2}}\label{classCamera_ab4604f1bddb77d7c8a1000e2f7e460b3}
+\hypertarget{classCamera_a5e294d376163c3c4be7bd7154c03220e}{\index{Camera@{Camera}!move\-\_\-camera\-\_\-end@{move\-\_\-camera\-\_\-end}}
+\index{move\-\_\-camera\-\_\-end@{move\-\_\-camera\-\_\-end}!Camera@{Camera}}
+\subsubsection[{move\-\_\-camera\-\_\-end}]{\setlength{\rightskip}{0pt plus 5cm}bool Camera\-::move\-\_\-camera\-\_\-end}}\label{classCamera_a5e294d376163c3c4be7bd7154c03220e}
+\hypertarget{classCamera_aabba2a74f24c615abb26ee433fb09b43}{\index{Camera@{Camera}!Move\-\_\-robot@{Move\-\_\-robot}}
+\index{Move\-\_\-robot@{Move\-\_\-robot}!Camera@{Camera}}
+\subsubsection[{Move\-\_\-robot}]{\setlength{\rightskip}{0pt plus 5cm}K\-D\-L\-::\-Frame Camera\-::\-Move\-\_\-robot}}\label{classCamera_aabba2a74f24c615abb26ee433fb09b43}
+\hypertarget{classCamera_a81ec320a1f88feb728a21c6f7f57ebd8}{\index{Camera@{Camera}!movewebcamrobot@{movewebcamrobot}}
+\index{movewebcamrobot@{movewebcamrobot}!Camera@{Camera}}
+\subsubsection[{movewebcamrobot}]{\setlength{\rightskip}{0pt plus 5cm}ros\-::\-Subscriber Camera\-::movewebcamrobot}}\label{classCamera_a81ec320a1f88feb728a21c6f7f57ebd8}
+\hypertarget{classCamera_a8e5072bfde6efd4cb45a7231cca8ed52}{\index{Camera@{Camera}!nh@{nh}}
+\index{nh@{nh}!Camera@{Camera}}
+\subsubsection[{nh}]{\setlength{\rightskip}{0pt plus 5cm}ros\-::\-Node\-Handle Camera\-::nh}}\label{classCamera_a8e5072bfde6efd4cb45a7231cca8ed52}
+\hypertarget{classCamera_a3c133f08d9bc8154927d9105984f2ce9}{\index{Camera@{Camera}!pos\-\_\-object@{pos\-\_\-object}}
+\index{pos\-\_\-object@{pos\-\_\-object}!Camera@{Camera}}
+\subsubsection[{pos\-\_\-object}]{\setlength{\rightskip}{0pt plus 5cm}cv\-::\-Point Camera\-::pos\-\_\-object\hspace{0.3cm}{\ttfamily [static]}}}\label{classCamera_a3c133f08d9bc8154927d9105984f2ce9}
+\hypertarget{classCamera_a17309254cbc79d0b0e8eb569d70131f6}{\index{Camera@{Camera}!press\-\_\-buttom@{press\-\_\-buttom}}
+\index{press\-\_\-buttom@{press\-\_\-buttom}!Camera@{Camera}}
+\subsubsection[{press\-\_\-buttom}]{\setlength{\rightskip}{0pt plus 5cm}int Camera\-::press\-\_\-buttom = 0\hspace{0.3cm}{\ttfamily [static]}}}\label{classCamera_a17309254cbc79d0b0e8eb569d70131f6}
+\hypertarget{classCamera_a8c9fec85e18c979baa250cc8582a6f30}{\index{Camera@{Camera}!ptam\-\_\-kf3d@{ptam\-\_\-kf3d}}
+\index{ptam\-\_\-kf3d@{ptam\-\_\-kf3d}!Camera@{Camera}}
+\subsubsection[{ptam\-\_\-kf3d}]{\setlength{\rightskip}{0pt plus 5cm}ros\-::\-Subscriber Camera\-::ptam\-\_\-kf3d}}\label{classCamera_a8c9fec85e18c979baa250cc8582a6f30}
+\hypertarget{classCamera_a353766709ed7bdd512b720bdbea0d971}{\index{Camera@{Camera}!ptam\-\_\-sub@{ptam\-\_\-sub}}
+\index{ptam\-\_\-sub@{ptam\-\_\-sub}!Camera@{Camera}}
+\subsubsection[{ptam\-\_\-sub}]{\setlength{\rightskip}{0pt plus 5cm}ros\-::\-Subscriber Camera\-::ptam\-\_\-sub}}\label{classCamera_a353766709ed7bdd512b720bdbea0d971}
+\hypertarget{classCamera_aef0d78eacbae15e72cb30d59083f3e03}{\index{Camera@{Camera}!Ptamkf3d@{Ptamkf3d}}
+\index{Ptamkf3d@{Ptamkf3d}!Camera@{Camera}}
+\subsubsection[{Ptamkf3d}]{\setlength{\rightskip}{0pt plus 5cm}pcl\-::\-Point\-Cloud$<$pcl\-::\-Point\-X\-Y\-Z$>$ Camera\-::\-Ptamkf3d}}\label{classCamera_aef0d78eacbae15e72cb30d59083f3e03}
+\hypertarget{classCamera_ab64f4cee999ddfe78d5da5378bcf7e55}{\index{Camera@{Camera}!Save\-First@{Save\-First}}
+\index{Save\-First@{Save\-First}!Camera@{Camera}}
+\subsubsection[{Save\-First}]{\setlength{\rightskip}{0pt plus 5cm}bool Camera\-::\-Save\-First}}\label{classCamera_ab64f4cee999ddfe78d5da5378bcf7e55}
+\hypertarget{classCamera_a724680ff9b6d9941710e45006d7c3654}{\index{Camera@{Camera}!scala@{scala}}
+\index{scala@{scala}!Camera@{Camera}}
+\subsubsection[{scala}]{\setlength{\rightskip}{0pt plus 5cm}double Camera\-::scala}}\label{classCamera_a724680ff9b6d9941710e45006d7c3654}
+\hypertarget{classCamera_a1472be6a92f776d41cc12ebb6529fc74}{\index{Camera@{Camera}!scene@{scene}}
+\index{scene@{scene}!Camera@{Camera}}
+\subsubsection[{scene}]{\setlength{\rightskip}{0pt plus 5cm}cv\-::\-Mat Camera\-::scene}}\label{classCamera_a1472be6a92f776d41cc12ebb6529fc74}
+\hypertarget{classCamera_afeaeb3e97cc648f250da792c08efd97d}{\index{Camera@{Camera}!So3\-\_\-prev\-\_\-ptam@{So3\-\_\-prev\-\_\-ptam}}
+\index{So3\-\_\-prev\-\_\-ptam@{So3\-\_\-prev\-\_\-ptam}!Camera@{Camera}}
+\subsubsection[{So3\-\_\-prev\-\_\-ptam}]{\setlength{\rightskip}{0pt plus 5cm}K\-D\-L\-::\-Frame Camera\-::\-So3\-\_\-prev\-\_\-ptam}}\label{classCamera_afeaeb3e97cc648f250da792c08efd97d}
+\hypertarget{classCamera_aa4d0866cc975c1f0383e3e46bc7a2f6c}{\index{Camera@{Camera}!sub@{sub}}
+\index{sub@{sub}!Camera@{Camera}}
+\subsubsection[{sub}]{\setlength{\rightskip}{0pt plus 5cm}image\-\_\-transport\-::\-Subscriber Camera\-::sub}}\label{classCamera_aa4d0866cc975c1f0383e3e46bc7a2f6c}
+\hypertarget{classCamera_a95c8cb7d543f8a1c4ba50c1c82ce6f82}{\index{Camera@{Camera}!sub\-\_\-ptam\-\_\-2@{sub\-\_\-ptam\-\_\-2}}
+\index{sub\-\_\-ptam\-\_\-2@{sub\-\_\-ptam\-\_\-2}!Camera@{Camera}}
+\subsubsection[{sub\-\_\-ptam\-\_\-2}]{\setlength{\rightskip}{0pt plus 5cm}bool Camera\-::sub\-\_\-ptam\-\_\-2}}\label{classCamera_a95c8cb7d543f8a1c4ba50c1c82ce6f82}
+
+
+The documentation for this class was generated from the following files\-:\begin{DoxyCompactItemize}
+\item 
+/home/daniela/code/src/eye\-\_\-in\-\_\-hand/include/\hyperlink{Camera__code_8h}{Camera\-\_\-code.\-h}\item 
+/home/daniela/code/src/eye\-\_\-in\-\_\-hand/include/\hyperlink{geometry__function_8hpp}{geometry\-\_\-function.\-hpp}\item 
+/home/daniela/code/src/eye\-\_\-in\-\_\-hand/include/\hyperlink{plane__estimate_8hpp}{plane\-\_\-estimate.\-hpp}\item 
+/home/daniela/code/src/eye\-\_\-in\-\_\-hand/src/\hyperlink{Camera__code_8cpp}{Camera\-\_\-code.\-cpp}\end{DoxyCompactItemize}

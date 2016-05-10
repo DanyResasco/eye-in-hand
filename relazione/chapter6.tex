@@ -1,0 +1,11 @@
+%!TEX root = pag0.tex
+\chapter{Conclusioni}
+\label{chapter6}
+Come visto nel capitolo ~\ref{chapter5} entrambi i metodi comportano un minimo errore di stima della posizione. Questo errore di può essere causato da:
+\begin{itemize}
+\item nella fase di inizializzazione di Ptam. Non si raggiungono abbastanza features per creare una griglia stabile
+\item nello spostamento per la stima della scala. Non si raggiungono o si superano i cm richiesti
+\item nella fase di riproiezione dei punti.
+\item ambiente circostante. 
+\end{itemize}
+Per rendere più stabile l'algoritmo si potrebbe utilizzare la dinamica del manipolare e un ulteriore controllo durante il percorso per correggere l'eventuale errore di posa.

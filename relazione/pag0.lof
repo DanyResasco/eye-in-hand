@@ -1,0 +1,45 @@
+\select@language {italian}
+\select@language {italian}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {1.1}{\ignorespaces Differenza tra le due categorie di posizionamento della camera}}{2}{figure.1.1}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Camera utilizzata nel progetto}}{4}{figure.2.1}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Modello schematico del modello pinhole}}{5}{figure.2.2}
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Punti nel piano immagine}}{6}{figure.2.3}
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Schema del modello pinhole con parametri estrinseci ed intrinseci}}{7}{figure.2.4}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Difference of Gaussian}}{9}{figure.3.1}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Keypoint}}{10}{figure.3.2}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Match tra due frame consegutivi}}{11}{figure.3.3}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Struttura dell'algoritmo sviluppato}}{12}{figure.4.1}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {$Scena\_iniziale$}}}{14}{subfigure.4.2.2}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {$Bottone\_scelto$}}}{14}{subfigure.4.2.2}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Esempio di ricerca del bottone selezionato}}{15}{figure.4.2}
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {$Figure\_trovate$}}}{15}{figure.4.2}
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {$Bottone\_riconosciuto$}}}{15}{figure.4.2}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {$Sift\_frame2$}}}{17}{subfigure.4.3.2}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {$Matching$}}}{17}{subfigure.4.3.2}
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Tracking del pulsante}}{18}{figure.4.3}
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {$Good\_matching$}}}{18}{figure.4.3}
+\contentsline {subfigure}{\numberline {(d)}{\ignorespaces {$Botton\_frame2$}}}{18}{figure.4.3}
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Fsse di inizializzazione di PTAM}}{20}{figure.4.4}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {$Fase\_init$}}}{22}{subfigure.4.5.2}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {$Ptam\_grid$}}}{22}{subfigure.4.5.2}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {$Frame$}}}{22}{subfigure.4.5.2}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {$Point\_W\_frame$}}}{22}{subfigure.4.5.2}
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Posizione delle features rispetto al word frame }}{23}{figure.4.5}
+\contentsline {subfigure}{\numberline {(c)}{\ignorespaces {$Point\_W\_frame$}}}{23}{figure.4.5}
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Point cloud della mappa 3D}}{25}{figure.4.6}
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {5.1}{\ignorespaces Grafico dell'errore di stima della posa. In blu i dati stimati mentre in verde quelli reali}}{27}{figure.5.1}
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Grafico dell'errore di stima della posa. In blu i dati stimati mentre in verde quelli reali}}{28}{figure.5.2}
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Grafico dell'errore di stima della posa. In rosso i dati stimati mentre in verde quelli reali}}{29}{figure.5.3}
+\contentsline {figure}{\numberline {5.4}{\ignorespaces Grafico della stima del valore di scala. In rosso i dati stimati mentre in verde quelli reali}}{29}{figure.5.4}
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Confronto tra i due metodi con la distanza effettiva}}{31}{figure.5.5}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {$Features\_2d$}}}{31}{figure.5.5}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {$Point\_cloud$}}}{31}{figure.5.5}
+\contentsline {subfigure}{\numberline {(a)}{\ignorespaces {$confronto\_set1$}}}{31}{figure.5.5}
+\contentsline {subfigure}{\numberline {(b)}{\ignorespaces {$confronto\_set2$}}}{31}{figure.5.5}
+\addvspace {10\p@ }
+\addvspace {10\p@ }

@@ -1,0 +1,248 @@
+\hypertarget{classSettings}{\section{Settings Class Reference}
+\label{classSettings}\index{Settings@{Settings}}
+}
+
+
+{\ttfamily \#include $<$calibration.\-h$>$}
+
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{classSettings_a0e7117abd9427a6f8bc1d1d8d456b5c8}{Pattern} \{ \hyperlink{classSettings_a0e7117abd9427a6f8bc1d1d8d456b5c8ad2f421ce100bd7e0302b17bda1a74eb9}{N\-O\-T\-\_\-\-E\-X\-I\-S\-T\-I\-N\-G}, 
+\hyperlink{classSettings_a0e7117abd9427a6f8bc1d1d8d456b5c8ae96aa2d60b4a554a215524a05b32908e}{C\-H\-E\-S\-S\-B\-O\-A\-R\-D}, 
+\hyperlink{classSettings_a0e7117abd9427a6f8bc1d1d8d456b5c8a79472d1c69f8ed7aa1b55f908b136f68}{C\-I\-R\-C\-L\-E\-S\-\_\-\-G\-R\-I\-D}, 
+\hyperlink{classSettings_a0e7117abd9427a6f8bc1d1d8d456b5c8a2cea29ee5896f2cb4cc64df25fd2375b}{A\-S\-Y\-M\-M\-E\-T\-R\-I\-C\-\_\-\-C\-I\-R\-C\-L\-E\-S\-\_\-\-G\-R\-I\-D}
+ \}
+\item 
+enum \hyperlink{classSettings_a5afe85d24b071973a7f248c05386f7f4}{Input\-Type} \{ \hyperlink{classSettings_a5afe85d24b071973a7f248c05386f7f4adb44130895aedc32a119565eb6d61bed}{I\-N\-V\-A\-L\-I\-D}, 
+\hyperlink{classSettings_a5afe85d24b071973a7f248c05386f7f4aba4cc7726878c8913831f0ea6360fa05}{C\-A\-M\-E\-R\-A}, 
+\hyperlink{classSettings_a5afe85d24b071973a7f248c05386f7f4ac9fd97535bc651249f9eed1fddf2d36b}{V\-I\-D\-E\-O\-\_\-\-F\-I\-L\-E}, 
+\hyperlink{classSettings_a5afe85d24b071973a7f248c05386f7f4a292bd2e5ba912a92ace1606e366edc4d}{I\-M\-A\-G\-E\-\_\-\-L\-I\-S\-T}
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classSettings_ab7169a6eefce79566dd07db3b1e5e967}{Settings} ()
+\item 
+void \hyperlink{classSettings_ae320e2f94798ba2de400f73a8110d412}{write} (File\-Storage \&fs) const 
+\item 
+void \hyperlink{classSettings_a2d7841f8441095032e0f3b7d20adfd3f}{read} (const File\-Node \&node)
+\item 
+void \hyperlink{classSettings_ac01c17bf3536e296f1076e50cdcb00cd}{interprate} ()
+\item 
+Mat \hyperlink{classSettings_a7701462e928f2425b342440fba9973e5}{next\-Image} ()
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static bool \hyperlink{classSettings_ae57696cead99c4f0c528e33793866457}{read\-String\-List} (const string \&filename, vector$<$ string $>$ \&l)
+\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Size \hyperlink{classSettings_a5030a7164df923bb3b86dd7a0fc9af30}{board\-Size}
+\item 
+\hyperlink{classSettings_a0e7117abd9427a6f8bc1d1d8d456b5c8}{Pattern} \hyperlink{classSettings_a94551b7ffe8ac60311b035b2905e9498}{calibration\-Pattern}
+\item 
+float \hyperlink{classSettings_a6c94708776ad1ce258fc44f2101f5941}{square\-Size}
+\item 
+int \hyperlink{classSettings_a7e6654cd0e51791ed687eaa85f8fc143}{nr\-Frames}
+\item 
+float \hyperlink{classSettings_af55c910308a0d773055d0b19261bb3b8}{aspect\-Ratio}
+\item 
+int \hyperlink{classSettings_a5fe947366441009187d633f9e4663256}{delay}
+\item 
+bool \hyperlink{classSettings_ab4aac97bdb5696d60b35a29c26497064}{bwrite\-Points}
+\item 
+bool \hyperlink{classSettings_af1ac412d660e25aea698c76fa88de57c}{bwrite\-Extrinsics}
+\item 
+bool \hyperlink{classSettings_a4bc7ff147d74721a3587ce6fcb64ef32}{calib\-Zero\-Tangent\-Dist}
+\item 
+bool \hyperlink{classSettings_a44397eea3f08a0c78808c38bdd716594}{calib\-Fix\-Principal\-Point}
+\item 
+bool \hyperlink{classSettings_ab6304f260b315d2820f755e1c3a052b5}{flip\-Vertical}
+\item 
+string \hyperlink{classSettings_a9468f1ad53e982f9541d76c8d3228900}{output\-File\-Name}
+\item 
+bool \hyperlink{classSettings_a935d6f27ee454e9fee63f8b662f48a06}{show\-Undistorsed}
+\item 
+string \hyperlink{classSettings_a9970d51ab47b6560ab11b267637b6219}{input}
+\item 
+int \hyperlink{classSettings_af32a5ff06192bde106c934e0361bcd7e}{camera\-I\-D}
+\item 
+vector$<$ string $>$ \hyperlink{classSettings_ae261128a69d1d3d2b0f5315aff8066c8}{image\-List}
+\item 
+int \hyperlink{classSettings_a80061aedf354e63cb6c4c1fb7c4a9055}{at\-Image\-List}
+\item 
+Video\-Capture \hyperlink{classSettings_abd5706146b34d3c32aef4025dcd2ec1b}{input\-Capture}
+\item 
+\hyperlink{classSettings_a5afe85d24b071973a7f248c05386f7f4}{Input\-Type} \hyperlink{classSettings_a89fb14ce9856fb642f18bb0f7c5b8868}{input\-Type}
+\item 
+bool \hyperlink{classSettings_a3b9fc27b555f982bd5b9ea5198e1f7e3}{good\-Input}
+\item 
+int \hyperlink{classSettings_aba5691e3e76525f93ea254e654ec3717}{flag}
+\end{DoxyCompactItemize}
+\subsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+string \hyperlink{classSettings_ae8df4a531058c0dc6b544aff531e55ef}{pattern\-To\-Use}
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Enumeration Documentation}
+\hypertarget{classSettings_a5afe85d24b071973a7f248c05386f7f4}{\index{Settings@{Settings}!Input\-Type@{Input\-Type}}
+\index{Input\-Type@{Input\-Type}!Settings@{Settings}}
+\subsubsection[{Input\-Type}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf Settings\-::\-Input\-Type}}}\label{classSettings_a5afe85d24b071973a7f248c05386f7f4}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{I\-N\-V\-A\-L\-I\-D@{I\-N\-V\-A\-L\-I\-D}!Settings@{Settings}}\index{Settings@{Settings}!I\-N\-V\-A\-L\-I\-D@{I\-N\-V\-A\-L\-I\-D}}\item[{\em 
+\hypertarget{classSettings_a5afe85d24b071973a7f248c05386f7f4adb44130895aedc32a119565eb6d61bed}{I\-N\-V\-A\-L\-I\-D}\label{classSettings_a5afe85d24b071973a7f248c05386f7f4adb44130895aedc32a119565eb6d61bed}
+}]\index{C\-A\-M\-E\-R\-A@{C\-A\-M\-E\-R\-A}!Settings@{Settings}}\index{Settings@{Settings}!C\-A\-M\-E\-R\-A@{C\-A\-M\-E\-R\-A}}\item[{\em 
+\hypertarget{classSettings_a5afe85d24b071973a7f248c05386f7f4aba4cc7726878c8913831f0ea6360fa05}{C\-A\-M\-E\-R\-A}\label{classSettings_a5afe85d24b071973a7f248c05386f7f4aba4cc7726878c8913831f0ea6360fa05}
+}]\index{V\-I\-D\-E\-O\-\_\-\-F\-I\-L\-E@{V\-I\-D\-E\-O\-\_\-\-F\-I\-L\-E}!Settings@{Settings}}\index{Settings@{Settings}!V\-I\-D\-E\-O\-\_\-\-F\-I\-L\-E@{V\-I\-D\-E\-O\-\_\-\-F\-I\-L\-E}}\item[{\em 
+\hypertarget{classSettings_a5afe85d24b071973a7f248c05386f7f4ac9fd97535bc651249f9eed1fddf2d36b}{V\-I\-D\-E\-O\-\_\-\-F\-I\-L\-E}\label{classSettings_a5afe85d24b071973a7f248c05386f7f4ac9fd97535bc651249f9eed1fddf2d36b}
+}]\index{I\-M\-A\-G\-E\-\_\-\-L\-I\-S\-T@{I\-M\-A\-G\-E\-\_\-\-L\-I\-S\-T}!Settings@{Settings}}\index{Settings@{Settings}!I\-M\-A\-G\-E\-\_\-\-L\-I\-S\-T@{I\-M\-A\-G\-E\-\_\-\-L\-I\-S\-T}}\item[{\em 
+\hypertarget{classSettings_a5afe85d24b071973a7f248c05386f7f4a292bd2e5ba912a92ace1606e366edc4d}{I\-M\-A\-G\-E\-\_\-\-L\-I\-S\-T}\label{classSettings_a5afe85d24b071973a7f248c05386f7f4a292bd2e5ba912a92ace1606e366edc4d}
+}]\end{description}
+\end{Desc}
+\hypertarget{classSettings_a0e7117abd9427a6f8bc1d1d8d456b5c8}{\index{Settings@{Settings}!Pattern@{Pattern}}
+\index{Pattern@{Pattern}!Settings@{Settings}}
+\subsubsection[{Pattern}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf Settings\-::\-Pattern}}}\label{classSettings_a0e7117abd9427a6f8bc1d1d8d456b5c8}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{N\-O\-T\-\_\-\-E\-X\-I\-S\-T\-I\-N\-G@{N\-O\-T\-\_\-\-E\-X\-I\-S\-T\-I\-N\-G}!Settings@{Settings}}\index{Settings@{Settings}!N\-O\-T\-\_\-\-E\-X\-I\-S\-T\-I\-N\-G@{N\-O\-T\-\_\-\-E\-X\-I\-S\-T\-I\-N\-G}}\item[{\em 
+\hypertarget{classSettings_a0e7117abd9427a6f8bc1d1d8d456b5c8ad2f421ce100bd7e0302b17bda1a74eb9}{N\-O\-T\-\_\-\-E\-X\-I\-S\-T\-I\-N\-G}\label{classSettings_a0e7117abd9427a6f8bc1d1d8d456b5c8ad2f421ce100bd7e0302b17bda1a74eb9}
+}]\index{C\-H\-E\-S\-S\-B\-O\-A\-R\-D@{C\-H\-E\-S\-S\-B\-O\-A\-R\-D}!Settings@{Settings}}\index{Settings@{Settings}!C\-H\-E\-S\-S\-B\-O\-A\-R\-D@{C\-H\-E\-S\-S\-B\-O\-A\-R\-D}}\item[{\em 
+\hypertarget{classSettings_a0e7117abd9427a6f8bc1d1d8d456b5c8ae96aa2d60b4a554a215524a05b32908e}{C\-H\-E\-S\-S\-B\-O\-A\-R\-D}\label{classSettings_a0e7117abd9427a6f8bc1d1d8d456b5c8ae96aa2d60b4a554a215524a05b32908e}
+}]\index{C\-I\-R\-C\-L\-E\-S\-\_\-\-G\-R\-I\-D@{C\-I\-R\-C\-L\-E\-S\-\_\-\-G\-R\-I\-D}!Settings@{Settings}}\index{Settings@{Settings}!C\-I\-R\-C\-L\-E\-S\-\_\-\-G\-R\-I\-D@{C\-I\-R\-C\-L\-E\-S\-\_\-\-G\-R\-I\-D}}\item[{\em 
+\hypertarget{classSettings_a0e7117abd9427a6f8bc1d1d8d456b5c8a79472d1c69f8ed7aa1b55f908b136f68}{C\-I\-R\-C\-L\-E\-S\-\_\-\-G\-R\-I\-D}\label{classSettings_a0e7117abd9427a6f8bc1d1d8d456b5c8a79472d1c69f8ed7aa1b55f908b136f68}
+}]\index{A\-S\-Y\-M\-M\-E\-T\-R\-I\-C\-\_\-\-C\-I\-R\-C\-L\-E\-S\-\_\-\-G\-R\-I\-D@{A\-S\-Y\-M\-M\-E\-T\-R\-I\-C\-\_\-\-C\-I\-R\-C\-L\-E\-S\-\_\-\-G\-R\-I\-D}!Settings@{Settings}}\index{Settings@{Settings}!A\-S\-Y\-M\-M\-E\-T\-R\-I\-C\-\_\-\-C\-I\-R\-C\-L\-E\-S\-\_\-\-G\-R\-I\-D@{A\-S\-Y\-M\-M\-E\-T\-R\-I\-C\-\_\-\-C\-I\-R\-C\-L\-E\-S\-\_\-\-G\-R\-I\-D}}\item[{\em 
+\hypertarget{classSettings_a0e7117abd9427a6f8bc1d1d8d456b5c8a2cea29ee5896f2cb4cc64df25fd2375b}{A\-S\-Y\-M\-M\-E\-T\-R\-I\-C\-\_\-\-C\-I\-R\-C\-L\-E\-S\-\_\-\-G\-R\-I\-D}\label{classSettings_a0e7117abd9427a6f8bc1d1d8d456b5c8a2cea29ee5896f2cb4cc64df25fd2375b}
+}]\end{description}
+\end{Desc}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classSettings_ab7169a6eefce79566dd07db3b1e5e967}{\index{Settings@{Settings}!Settings@{Settings}}
+\index{Settings@{Settings}!Settings@{Settings}}
+\subsubsection[{Settings}]{\setlength{\rightskip}{0pt plus 5cm}Settings\-::\-Settings (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classSettings_ab7169a6eefce79566dd07db3b1e5e967}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classSettings_ac01c17bf3536e296f1076e50cdcb00cd}{\index{Settings@{Settings}!interprate@{interprate}}
+\index{interprate@{interprate}!Settings@{Settings}}
+\subsubsection[{interprate}]{\setlength{\rightskip}{0pt plus 5cm}void Settings\-::interprate (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classSettings_ac01c17bf3536e296f1076e50cdcb00cd}
+\hypertarget{classSettings_a7701462e928f2425b342440fba9973e5}{\index{Settings@{Settings}!next\-Image@{next\-Image}}
+\index{next\-Image@{next\-Image}!Settings@{Settings}}
+\subsubsection[{next\-Image}]{\setlength{\rightskip}{0pt plus 5cm}Mat Settings\-::next\-Image (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classSettings_a7701462e928f2425b342440fba9973e5}
+\hypertarget{classSettings_a2d7841f8441095032e0f3b7d20adfd3f}{\index{Settings@{Settings}!read@{read}}
+\index{read@{read}!Settings@{Settings}}
+\subsubsection[{read}]{\setlength{\rightskip}{0pt plus 5cm}void Settings\-::read (
+\begin{DoxyParamCaption}
+\item[{const File\-Node \&}]{node}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}}\label{classSettings_a2d7841f8441095032e0f3b7d20adfd3f}
+\hypertarget{classSettings_ae57696cead99c4f0c528e33793866457}{\index{Settings@{Settings}!read\-String\-List@{read\-String\-List}}
+\index{read\-String\-List@{read\-String\-List}!Settings@{Settings}}
+\subsubsection[{read\-String\-List}]{\setlength{\rightskip}{0pt plus 5cm}static bool Settings\-::read\-String\-List (
+\begin{DoxyParamCaption}
+\item[{const string \&}]{filename, }
+\item[{vector$<$ string $>$ \&}]{l}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}}\label{classSettings_ae57696cead99c4f0c528e33793866457}
+\hypertarget{classSettings_ae320e2f94798ba2de400f73a8110d412}{\index{Settings@{Settings}!write@{write}}
+\index{write@{write}!Settings@{Settings}}
+\subsubsection[{write}]{\setlength{\rightskip}{0pt plus 5cm}void Settings\-::write (
+\begin{DoxyParamCaption}
+\item[{File\-Storage \&}]{fs}
+\end{DoxyParamCaption}
+) const\hspace{0.3cm}{\ttfamily [inline]}}}\label{classSettings_ae320e2f94798ba2de400f73a8110d412}
+
+
+\subsection{Member Data Documentation}
+\hypertarget{classSettings_af55c910308a0d773055d0b19261bb3b8}{\index{Settings@{Settings}!aspect\-Ratio@{aspect\-Ratio}}
+\index{aspect\-Ratio@{aspect\-Ratio}!Settings@{Settings}}
+\subsubsection[{aspect\-Ratio}]{\setlength{\rightskip}{0pt plus 5cm}float Settings\-::aspect\-Ratio}}\label{classSettings_af55c910308a0d773055d0b19261bb3b8}
+\hypertarget{classSettings_a80061aedf354e63cb6c4c1fb7c4a9055}{\index{Settings@{Settings}!at\-Image\-List@{at\-Image\-List}}
+\index{at\-Image\-List@{at\-Image\-List}!Settings@{Settings}}
+\subsubsection[{at\-Image\-List}]{\setlength{\rightskip}{0pt plus 5cm}int Settings\-::at\-Image\-List}}\label{classSettings_a80061aedf354e63cb6c4c1fb7c4a9055}
+\hypertarget{classSettings_a5030a7164df923bb3b86dd7a0fc9af30}{\index{Settings@{Settings}!board\-Size@{board\-Size}}
+\index{board\-Size@{board\-Size}!Settings@{Settings}}
+\subsubsection[{board\-Size}]{\setlength{\rightskip}{0pt plus 5cm}Size Settings\-::board\-Size}}\label{classSettings_a5030a7164df923bb3b86dd7a0fc9af30}
+\hypertarget{classSettings_af1ac412d660e25aea698c76fa88de57c}{\index{Settings@{Settings}!bwrite\-Extrinsics@{bwrite\-Extrinsics}}
+\index{bwrite\-Extrinsics@{bwrite\-Extrinsics}!Settings@{Settings}}
+\subsubsection[{bwrite\-Extrinsics}]{\setlength{\rightskip}{0pt plus 5cm}bool Settings\-::bwrite\-Extrinsics}}\label{classSettings_af1ac412d660e25aea698c76fa88de57c}
+\hypertarget{classSettings_ab4aac97bdb5696d60b35a29c26497064}{\index{Settings@{Settings}!bwrite\-Points@{bwrite\-Points}}
+\index{bwrite\-Points@{bwrite\-Points}!Settings@{Settings}}
+\subsubsection[{bwrite\-Points}]{\setlength{\rightskip}{0pt plus 5cm}bool Settings\-::bwrite\-Points}}\label{classSettings_ab4aac97bdb5696d60b35a29c26497064}
+\hypertarget{classSettings_a44397eea3f08a0c78808c38bdd716594}{\index{Settings@{Settings}!calib\-Fix\-Principal\-Point@{calib\-Fix\-Principal\-Point}}
+\index{calib\-Fix\-Principal\-Point@{calib\-Fix\-Principal\-Point}!Settings@{Settings}}
+\subsubsection[{calib\-Fix\-Principal\-Point}]{\setlength{\rightskip}{0pt plus 5cm}bool Settings\-::calib\-Fix\-Principal\-Point}}\label{classSettings_a44397eea3f08a0c78808c38bdd716594}
+\hypertarget{classSettings_a94551b7ffe8ac60311b035b2905e9498}{\index{Settings@{Settings}!calibration\-Pattern@{calibration\-Pattern}}
+\index{calibration\-Pattern@{calibration\-Pattern}!Settings@{Settings}}
+\subsubsection[{calibration\-Pattern}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Pattern} Settings\-::calibration\-Pattern}}\label{classSettings_a94551b7ffe8ac60311b035b2905e9498}
+\hypertarget{classSettings_a4bc7ff147d74721a3587ce6fcb64ef32}{\index{Settings@{Settings}!calib\-Zero\-Tangent\-Dist@{calib\-Zero\-Tangent\-Dist}}
+\index{calib\-Zero\-Tangent\-Dist@{calib\-Zero\-Tangent\-Dist}!Settings@{Settings}}
+\subsubsection[{calib\-Zero\-Tangent\-Dist}]{\setlength{\rightskip}{0pt plus 5cm}bool Settings\-::calib\-Zero\-Tangent\-Dist}}\label{classSettings_a4bc7ff147d74721a3587ce6fcb64ef32}
+\hypertarget{classSettings_af32a5ff06192bde106c934e0361bcd7e}{\index{Settings@{Settings}!camera\-I\-D@{camera\-I\-D}}
+\index{camera\-I\-D@{camera\-I\-D}!Settings@{Settings}}
+\subsubsection[{camera\-I\-D}]{\setlength{\rightskip}{0pt plus 5cm}int Settings\-::camera\-I\-D}}\label{classSettings_af32a5ff06192bde106c934e0361bcd7e}
+\hypertarget{classSettings_a5fe947366441009187d633f9e4663256}{\index{Settings@{Settings}!delay@{delay}}
+\index{delay@{delay}!Settings@{Settings}}
+\subsubsection[{delay}]{\setlength{\rightskip}{0pt plus 5cm}int Settings\-::delay}}\label{classSettings_a5fe947366441009187d633f9e4663256}
+\hypertarget{classSettings_aba5691e3e76525f93ea254e654ec3717}{\index{Settings@{Settings}!flag@{flag}}
+\index{flag@{flag}!Settings@{Settings}}
+\subsubsection[{flag}]{\setlength{\rightskip}{0pt plus 5cm}int Settings\-::flag}}\label{classSettings_aba5691e3e76525f93ea254e654ec3717}
+\hypertarget{classSettings_ab6304f260b315d2820f755e1c3a052b5}{\index{Settings@{Settings}!flip\-Vertical@{flip\-Vertical}}
+\index{flip\-Vertical@{flip\-Vertical}!Settings@{Settings}}
+\subsubsection[{flip\-Vertical}]{\setlength{\rightskip}{0pt plus 5cm}bool Settings\-::flip\-Vertical}}\label{classSettings_ab6304f260b315d2820f755e1c3a052b5}
+\hypertarget{classSettings_a3b9fc27b555f982bd5b9ea5198e1f7e3}{\index{Settings@{Settings}!good\-Input@{good\-Input}}
+\index{good\-Input@{good\-Input}!Settings@{Settings}}
+\subsubsection[{good\-Input}]{\setlength{\rightskip}{0pt plus 5cm}bool Settings\-::good\-Input}}\label{classSettings_a3b9fc27b555f982bd5b9ea5198e1f7e3}
+\hypertarget{classSettings_ae261128a69d1d3d2b0f5315aff8066c8}{\index{Settings@{Settings}!image\-List@{image\-List}}
+\index{image\-List@{image\-List}!Settings@{Settings}}
+\subsubsection[{image\-List}]{\setlength{\rightskip}{0pt plus 5cm}vector$<$string$>$ Settings\-::image\-List}}\label{classSettings_ae261128a69d1d3d2b0f5315aff8066c8}
+\hypertarget{classSettings_a9970d51ab47b6560ab11b267637b6219}{\index{Settings@{Settings}!input@{input}}
+\index{input@{input}!Settings@{Settings}}
+\subsubsection[{input}]{\setlength{\rightskip}{0pt plus 5cm}string Settings\-::input}}\label{classSettings_a9970d51ab47b6560ab11b267637b6219}
+\hypertarget{classSettings_abd5706146b34d3c32aef4025dcd2ec1b}{\index{Settings@{Settings}!input\-Capture@{input\-Capture}}
+\index{input\-Capture@{input\-Capture}!Settings@{Settings}}
+\subsubsection[{input\-Capture}]{\setlength{\rightskip}{0pt plus 5cm}Video\-Capture Settings\-::input\-Capture}}\label{classSettings_abd5706146b34d3c32aef4025dcd2ec1b}
+\hypertarget{classSettings_a89fb14ce9856fb642f18bb0f7c5b8868}{\index{Settings@{Settings}!input\-Type@{input\-Type}}
+\index{input\-Type@{input\-Type}!Settings@{Settings}}
+\subsubsection[{input\-Type}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Input\-Type} Settings\-::input\-Type}}\label{classSettings_a89fb14ce9856fb642f18bb0f7c5b8868}
+\hypertarget{classSettings_a7e6654cd0e51791ed687eaa85f8fc143}{\index{Settings@{Settings}!nr\-Frames@{nr\-Frames}}
+\index{nr\-Frames@{nr\-Frames}!Settings@{Settings}}
+\subsubsection[{nr\-Frames}]{\setlength{\rightskip}{0pt plus 5cm}int Settings\-::nr\-Frames}}\label{classSettings_a7e6654cd0e51791ed687eaa85f8fc143}
+\hypertarget{classSettings_a9468f1ad53e982f9541d76c8d3228900}{\index{Settings@{Settings}!output\-File\-Name@{output\-File\-Name}}
+\index{output\-File\-Name@{output\-File\-Name}!Settings@{Settings}}
+\subsubsection[{output\-File\-Name}]{\setlength{\rightskip}{0pt plus 5cm}string Settings\-::output\-File\-Name}}\label{classSettings_a9468f1ad53e982f9541d76c8d3228900}
+\hypertarget{classSettings_ae8df4a531058c0dc6b544aff531e55ef}{\index{Settings@{Settings}!pattern\-To\-Use@{pattern\-To\-Use}}
+\index{pattern\-To\-Use@{pattern\-To\-Use}!Settings@{Settings}}
+\subsubsection[{pattern\-To\-Use}]{\setlength{\rightskip}{0pt plus 5cm}string Settings\-::pattern\-To\-Use\hspace{0.3cm}{\ttfamily [private]}}}\label{classSettings_ae8df4a531058c0dc6b544aff531e55ef}
+\hypertarget{classSettings_a935d6f27ee454e9fee63f8b662f48a06}{\index{Settings@{Settings}!show\-Undistorsed@{show\-Undistorsed}}
+\index{show\-Undistorsed@{show\-Undistorsed}!Settings@{Settings}}
+\subsubsection[{show\-Undistorsed}]{\setlength{\rightskip}{0pt plus 5cm}bool Settings\-::show\-Undistorsed}}\label{classSettings_a935d6f27ee454e9fee63f8b662f48a06}
+\hypertarget{classSettings_a6c94708776ad1ce258fc44f2101f5941}{\index{Settings@{Settings}!square\-Size@{square\-Size}}
+\index{square\-Size@{square\-Size}!Settings@{Settings}}
+\subsubsection[{square\-Size}]{\setlength{\rightskip}{0pt plus 5cm}float Settings\-::square\-Size}}\label{classSettings_a6c94708776ad1ce258fc44f2101f5941}
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+/home/daniela/code/src/eye\-\_\-in\-\_\-hand/include/\hyperlink{calibration_8h}{calibration.\-h}\end{DoxyCompactItemize}

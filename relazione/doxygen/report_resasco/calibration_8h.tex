@@ -1,0 +1,69 @@
+\hypertarget{calibration_8h}{\section{/home/daniela/code/src/eye\-\_\-in\-\_\-hand/include/calibration.h File Reference}
+\label{calibration_8h}\index{/home/daniela/code/src/eye\-\_\-in\-\_\-hand/include/calibration.\-h@{/home/daniela/code/src/eye\-\_\-in\-\_\-hand/include/calibration.\-h}}
+}
+{\ttfamily \#include $<$iostream$>$}\\*
+{\ttfamily \#include $<$sstream$>$}\\*
+{\ttfamily \#include $<$time.\-h$>$}\\*
+{\ttfamily \#include $<$stdio.\-h$>$}\\*
+{\ttfamily \#include $<$opencv2/core/core.\-hpp$>$}\\*
+{\ttfamily \#include $<$opencv2/imgproc/imgproc.\-hpp$>$}\\*
+{\ttfamily \#include $<$opencv2/calib3d/calib3d.\-hpp$>$}\\*
+{\ttfamily \#include $<$opencv2/highgui/highgui.\-hpp$>$}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classSettings}{Settings}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{calibration_8h_af08ec37a8c99d747fb60fa15bc28678b}{\-\_\-\-C\-R\-T\-\_\-\-S\-E\-C\-U\-R\-E\-\_\-\-N\-O\-\_\-\-W\-A\-R\-N\-I\-N\-G\-S}
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \{ \hyperlink{calibration_8h_a06fc87d81c62e9abb8790b6e5713c55ba167a7ee1aabe9f27e010fff93c0ba971}{D\-E\-T\-E\-C\-T\-I\-O\-N} = 0, 
+\hyperlink{calibration_8h_a06fc87d81c62e9abb8790b6e5713c55ba53f5d985011ab26db21516188f46a94f}{C\-A\-P\-T\-U\-R\-I\-N\-G} = 1, 
+\hyperlink{calibration_8h_a06fc87d81c62e9abb8790b6e5713c55baf7834eaf5a327e180e039aa05dd3ebd1}{C\-A\-L\-I\-B\-R\-A\-T\-E\-D} = 2
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{calibration_8h_ac7558c8da6af683fc1c86c2ede7bb31c}{run\-Calibration\-And\-Save} (\hyperlink{classSettings}{Settings} \&s, Size image\-Size, Mat \&camera\-Matrix, Mat \&dist\-Coeffs, vector$<$ vector$<$ Point2f $>$ $>$ image\-Points)
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{calibration_8h_af08ec37a8c99d747fb60fa15bc28678b}{\index{calibration.\-h@{calibration.\-h}!\-\_\-\-C\-R\-T\-\_\-\-S\-E\-C\-U\-R\-E\-\_\-\-N\-O\-\_\-\-W\-A\-R\-N\-I\-N\-G\-S@{\-\_\-\-C\-R\-T\-\_\-\-S\-E\-C\-U\-R\-E\-\_\-\-N\-O\-\_\-\-W\-A\-R\-N\-I\-N\-G\-S}}
+\index{\-\_\-\-C\-R\-T\-\_\-\-S\-E\-C\-U\-R\-E\-\_\-\-N\-O\-\_\-\-W\-A\-R\-N\-I\-N\-G\-S@{\-\_\-\-C\-R\-T\-\_\-\-S\-E\-C\-U\-R\-E\-\_\-\-N\-O\-\_\-\-W\-A\-R\-N\-I\-N\-G\-S}!calibration.h@{calibration.\-h}}
+\subsubsection[{\-\_\-\-C\-R\-T\-\_\-\-S\-E\-C\-U\-R\-E\-\_\-\-N\-O\-\_\-\-W\-A\-R\-N\-I\-N\-G\-S}]{\setlength{\rightskip}{0pt plus 5cm}\#define \-\_\-\-C\-R\-T\-\_\-\-S\-E\-C\-U\-R\-E\-\_\-\-N\-O\-\_\-\-W\-A\-R\-N\-I\-N\-G\-S}}\label{calibration_8h_af08ec37a8c99d747fb60fa15bc28678b}
+
+
+\subsection{Enumeration Type Documentation}
+\hypertarget{calibration_8h_a06fc87d81c62e9abb8790b6e5713c55b}{\subsubsection[{anonymous enum}]{\setlength{\rightskip}{0pt plus 5cm}anonymous enum}}\label{calibration_8h_a06fc87d81c62e9abb8790b6e5713c55b}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{D\-E\-T\-E\-C\-T\-I\-O\-N@{D\-E\-T\-E\-C\-T\-I\-O\-N}!calibration.\-h@{calibration.\-h}}\index{calibration.\-h@{calibration.\-h}!D\-E\-T\-E\-C\-T\-I\-O\-N@{D\-E\-T\-E\-C\-T\-I\-O\-N}}\item[{\em 
+\hypertarget{calibration_8h_a06fc87d81c62e9abb8790b6e5713c55ba167a7ee1aabe9f27e010fff93c0ba971}{D\-E\-T\-E\-C\-T\-I\-O\-N}\label{calibration_8h_a06fc87d81c62e9abb8790b6e5713c55ba167a7ee1aabe9f27e010fff93c0ba971}
+}]\index{C\-A\-P\-T\-U\-R\-I\-N\-G@{C\-A\-P\-T\-U\-R\-I\-N\-G}!calibration.\-h@{calibration.\-h}}\index{calibration.\-h@{calibration.\-h}!C\-A\-P\-T\-U\-R\-I\-N\-G@{C\-A\-P\-T\-U\-R\-I\-N\-G}}\item[{\em 
+\hypertarget{calibration_8h_a06fc87d81c62e9abb8790b6e5713c55ba53f5d985011ab26db21516188f46a94f}{C\-A\-P\-T\-U\-R\-I\-N\-G}\label{calibration_8h_a06fc87d81c62e9abb8790b6e5713c55ba53f5d985011ab26db21516188f46a94f}
+}]\index{C\-A\-L\-I\-B\-R\-A\-T\-E\-D@{C\-A\-L\-I\-B\-R\-A\-T\-E\-D}!calibration.\-h@{calibration.\-h}}\index{calibration.\-h@{calibration.\-h}!C\-A\-L\-I\-B\-R\-A\-T\-E\-D@{C\-A\-L\-I\-B\-R\-A\-T\-E\-D}}\item[{\em 
+\hypertarget{calibration_8h_a06fc87d81c62e9abb8790b6e5713c55baf7834eaf5a327e180e039aa05dd3ebd1}{C\-A\-L\-I\-B\-R\-A\-T\-E\-D}\label{calibration_8h_a06fc87d81c62e9abb8790b6e5713c55baf7834eaf5a327e180e039aa05dd3ebd1}
+}]\end{description}
+\end{Desc}
+
+
+\subsection{Function Documentation}
+\hypertarget{calibration_8h_ac7558c8da6af683fc1c86c2ede7bb31c}{\index{calibration.\-h@{calibration.\-h}!run\-Calibration\-And\-Save@{run\-Calibration\-And\-Save}}
+\index{run\-Calibration\-And\-Save@{run\-Calibration\-And\-Save}!calibration.h@{calibration.\-h}}
+\subsubsection[{run\-Calibration\-And\-Save}]{\setlength{\rightskip}{0pt plus 5cm}bool run\-Calibration\-And\-Save (
+\begin{DoxyParamCaption}
+\item[{{\bf Settings} \&}]{s, }
+\item[{Size}]{image\-Size, }
+\item[{Mat \&}]{camera\-Matrix, }
+\item[{Mat \&}]{dist\-Coeffs, }
+\item[{vector$<$ vector$<$ Point2f $>$ $>$}]{image\-Points}
+\end{DoxyParamCaption}
+)}}\label{calibration_8h_ac7558c8da6af683fc1c86c2ede7bb31c}

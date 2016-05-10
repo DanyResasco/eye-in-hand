@@ -1,0 +1,65 @@
+\hypertarget{geometry__function_8hpp}{\section{/home/daniela/code/src/eye\-\_\-in\-\_\-hand/include/geometry\-\_\-function.hpp File Reference}
+\label{geometry__function_8hpp}\index{/home/daniela/code/src/eye\-\_\-in\-\_\-hand/include/geometry\-\_\-function.\-hpp@{/home/daniela/code/src/eye\-\_\-in\-\_\-hand/include/geometry\-\_\-function.\-hpp}}
+}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+std\-::pair$<$ int, int $>$ \hyperlink{geometry__function_8hpp_a40c710235fc641ebf71031edd4085c2b}{Find\-Max\-Value} (cv\-::\-Mat \&matrix, cv\-::\-Point \&point)
+\begin{DoxyCompactList}\small\item\em \-: function that calculates the max value of width and height for the roi \end{DoxyCompactList}\item 
+cv\-::\-Point \hyperlink{geometry__function_8hpp_a68ba34ab3322b65a28949d8ec37fad05}{Find\-A\-Center} (std\-::vector$<$ cv\-::\-Point $>$ \&geometry)
+\begin{DoxyCompactList}\small\item\em \-: Find a centroid of shape \end{DoxyCompactList}\item 
+void \hyperlink{geometry__function_8hpp_affd112f0eee1ffc20580ee858406fa6d}{set\-Label} (cv\-::\-Mat \&im, const std\-::string label, std\-::vector$<$ cv\-::\-Point $>$ \&contour)
+\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{geometry__function_8hpp_a68ba34ab3322b65a28949d8ec37fad05}{\index{geometry\-\_\-function.\-hpp@{geometry\-\_\-function.\-hpp}!Find\-A\-Center@{Find\-A\-Center}}
+\index{Find\-A\-Center@{Find\-A\-Center}!geometry_function.hpp@{geometry\-\_\-function.\-hpp}}
+\subsubsection[{Find\-A\-Center}]{\setlength{\rightskip}{0pt plus 5cm}cv\-::\-Point Find\-A\-Center (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ cv\-::\-Point $>$ \&}]{geometry}
+\end{DoxyParamCaption}
+)}}\label{geometry__function_8hpp_a68ba34ab3322b65a28949d8ec37fad05}
+
+
+\-: Find a centroid of shape 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em } & shape contours \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\-: center position 
+\end{DoxyReturn}
+\hypertarget{geometry__function_8hpp_a40c710235fc641ebf71031edd4085c2b}{\index{geometry\-\_\-function.\-hpp@{geometry\-\_\-function.\-hpp}!Find\-Max\-Value@{Find\-Max\-Value}}
+\index{Find\-Max\-Value@{Find\-Max\-Value}!geometry_function.hpp@{geometry\-\_\-function.\-hpp}}
+\subsubsection[{Find\-Max\-Value}]{\setlength{\rightskip}{0pt plus 5cm}std\-::pair$<$int,int$>$ Find\-Max\-Value (
+\begin{DoxyParamCaption}
+\item[{cv\-::\-Mat \&}]{matrix, }
+\item[{cv\-::\-Point \&}]{point}
+\end{DoxyParamCaption}
+)}}\label{geometry__function_8hpp_a40c710235fc641ebf71031edd4085c2b}
+
+
+\-: function that calculates the max value of width and height for the roi 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em } & mat of scene \\
+\hline
+\mbox{\tt in}  & {\em } & point of interest \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\-: range to cut the image to make a roi 
+\end{DoxyReturn}
+\hypertarget{geometry__function_8hpp_affd112f0eee1ffc20580ee858406fa6d}{\index{geometry\-\_\-function.\-hpp@{geometry\-\_\-function.\-hpp}!set\-Label@{set\-Label}}
+\index{set\-Label@{set\-Label}!geometry_function.hpp@{geometry\-\_\-function.\-hpp}}
+\subsubsection[{set\-Label}]{\setlength{\rightskip}{0pt plus 5cm}void set\-Label (
+\begin{DoxyParamCaption}
+\item[{cv\-::\-Mat \&}]{im, }
+\item[{const std\-::string}]{label, }
+\item[{std\-::vector$<$ cv\-::\-Point $>$ \&}]{contour}
+\end{DoxyParamCaption}
+)}}\label{geometry__function_8hpp_affd112f0eee1ffc20580ee858406fa6d}

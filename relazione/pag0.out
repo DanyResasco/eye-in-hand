@@ -1,0 +1,20 @@
+\BOOKMARK [0][-]{chapter.1}{Introduzione}{}% 1
+\BOOKMARK [1][-]{subsection.1.0.1}{Organizzazione del report}{chapter.1}% 2
+\BOOKMARK [0][-]{chapter.2}{Modello della camera}{}% 3
+\BOOKMARK [1][-]{subsection.2.0.2}{Modello pinhole}{chapter.2}% 4
+\BOOKMARK [0][-]{chapter.3}{Tracking and Matching tramite SIFT}{}% 5
+\BOOKMARK [0][-]{chapter.4}{Algoritmo}{}% 6
+\BOOKMARK [1][-]{subsection.4.0.3}{Fase di plan}{chapter.4}% 7
+\BOOKMARK [2][-]{subsection.4.0.4}{Fase di tracking}{subsection.4.0.3}% 8
+\BOOKMARK [2][-]{subsection.4.0.5}{Fase di interazione}{subsection.4.0.3}% 9
+\BOOKMARK [3][-]{subsubsection.4.0.5.1}{Ptam}{subsection.4.0.5}% 10
+\BOOKMARK [3][-]{subsubsection.4.0.5.2}{Stima del fattore di scala}{subsection.4.0.5}% 11
+\BOOKMARK [2][-]{subsection.4.0.6}{Posizione 3D del pulsante}{subsection.4.0.3}% 12
+\BOOKMARK [0][-]{chapter.5}{Esperimenti}{}% 13
+\BOOKMARK [1][-]{subsection.5.0.7}{Confronto}{chapter.5}% 14
+\BOOKMARK [0][-]{chapter.6}{Conclusioni}{}% 15
+\BOOKMARK [0][-]{appendix.Alph1}{Pseudo Codice}{}% 16
+\BOOKMARK [1][-]{subsection.Alph1.0.8}{Fase di plan}{appendix.Alph1}% 17
+\BOOKMARK [2][-]{subsection.Alph1.0.9}{Fase di Tracking}{subsection.Alph1.0.8}% 18
+\BOOKMARK [2][-]{subsection.Alph1.0.10}{Fase di Interazione}{subsection.Alph1.0.8}% 19
+\BOOKMARK [2][-]{subsection.Alph1.0.11}{Stima del fattore di scala}{subsection.Alph1.0.8}% 20

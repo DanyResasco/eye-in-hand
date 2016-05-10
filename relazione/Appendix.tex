@@ -1,0 +1,88 @@
+%!TEX root = pag0.tex
+
+\chapter{Pseudo Codice}
+\subsection{Fase di plan}
+
+\begin{algorithm}
+  \caption{Plan}\label{alg:Plan}
+  \begin{algorithmic}[1]
+    \State $Scena \gets TrovaContorni(p^{2D})$
+    \State $PerogniContorno \gets CalcolaCentroDiMassa$
+    % \State $vect_Objects \gets GetCluster(AllObjcets)$
+      \If{$(PosizioneCentroDiMassa - Posizione Bottone Premuto < Soglia $} \Comment{Trovato pulsante desiderato}
+      	\State $Scena \gets RitagliareImmagine(Posizione Bottone Premuto)$
+            \State $ScenaTagliata \gets Sift$
+      \Else 
+      \Comment {Premere nuovamente il pulsante e far ripartire la procedura}
+    \EndIf
+    % \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+
+\subsection{Fase di Tracking}
+
+\begin{algorithm}
+  \caption{Tracking}\label{alg:Tracking}
+  \begin{algorithmic}[1]
+    \State $Frame \gets Sift$
+    \State $Match(FrameEBottonePremuto ) \gets Flann$
+    \State $PerOgniKeypoint \gets CalcoloCentroide$
+      \If{$(  PosizioneCentroide - Posizione Bottone Premuto  < Soglia $} \Comment{Feature valida}
+      	\State $FeaturesValide \gets CalcoloCentroide $
+      	\State $BottoneNellaSecondaImmagine  = Centroide $
+      \Else 
+      \Comment {Feature non valida}
+    \EndIf
+    % \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+
+\subsection{Fase di Interazione}
+
+\begin{algorithm}
+  \caption{Interazione}\label{alg:Interazione}
+  \begin{algorithmic}[1]
+    \State $Punti3DFrameMondo \gets Ptam$
+    \State $Punti3DFrameCamera \gets Trasformo(Punti3DFrameMondo)$
+    \State $Scala \gets MessaggioDalNodoDiStima(Scala)$
+     \State $Punti2D \gets Riproietto(Punti3D*Scala)$
+     \If{$(  Posizione Punti2D - Posizione Bottone Premuto  < Soglia $} \Comment{Punti validi}
+     \If{$(  PuntiValidi > 3 $} \Comment{Servono 3 punti per fittare il piano}
+     \State $ParametriDelPiano \gets FitPiano(PuntiValidi)$
+     \State $PosizioneBottone3D \gets ParametriDelPiano$
+        \Else 
+      \Comment {Impossibile trovare un piano}
+      \EndIf
+      % \If{$(  Posizione CalcoloCentroide - Posizione Bottone Premuto  < Soglia $} \Comment{Feature valida}
+      	% \State $FeaturesValide \gets CalcoloCentroide $
+      \Else 
+      \Comment {Punti non validi}
+    \EndIf
+    % \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+
+\subsection{Stima del fattore di scala}
+
+\begin{algorithm}
+  \caption{Scala}\label{alg:scala}
+  \begin{algorithmic}[1]
+    \State $PosizioneRobotPtamAttuale \gets Ptam$
+    \State $MovimentoRobotReale \gets Robot$
+    \State $PosizioneRobotPtamPrecedente $\Comment{Salvata ad ogni spostamento}
+    \State $MovimentoRobotPtam \gets PosizioneRobotPtamPrecedente*PosizioneRobotPtamAttuale$
+     \If{$Vect(MovimentoRobotPtam).size() > 1000 $} \Comment{Se si è preso abbastanza campioni}
+     % \If{$(  Punti validi > 3 $} \Comment{Servono 3 punti per fittare il piano}
+    \State $Scala \gets MassimaVerossimiglianza(MovimentoRobotPtam, MovimentoRobotReale)$
+        \State $InvioMessaggio \gets scala$
+     \Else 
+      \Comment {wait}
+
+    % 
+    \EndIf
+    % \EndProcedure
+  \end{algorithmic}
+\end{algorithm}

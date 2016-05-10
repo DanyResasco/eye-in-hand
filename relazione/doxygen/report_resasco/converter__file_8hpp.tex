@@ -1,0 +1,72 @@
+\hypertarget{converter__file_8hpp}{\section{/home/daniela/code/src/eye\-\_\-in\-\_\-hand/include/converter\-\_\-file.hpp File Reference}
+\label{converter__file_8hpp}\index{/home/daniela/code/src/eye\-\_\-in\-\_\-hand/include/converter\-\_\-file.\-hpp@{/home/daniela/code/src/eye\-\_\-in\-\_\-hand/include/converter\-\_\-file.\-hpp}}
+}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{converter__file_8hpp_a292dffc58caf869b68d5342f621356c5}{From\-Mat\-To\-Eigen} (cv\-::\-Mat Mat\-\_\-, Eigen\-::\-Matrix\-Xd \&Eigen1)
+\begin{DoxyCompactList}\small\item\em \-: Convert cv mat into eigen matrix \end{DoxyCompactList}\item 
+void \hyperlink{converter__file_8hpp_a833ec25c78f4a10d09f0251010376cb9}{From\-Cv\-Point\-To\-Eigen} (cv\-::\-Point3d point\-\_\-, Eigen\-::\-Vector\-Xd \&vect)
+\begin{DoxyCompactList}\small\item\em \-: Convert cv point into eigen vector \end{DoxyCompactList}\item 
+void \hyperlink{converter__file_8hpp_a5e32eb9388e056d01dc895b86de3388e}{From\-Eigen\-Vector\-To\-Cv\-P\-Oint} (Eigen\-::\-Vector\-Xd Eigen, cv\-::\-Point3d \&mat)
+\begin{DoxyCompactList}\small\item\em \-: Convert eigen vector to cv point \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{converter__file_8hpp_a833ec25c78f4a10d09f0251010376cb9}{\index{converter\-\_\-file.\-hpp@{converter\-\_\-file.\-hpp}!From\-Cv\-Point\-To\-Eigen@{From\-Cv\-Point\-To\-Eigen}}
+\index{From\-Cv\-Point\-To\-Eigen@{From\-Cv\-Point\-To\-Eigen}!converter_file.hpp@{converter\-\_\-file.\-hpp}}
+\subsubsection[{From\-Cv\-Point\-To\-Eigen}]{\setlength{\rightskip}{0pt plus 5cm}void From\-Cv\-Point\-To\-Eigen (
+\begin{DoxyParamCaption}
+\item[{cv\-::\-Point3d}]{point\-\_\-, }
+\item[{Eigen\-::\-Vector\-Xd \&}]{vect}
+\end{DoxyParamCaption}
+)}}\label{converter__file_8hpp_a833ec25c78f4a10d09f0251010376cb9}
+
+
+\-: Convert cv point into eigen vector 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em } & cv\-::\-Point3d \\
+\hline
+\mbox{\tt out}  & {\em } & Eigen\-::\-Vectorxd homogeneus \\
+\hline
+\end{DoxyParams}
+\hypertarget{converter__file_8hpp_a5e32eb9388e056d01dc895b86de3388e}{\index{converter\-\_\-file.\-hpp@{converter\-\_\-file.\-hpp}!From\-Eigen\-Vector\-To\-Cv\-P\-Oint@{From\-Eigen\-Vector\-To\-Cv\-P\-Oint}}
+\index{From\-Eigen\-Vector\-To\-Cv\-P\-Oint@{From\-Eigen\-Vector\-To\-Cv\-P\-Oint}!converter_file.hpp@{converter\-\_\-file.\-hpp}}
+\subsubsection[{From\-Eigen\-Vector\-To\-Cv\-P\-Oint}]{\setlength{\rightskip}{0pt plus 5cm}void From\-Eigen\-Vector\-To\-Cv\-P\-Oint (
+\begin{DoxyParamCaption}
+\item[{Eigen\-::\-Vector\-Xd}]{Eigen, }
+\item[{cv\-::\-Point3d \&}]{mat}
+\end{DoxyParamCaption}
+)}}\label{converter__file_8hpp_a5e32eb9388e056d01dc895b86de3388e}
+
+
+\-: Convert eigen vector to cv point 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em } & Eigen\-::\-Vector\-Xd \\
+\hline
+\mbox{\tt out}  & {\em } & cv\-::\-Point3d \\
+\hline
+\end{DoxyParams}
+\hypertarget{converter__file_8hpp_a292dffc58caf869b68d5342f621356c5}{\index{converter\-\_\-file.\-hpp@{converter\-\_\-file.\-hpp}!From\-Mat\-To\-Eigen@{From\-Mat\-To\-Eigen}}
+\index{From\-Mat\-To\-Eigen@{From\-Mat\-To\-Eigen}!converter_file.hpp@{converter\-\_\-file.\-hpp}}
+\subsubsection[{From\-Mat\-To\-Eigen}]{\setlength{\rightskip}{0pt plus 5cm}void From\-Mat\-To\-Eigen (
+\begin{DoxyParamCaption}
+\item[{cv\-::\-Mat}]{Mat\-\_\-, }
+\item[{Eigen\-::\-Matrix\-Xd \&}]{Eigen}
+\end{DoxyParamCaption}
+)}}\label{converter__file_8hpp_a292dffc58caf869b68d5342f621356c5}
+
+
+\-: Convert cv mat into eigen matrix 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em } & cv\-::\-Mat \\
+\hline
+\mbox{\tt out}  & {\em } & Eigen\-::\-Matrix\-Xd homogeneus \\
+\hline
+\end{DoxyParams}

@@ -1,0 +1,33 @@
+\hypertarget{plane__estimate_8hpp}{\section{/home/daniela/code/src/eye\-\_\-in\-\_\-hand/include/plane\-\_\-estimate.hpp File Reference}
+\label{plane__estimate_8hpp}\index{/home/daniela/code/src/eye\-\_\-in\-\_\-hand/include/plane\-\_\-estimate.\-hpp@{/home/daniela/code/src/eye\-\_\-in\-\_\-hand/include/plane\-\_\-estimate.\-hpp}}
+}
+{\ttfamily \#include $<$pcl/search/kdtree.\-h$>$}\\*
+{\ttfamily \#include $<$pcl/point\-\_\-cloud.\-h$>$}\\*
+{\ttfamily \#include $<$pcl/io/pcd\-\_\-io.\-h$>$}\\*
+{\ttfamily \#include $<$pcl/point\-\_\-types.\-h$>$}\\*
+{\ttfamily \#include $<$pcl/features/normal\-\_\-3d.\-h$>$}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+Eigen\-::\-Vector4f \hyperlink{plane__estimate_8hpp_aa5a1c274f56d815d54e5af4c187e560f}{Estimate\-Plane} (std\-::vector$<$ cv\-::\-Point3d $>$ Point\-\_\-\-Near)
+\begin{DoxyCompactList}\small\item\em \-: Plane estimation \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{plane__estimate_8hpp_aa5a1c274f56d815d54e5af4c187e560f}{\index{plane\-\_\-estimate.\-hpp@{plane\-\_\-estimate.\-hpp}!Estimate\-Plane@{Estimate\-Plane}}
+\index{Estimate\-Plane@{Estimate\-Plane}!plane_estimate.hpp@{plane\-\_\-estimate.\-hpp}}
+\subsubsection[{Estimate\-Plane}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\-::\-Vector4f Estimate\-Plane (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ cv\-::\-Point3d $>$}]{Point\-\_\-\-Near}
+\end{DoxyParamCaption}
+)}}\label{plane__estimate_8hpp_aa5a1c274f56d815d54e5af4c187e560f}
+
+
+\-: Plane estimation 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em } & 3d position of each point near the botton\\
+\hline
+\end{DoxyParams}
+Estimate the plane with lms method 

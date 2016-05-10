@@ -1,0 +1,166 @@
+\documentclass[laurea,oneside,11pt]{report}
+\usepackage{graphicx}
+\usepackage{subfigure}
+% \usepackage[latin1]{inputenc}
+\usepackage[italian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts}
+\usepackage{amsmath} % assumes amsmath package installed
+\usepackage{amssymb}  % assumes amsmath package installed
+\usepackage[pagestyles]{titlesec}
+\usepackage{algorithm,algpseudocode}
+% \usepackage{hyperref}
+\usepackage{float}
+\usepackage{rotating}
+\usepackage{url}
+% \usepackage{cite}
+\usepackage{color}
+\usepackage{epstopdf}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{latexsym}
+\usepackage{psfrag}
+\usepackage{fancyhdr}
+
+\usepackage[nokeyprefix]{refstyle}
+\usepackage{varioref}
+\usepackage{xr-hyper}
+\usepackage[hidelinks]{hyperref}
+
+\usepackage{textcomp}
+\usepackage{multirow}
+\usepackage{booktabs}
+
+
+
+
+
+
+\setcounter{secnumdepth}{5}
+\setcounter{tocdepth}{5} 
+\DeclareMathOperator*{\argminB}{argmin}
+
+\usepackage[margin=4cm]{geometry}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for the horizontal lines, change thickness here
+
+\begin{document}
+
+\begin{titlepage}
+
+
+%----------------------------------------------------------------------------------------
+%	LOGO SECTION
+%----------------------------------------------------------------------------------------
+\center % Center everything on the page
+ \includegraphics*[width=0.5\columnwidth]{Logo}~\\[.5cm]
+%----------------------------------------------------------------------------------------
+%	HEADING SECTIONS
+%----------------------------------------------------------------------------------------
+
+\textsc{\LARGE Universita' di Pisa}\\[1.0cm] % Name of your university/college
+\textsc{\Large Ingegneria Robotica}\\[0.5cm] % Major heading such as course name
+\textsc{\large Sistemi di guida e navigazione}\\[0.5cm] % Minor heading such as course title
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\HRule \\[0.3cm]
+{ \huge \bfseries Algoritmo di tracking per la stima della posa di una camera monoculare}\\[0.4cm] % Title of your document
+\HRule \\[1.cm]
+ 
+%----------------------------------------------------------------------------------------
+%	AUTHOR SECTION
+%----------------------------------------------------------------------------------------
+
+\begin{minipage}{0.4\textwidth}
+\begin{flushleft} \large
+\emph{Studente:}\\
+Daniela \textsc{Resasco} % Your name
+\end{flushleft}
+\end{minipage}
+~
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+\emph{Professore:} \\
+Lorenzo \textsc{Pollini}  % Supervisor's Name
+\end{flushright}
+\end{minipage}\\[4cm]
+
+%----------------------------------------------------------------------------------------
+%	DATE SECTION
+%----------------------------------------------------------------------------------------
+{\large \today}\\[3cm] % Date, change the \today to a set date if you want to be precise
+
+ 
+%----------------------------------------------------------------------------------------
+
+\vfill % Fill the rest of the page with whitespace
+\end{titlepage}
+% \begin{flushleft}
+
+
+
+\pagenumbering{roman}
+\newpage 
+\section*{Abstrac} % (fold)
+\label{sec:abstract}
+In questo report verrà presentato l'algoritmo di visione implementato per la stima della posa di una camera monoculare. Queste informazioni verranno utilizzate in seguito per il controllo di un braccio robotico posto su di una carozzina al fine di premere un pulsante scelto dall'utente. 
+Il pulsante viene premuto dall'utente tramite interfaccia tablet. Una volta identificato il pulsante premuto, la camera fornisce al robot le informazioni di posizione ad orientazione dello stesso, in modo da posizionarsi sul percorso corretto. La camera utilizzata è monoculare pertanto non si hanno informazioni sulla distanza. Per ovviare a questa mancanza si è deciso di utilizzare un algoritmo esterno capace di utilizzare le informazioni delle features trovate per stimare la posizione relativa. Questo algoritmo è affetto da un errore di scala e per ridurne gli effetti, si utilizza un criterio di convergenza della stima del fattore di scala utilizzando il metodo della massima verosimiglianza.  
+
+\newpage 
+% % % % % Indice % % % % %
+% \frontmatter
+% \pagenumbering{roman}
+\tableofcontents
+\newpage 
+\listoffigures
+% \newpage
+
+% \newpage 
+% \section*{Abstrac} % (fold)
+% \label{sec:abstract}
+% In questo report verrà presentato l'algoritmo di visione per la stima della posa di una camera monoculare. Queste informazioni verranno utilizzate in seguito per il controllo di un braccio robotico posto su di una carozzina al fine di premere un pulsante scelto dall'utente. 
+% Il pulsante viene premuto dall'utente tramite interfaccia tablet. Una volta identificato il pulsante premuto, la camera fornisce al robot le informazioni di posizione ad orientazione dello stesso, in modo da posizionarsi sul percorso corretto. La camera utilizzata è monoculare pertanto non si hanno informazioni sulla distanza. Per ovviare a questa mancanza si è deciso di utilizzare un algoritmo esterno capace di utilizzare le informazioni delle features trovate per stimare la posizione relativa. Questo algoritmo è affetto da un errore di scala e per ridurne gli effetti, si utilizza un criterio di convergenza della stima del fattore di scala utilizzando il metodo della massima verosimiglianza.  
+
+
+
+\newpage 
+\clearpage
+\pagenumbering{arabic}
+% \mainmatter
+\include{chapter1} 
+% Include the first content chapter
+\include{chapter2} % Include the second content chapter
+\include{chapter3} % Include the third content chapter
+\include{chapter4}
+\include{chapter5}
+\include{chapter6}
+
+
+% \backmatter
+
+% \chapterstyle{default} % Reset the chapter style back to the default used for non-content chapters
+
+\appendix
+\include{Appendix}
+% \chapter{Pseudo Codice}
+\label{Appendix}
+% \input{Appendix}
+
+
+
+% \backmatter
+% \addlibresource{bibliography}
+\bibliographystyle{IEEEtran}
+\bibliography{bibliography}
+% \begin{thebibliography}{}
+% \bibliography{biblio}
+% \bibliographystyle{unsrt}
+% \bibliography{bibliography}
+% \end{thebibliography}
+
+% \end{flushleft}
+
+\end{document}
+

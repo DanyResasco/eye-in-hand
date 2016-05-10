@@ -1,0 +1,59 @@
+\hypertarget{Camera__code_8cpp}{\section{/home/daniela/code/src/eye\-\_\-in\-\_\-hand/src/\-Camera\-\_\-code.cpp File Reference}
+\label{Camera__code_8cpp}\index{/home/daniela/code/src/eye\-\_\-in\-\_\-hand/src/\-Camera\-\_\-code.\-cpp@{/home/daniela/code/src/eye\-\_\-in\-\_\-hand/src/\-Camera\-\_\-code.\-cpp}}
+}
+{\ttfamily \#include $<$Camera\-\_\-code.\-h$>$}\\*
+{\ttfamily \#include $<$geometry\-\_\-function.\-hpp$>$}\\*
+{\ttfamily \#include $<$converter\-\_\-file.\-hpp$>$}\\*
+{\ttfamily \#include $<$plane\-\_\-estimate.\-hpp$>$}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+cv\-::\-R\-N\-G \hyperlink{Camera__code_8cpp_abaa8fac8afd813eea8814d3e6448caa6}{rng} (12345)
+\item 
+int \hyperlink{Camera__code_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{main} (int argc, char $\ast$$\ast$argv)
+\item 
+double \hyperlink{Camera__code_8cpp_ac0274dde20a022e605ccb2a1311258f1}{Scala\-Return} (double ptam, double ptam\-\_\-prev, double robot)
+\begin{DoxyCompactList}\small\item\em \-: Calculates the scale factor \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{Camera__code_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{\index{Camera\-\_\-code.\-cpp@{Camera\-\_\-code.\-cpp}!main@{main}}
+\index{main@{main}!Camera_code.cpp@{Camera\-\_\-code.\-cpp}}
+\subsubsection[{main}]{\setlength{\rightskip}{0pt plus 5cm}int main (
+\begin{DoxyParamCaption}
+\item[{int}]{argc, }
+\item[{char $\ast$$\ast$}]{argv}
+\end{DoxyParamCaption}
+)}}\label{Camera__code_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}
+\hypertarget{Camera__code_8cpp_abaa8fac8afd813eea8814d3e6448caa6}{\index{Camera\-\_\-code.\-cpp@{Camera\-\_\-code.\-cpp}!rng@{rng}}
+\index{rng@{rng}!Camera_code.cpp@{Camera\-\_\-code.\-cpp}}
+\subsubsection[{rng}]{\setlength{\rightskip}{0pt plus 5cm}cv\-::\-R\-N\-G rng (
+\begin{DoxyParamCaption}
+\item[{12345}]{}
+\end{DoxyParamCaption}
+)}}\label{Camera__code_8cpp_abaa8fac8afd813eea8814d3e6448caa6}
+\hypertarget{Camera__code_8cpp_ac0274dde20a022e605ccb2a1311258f1}{\index{Camera\-\_\-code.\-cpp@{Camera\-\_\-code.\-cpp}!Scala\-Return@{Scala\-Return}}
+\index{Scala\-Return@{Scala\-Return}!Camera_code.cpp@{Camera\-\_\-code.\-cpp}}
+\subsubsection[{Scala\-Return}]{\setlength{\rightskip}{0pt plus 5cm}double Scala\-Return (
+\begin{DoxyParamCaption}
+\item[{double}]{ptam, }
+\item[{double}]{ptam\-\_\-prev, }
+\item[{double}]{robot}
+\end{DoxyParamCaption}
+)}}\label{Camera__code_8cpp_ac0274dde20a022e605ccb2a1311258f1}
+
+
+\-: Calculates the scale factor 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em } & actual position \\
+\hline
+\mbox{\tt in}  & {\em } & previusly position \\
+\hline
+\mbox{\tt in}  & {\em } & robot movements \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+scale factor 
+\end{DoxyReturn}

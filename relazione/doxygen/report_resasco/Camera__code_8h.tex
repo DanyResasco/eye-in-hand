@@ -1,0 +1,224 @@
+\hypertarget{Camera__code_8h}{\section{/home/daniela/code/src/eye\-\_\-in\-\_\-hand/include/\-Camera\-\_\-code.h File Reference}
+\label{Camera__code_8h}\index{/home/daniela/code/src/eye\-\_\-in\-\_\-hand/include/\-Camera\-\_\-code.\-h@{/home/daniela/code/src/eye\-\_\-in\-\_\-hand/include/\-Camera\-\_\-code.\-h}}
+}
+{\ttfamily \#include $<$utility$>$}\\*
+{\ttfamily \#include $<$list$>$}\\*
+{\ttfamily \#include $<$string$>$}\\*
+{\ttfamily \#include $<$eigen3/\-Eigen/\-Dense$>$}\\*
+{\ttfamily \#include $<$kdl/frames.\-hpp$>$}\\*
+{\ttfamily \#include $<$kdl\-\_\-parser/kdl\-\_\-parser.\-hpp$>$}\\*
+{\ttfamily \#include $<$kdl/kdl.\-hpp$>$}\\*
+{\ttfamily \#include $<$kdl/frames\-\_\-io.\-hpp$>$}\\*
+{\ttfamily \#include $<$ptam\-\_\-com/\-Key\-Frame\-\_\-msg.\-h$>$}\\*
+{\ttfamily \#include $<$ros/ros.\-h$>$}\\*
+{\ttfamily \#include $<$image\-\_\-transport/image\-\_\-transport.\-h$>$}\\*
+{\ttfamily \#include $<$cv\-\_\-bridge/cv\-\_\-bridge.\-h$>$}\\*
+{\ttfamily \#include $<$sensor\-\_\-msgs/image\-\_\-encodings.\-h$>$}\\*
+{\ttfamily \#include $<$opencv2/imgproc/imgproc.\-hpp$>$}\\*
+{\ttfamily \#include $<$geometry\-\_\-msgs/\-Pose.\-h$>$}\\*
+{\ttfamily \#include $<$opencv2/highgui/highgui.\-hpp$>$}\\*
+{\ttfamily \#include $<$std\-\_\-msgs/\-Bool.\-h$>$}\\*
+{\ttfamily \#include $<$sensor\-\_\-msgs/\-Point\-Cloud2.\-h$>$}\\*
+{\ttfamily \#include $<$stdio.\-h$>$}\\*
+{\ttfamily \#include $<$iostream$>$}\\*
+{\ttfamily \#include $<$fstream$>$}\\*
+{\ttfamily \#include \char`\"{}opencv2/core/core.\-hpp\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}opencv2/features2d/features2d.\-hpp\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}opencv2/nonfree/features2d.\-hpp\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}opencv2/nonfree/nonfree.\-hpp\char`\"{}}\\*
+{\ttfamily \#include $<$tf/transform\-\_\-broadcaster.\-h$>$}\\*
+{\ttfamily \#include $<$geometry\-\_\-msgs/\-Pose\-With\-Covariance\-Stamped.\-h$>$}\\*
+{\ttfamily \#include \char`\"{}opencv2/calib3d/calib3d.\-hpp\char`\"{}}\\*
+{\ttfamily \#include $<$tf\-\_\-conversions/tf\-\_\-kdl.\-h$>$}\\*
+{\ttfamily \#include $<$pcl/io/pcd\-\_\-io.\-h$>$}\\*
+{\ttfamily \#include $<$pcl\-\_\-conversions/pcl\-\_\-conversions.\-h$>$}\\*
+{\ttfamily \#include $<$std\-\_\-msgs/\-Float32\-Multi\-Array.\-h$>$}\\*
+{\ttfamily \#include $<$visualization\-\_\-msgs/\-Marker\-Array.\-h$>$}\\*
+\subsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classCamera}{Camera}
+\item 
+struct \hyperlink{structCamera_1_1Obj}{Camera\-::\-Obj}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+Eigen\-::\-Vector4f \hyperlink{Camera__code_8h_aa5a1c274f56d815d54e5af4c187e560f}{Estimate\-Plane} (std\-::vector$<$ cv\-::\-Point3d $>$ Point\-\_\-\-Near)
+\begin{DoxyCompactList}\small\item\em \-: Plane estimation \end{DoxyCompactList}\item 
+void \hyperlink{Camera__code_8h_affd112f0eee1ffc20580ee858406fa6d}{set\-Label} (cv\-::\-Mat \&im, const std\-::string label, std\-::vector$<$ cv\-::\-Point $>$ \&contour)
+\item 
+cv\-::\-Point \hyperlink{Camera__code_8h_a68ba34ab3322b65a28949d8ec37fad05}{Find\-A\-Center} (std\-::vector$<$ cv\-::\-Point $>$ \&geometry)
+\begin{DoxyCompactList}\small\item\em \-: Find a centroid of shape \end{DoxyCompactList}\item 
+std\-::pair$<$ int, int $>$ \hyperlink{Camera__code_8h_a40c710235fc641ebf71031edd4085c2b}{Find\-Max\-Value} (cv\-::\-Mat \&matrix, cv\-::\-Point \&point)
+\begin{DoxyCompactList}\small\item\em \-: function that calculates the max value of width and height for the roi \end{DoxyCompactList}\item 
+double \hyperlink{Camera__code_8h_aecd9a34d67b0b4bd9d937be254d150f1}{Media} (cv\-::\-Mat triangulated\-Points3\-D, double Max\-Lenght, int col)
+\item 
+void \hyperlink{Camera__code_8h_a833ec25c78f4a10d09f0251010376cb9}{From\-Cv\-Point\-To\-Eigen} (cv\-::\-Point3d point\-\_\-, Eigen\-::\-Vector\-Xd \&vect)
+\begin{DoxyCompactList}\small\item\em \-: Convert cv point into eigen vector \end{DoxyCompactList}\item 
+void \hyperlink{Camera__code_8h_a35dca23f7e51c0daba17bd3c1c00915b}{From\-Mat\-To\-Eigen} (cv\-::\-Mat Mat\-\_\-, Eigen\-::\-Matrix\-Xd \&Eigen)
+\begin{DoxyCompactList}\small\item\em \-: Convert cv mat into eigen matrix \end{DoxyCompactList}\item 
+void \hyperlink{Camera__code_8h_a5e32eb9388e056d01dc895b86de3388e}{From\-Eigen\-Vector\-To\-Cv\-P\-Oint} (Eigen\-::\-Vector\-Xd Eigen, cv\-::\-Point3d \&mat)
+\begin{DoxyCompactList}\small\item\em \-: Convert eigen vector to cv point \end{DoxyCompactList}\item 
+double \hyperlink{Camera__code_8h_ac0274dde20a022e605ccb2a1311258f1}{Scala\-Return} (double ptam, double ptam\-\_\-prev, double robot)
+\begin{DoxyCompactList}\small\item\em \-: Calculates the scale factor \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\hypertarget{Camera__code_8h_aa5a1c274f56d815d54e5af4c187e560f}{\index{Camera\-\_\-code.\-h@{Camera\-\_\-code.\-h}!Estimate\-Plane@{Estimate\-Plane}}
+\index{Estimate\-Plane@{Estimate\-Plane}!Camera_code.h@{Camera\-\_\-code.\-h}}
+\subsubsection[{Estimate\-Plane}]{\setlength{\rightskip}{0pt plus 5cm}Eigen\-::\-Vector4f Estimate\-Plane (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ cv\-::\-Point3d $>$}]{Point\-\_\-\-Near}
+\end{DoxyParamCaption}
+)}}\label{Camera__code_8h_aa5a1c274f56d815d54e5af4c187e560f}
+
+
+\-: Plane estimation 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em } & 3d position of each point near the botton\\
+\hline
+\end{DoxyParams}
+Estimate the plane with lms method \hypertarget{Camera__code_8h_a68ba34ab3322b65a28949d8ec37fad05}{\index{Camera\-\_\-code.\-h@{Camera\-\_\-code.\-h}!Find\-A\-Center@{Find\-A\-Center}}
+\index{Find\-A\-Center@{Find\-A\-Center}!Camera_code.h@{Camera\-\_\-code.\-h}}
+\subsubsection[{Find\-A\-Center}]{\setlength{\rightskip}{0pt plus 5cm}cv\-::\-Point Find\-A\-Center (
+\begin{DoxyParamCaption}
+\item[{std\-::vector$<$ cv\-::\-Point $>$ \&}]{geometry}
+\end{DoxyParamCaption}
+)}}\label{Camera__code_8h_a68ba34ab3322b65a28949d8ec37fad05}
+
+
+\-: Find a centroid of shape 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em } & shape contours \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\-: center position 
+\end{DoxyReturn}
+\hypertarget{Camera__code_8h_a40c710235fc641ebf71031edd4085c2b}{\index{Camera\-\_\-code.\-h@{Camera\-\_\-code.\-h}!Find\-Max\-Value@{Find\-Max\-Value}}
+\index{Find\-Max\-Value@{Find\-Max\-Value}!Camera_code.h@{Camera\-\_\-code.\-h}}
+\subsubsection[{Find\-Max\-Value}]{\setlength{\rightskip}{0pt plus 5cm}std\-::pair$<$int,int$>$ Find\-Max\-Value (
+\begin{DoxyParamCaption}
+\item[{cv\-::\-Mat \&}]{matrix, }
+\item[{cv\-::\-Point \&}]{point}
+\end{DoxyParamCaption}
+)}}\label{Camera__code_8h_a40c710235fc641ebf71031edd4085c2b}
+
+
+\-: function that calculates the max value of width and height for the roi 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em } & mat of scene \\
+\hline
+\mbox{\tt in}  & {\em } & point of interest \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\-: range to cut the image to make a roi 
+\end{DoxyReturn}
+\hypertarget{Camera__code_8h_a833ec25c78f4a10d09f0251010376cb9}{\index{Camera\-\_\-code.\-h@{Camera\-\_\-code.\-h}!From\-Cv\-Point\-To\-Eigen@{From\-Cv\-Point\-To\-Eigen}}
+\index{From\-Cv\-Point\-To\-Eigen@{From\-Cv\-Point\-To\-Eigen}!Camera_code.h@{Camera\-\_\-code.\-h}}
+\subsubsection[{From\-Cv\-Point\-To\-Eigen}]{\setlength{\rightskip}{0pt plus 5cm}void From\-Cv\-Point\-To\-Eigen (
+\begin{DoxyParamCaption}
+\item[{cv\-::\-Point3d}]{point\-\_\-, }
+\item[{Eigen\-::\-Vector\-Xd \&}]{vect}
+\end{DoxyParamCaption}
+)}}\label{Camera__code_8h_a833ec25c78f4a10d09f0251010376cb9}
+
+
+\-: Convert cv point into eigen vector 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em } & cv\-::\-Point3d \\
+\hline
+\mbox{\tt out}  & {\em } & Eigen\-::\-Vectorxd homogeneus \\
+\hline
+\end{DoxyParams}
+\hypertarget{Camera__code_8h_a5e32eb9388e056d01dc895b86de3388e}{\index{Camera\-\_\-code.\-h@{Camera\-\_\-code.\-h}!From\-Eigen\-Vector\-To\-Cv\-P\-Oint@{From\-Eigen\-Vector\-To\-Cv\-P\-Oint}}
+\index{From\-Eigen\-Vector\-To\-Cv\-P\-Oint@{From\-Eigen\-Vector\-To\-Cv\-P\-Oint}!Camera_code.h@{Camera\-\_\-code.\-h}}
+\subsubsection[{From\-Eigen\-Vector\-To\-Cv\-P\-Oint}]{\setlength{\rightskip}{0pt plus 5cm}void From\-Eigen\-Vector\-To\-Cv\-P\-Oint (
+\begin{DoxyParamCaption}
+\item[{Eigen\-::\-Vector\-Xd}]{Eigen, }
+\item[{cv\-::\-Point3d \&}]{mat}
+\end{DoxyParamCaption}
+)}}\label{Camera__code_8h_a5e32eb9388e056d01dc895b86de3388e}
+
+
+\-: Convert eigen vector to cv point 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em } & Eigen\-::\-Vector\-Xd \\
+\hline
+\mbox{\tt out}  & {\em } & cv\-::\-Point3d \\
+\hline
+\end{DoxyParams}
+\hypertarget{Camera__code_8h_a35dca23f7e51c0daba17bd3c1c00915b}{\index{Camera\-\_\-code.\-h@{Camera\-\_\-code.\-h}!From\-Mat\-To\-Eigen@{From\-Mat\-To\-Eigen}}
+\index{From\-Mat\-To\-Eigen@{From\-Mat\-To\-Eigen}!Camera_code.h@{Camera\-\_\-code.\-h}}
+\subsubsection[{From\-Mat\-To\-Eigen}]{\setlength{\rightskip}{0pt plus 5cm}void From\-Mat\-To\-Eigen (
+\begin{DoxyParamCaption}
+\item[{cv\-::\-Mat}]{Mat\-\_\-, }
+\item[{Eigen\-::\-Matrix\-Xd \&}]{Eigen}
+\end{DoxyParamCaption}
+)}}\label{Camera__code_8h_a35dca23f7e51c0daba17bd3c1c00915b}
+
+
+\-: Convert cv mat into eigen matrix 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em } & cv\-::\-Mat \\
+\hline
+\mbox{\tt out}  & {\em } & Eigen\-::\-Matrix\-Xd homogeneus \\
+\hline
+\end{DoxyParams}
+\hypertarget{Camera__code_8h_aecd9a34d67b0b4bd9d937be254d150f1}{\index{Camera\-\_\-code.\-h@{Camera\-\_\-code.\-h}!Media@{Media}}
+\index{Media@{Media}!Camera_code.h@{Camera\-\_\-code.\-h}}
+\subsubsection[{Media}]{\setlength{\rightskip}{0pt plus 5cm}double Media (
+\begin{DoxyParamCaption}
+\item[{cv\-::\-Mat}]{triangulated\-Points3\-D, }
+\item[{double}]{Max\-Lenght, }
+\item[{int}]{col}
+\end{DoxyParamCaption}
+)}}\label{Camera__code_8h_aecd9a34d67b0b4bd9d937be254d150f1}
+\hypertarget{Camera__code_8h_ac0274dde20a022e605ccb2a1311258f1}{\index{Camera\-\_\-code.\-h@{Camera\-\_\-code.\-h}!Scala\-Return@{Scala\-Return}}
+\index{Scala\-Return@{Scala\-Return}!Camera_code.h@{Camera\-\_\-code.\-h}}
+\subsubsection[{Scala\-Return}]{\setlength{\rightskip}{0pt plus 5cm}double Scala\-Return (
+\begin{DoxyParamCaption}
+\item[{double}]{ptam, }
+\item[{double}]{ptam\-\_\-prev, }
+\item[{double}]{robot}
+\end{DoxyParamCaption}
+)}}\label{Camera__code_8h_ac0274dde20a022e605ccb2a1311258f1}
+
+
+\-: Calculates the scale factor 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em } & actual position \\
+\hline
+\mbox{\tt in}  & {\em } & previusly position \\
+\hline
+\mbox{\tt in}  & {\em } & robot movements \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+scale factor 
+\end{DoxyReturn}
+\hypertarget{Camera__code_8h_affd112f0eee1ffc20580ee858406fa6d}{\index{Camera\-\_\-code.\-h@{Camera\-\_\-code.\-h}!set\-Label@{set\-Label}}
+\index{set\-Label@{set\-Label}!Camera_code.h@{Camera\-\_\-code.\-h}}
+\subsubsection[{set\-Label}]{\setlength{\rightskip}{0pt plus 5cm}void set\-Label (
+\begin{DoxyParamCaption}
+\item[{cv\-::\-Mat \&}]{im, }
+\item[{const std\-::string}]{label, }
+\item[{std\-::vector$<$ cv\-::\-Point $>$ \&}]{contour}
+\end{DoxyParamCaption}
+)}}\label{Camera__code_8h_affd112f0eee1ffc20580ee858406fa6d}
